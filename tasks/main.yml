@@ -1,13 +1,12 @@
 ---
 - name: mariadb-server and mariadb-client packages present
   apt:
-    pkg: "{{ item }}"
+    pkg: 
+      - mariadb-server
+      - mariadb-client
+      - mysqltuner
     state: latest
     update_cache: yes
-  with_items:
-    - mariadb-server
-    - mariadb-client
-    - mysqltuner
   tags:
     - mariadb
 
