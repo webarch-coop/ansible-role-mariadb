@@ -92,7 +92,7 @@
 - name: MariaDB user present
   mysql_user:
     login_user: root
-    login_socket: /var/run/mysqld/mysqld.sock
+    login_unix_socket: /var/run/mysqld/mysqld.sock
     name: "{{ mariadb_username }}"
     password: "{{ mariadb_password }}"
     priv: "{{ mariadb_database }}.*:ALL"
