@@ -101,3 +101,11 @@
   tags:
     - mariadb
 
+- name: "Save {{ mariadb_username }} password to {{ mariadb_mycnf }}"
+  template:
+    src: templates/my.cnf.j2
+    dest: "{{ mariadb_mycnf }}"
+    force: no
+  tags:
+    - mariadb
+
