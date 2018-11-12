@@ -50,7 +50,8 @@ The other repo should also contain a `mariadb.yml` file that contains:
   #   name 
   #
   # * If the password is not set a random one will be generated and saved to
-  #   ~/.my.cnf if the username matches a username in /etc/passwd 
+  #   ~/.my.cnf if the username matches a username in /etc/passwd or 
+  #   /root/.username.my.cnf if it doesn't
   #
   #vars:
   #  - mariadb_username:
