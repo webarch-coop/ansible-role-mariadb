@@ -97,6 +97,7 @@
     password: "{{ mariadb_password }}"
     priv: "{{ mariadb_database }}.*:ALL"
     state: present
+    update_password: on_create
   tags:
     - mariadb
 
