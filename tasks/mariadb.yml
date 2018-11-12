@@ -21,12 +21,25 @@
     - mariadb
 
 - name: Check if a user account matching the MariaDB username exists
-  getent:
-    database: passwd
-    key: "{{ mariadb_username }}"
+  shell: "grep '^{{ mariadb_username }}:' /etc/passwd | awk -F : '{ print$6 }'" 
+  register: mariadb_username_home_check
   
+- name: Set the path and filename for the .my.cnf file
+  set_fact:
+    mariadb_mycnf: "{{ /root/.{{ mariadb_username }}/my.cnf" 
+  when: mariadb_username_home_check.stat.stdout == ""
+
+- name: Set the path and filename for the .my.cnf file
+  set_fact:
+    mariadb_mycnf: "{{ mariadb_username_home_check.stat.stdout }}/my.cnf" 
+  when: mariadb_username_home_check.stat.stdout != ""
+
 - debug:
-    var: getent_passwd 
+    msg: "mariadb_mycnf: {{ mariadb_mycnf }}"
+    verbosity: 1
+  when: mariadb_mycnf is defined and mariadb_mycnf != ""
+  tags:
+    - mariadb
 
 - block:
 
