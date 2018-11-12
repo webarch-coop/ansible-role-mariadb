@@ -1,7 +1,22 @@
 ---
 - debug:
-    msg: "mariadb_username: {{ mariadb_username }}, mariadb_database: {{ mariadb_database }}, mariadb_password: {{ mariadb_password }}"
+    msg: "mariadb_username: {{ mariadb_username }}"
     verbosity: 1
+  when: mariadb_username is defined and mariadb_username != ""
+  tags:
+    - mariadb
+
+- debug:
+    msg: "mariadb_database: {{ mariadb_database }}"
+    verbosity: 1
+  when: mariadb_database is defined and mariadb_database != ""
+  tags:
+    - mariadb
+
+- debug:
+    msg: "mariadb_password: {{ mariadb_password }}"
+    verbosity: 1
+  when: mariadb_password is defined and mariadb_password != ""
   tags:
     - mariadb
 
