@@ -14,4 +14,4 @@
 
 - name: Conditionally include the user and database creation tasks 
   include_tasks: mariadb.yml
-  when: mariadb_user is defined and mariadb_user != ""
+  when: mariadb_username is defined and mariadb_username != ""
