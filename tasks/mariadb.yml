@@ -98,6 +98,7 @@
     priv: "{{ mariadb_database }}.*:ALL"
     state: present
     update_password: on_create
+  register: mariadb_user_creation
   tags:
     - mariadb
 
@@ -106,6 +107,7 @@
     src: templates/my.cnf.j2
     dest: "{{ mariadb_mycnf }}"
     force: no
+  when: mariadb_user_creation.changed
   tags:
     - mariadb
 
