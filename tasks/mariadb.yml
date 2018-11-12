@@ -1,0 +1,56 @@
+---
+- debug:
+    msg: "mariadb_username: {{ mariadb_username }}, mariadb_database: {{ mariadb_database }}, mariadb_password: {{ mariadb_password }}"
+    verbosity: 1
+  tags:
+    - mariadb
+
+- name: Check if a user account matching the MariaDB username exists
+  getent:
+    database: passwd
+    key: "{{ mariadb_username }}"
+  
+- debug:
+    var: getent_passwd 
+
+- block:
+
+  - name: Generate a random password for mariadb_username if none is set
+    command: pwgen -n 16 1
+    register: mariadb_password_gen
+    tags:
+      - mariadb
+  
+  - name: Set a fact for the mariadb_password
+    set_fact:
+      mariadb_password: "{{ mariadb_password_gen.stdout | trim | quote }}"
+    tags:
+      - mariadb
+
+  when: mariadb_password is not defined and mariadb_password == ""
+
+- name: Set the mariadb_database name to match the mariadb_username
+  set_fact:
+    mariadb_database: "{{ mariadb_username }}"
+  when: mariadb_database is not defined and mariadb_database == ""
+  tags:
+    - mariadb
+
+- name: MariaDB database present
+  mysql_db:
+    name: "{{ mariadb_database }}"
+    state: present
+  tags:
+    - mariadb
+  
+- name: MariaDB user present
+  mysql_user:
+    login_user: root
+    login_socket: /var/run/mysqld/mysqld.sock
+    name: "{{ mariadb_username }}"
+    password: "{{ mariadb_password }}"
+    priv: "{{ mariadb_database }}.*:ALL"
+    state: present
+  tags:
+    - mariadb
+

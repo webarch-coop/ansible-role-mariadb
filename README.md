@@ -42,6 +42,21 @@ The other repo should also contain a `mariadb.yml` file that contains:
 - name: Install MariaDB
   become: yes
 
+  # All these variables are optional
+  #
+  # * If the username is not set no user account or database will be created
+  #
+  # * If the database name is not set the username will be used as the database
+  #   name 
+  #
+  # * If the password is not set a random one will be generated and saved to
+  #   ~/.my.cnf if the username matches a username in /etc/passwd 
+  #
+  #vars:
+  #  - mariadb_username:
+  #  - mariadb_database:
+  #  - mariadb_password: 
+
   hosts:
     - mariadb_servers
 
