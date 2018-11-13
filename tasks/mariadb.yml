@@ -42,7 +42,7 @@
     - mariadb
 
 - name: Check if a user account matching the MariaDB username exists
-  shell: "grep '^{{ mariadb_username }}:' /etc/passwd | awk -F : '{ print$6 }'" 
+  shell: "grep '^{{ mariadb_username }}:' /etc/passwd | awk -F : '{ print $6 }'" 
   register: mariadb_username_home_check
   tags:
     - mariadb
