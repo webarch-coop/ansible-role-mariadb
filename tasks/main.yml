@@ -12,6 +12,15 @@
   tags:
     - mariadb
 
+- name: MariaDB defaults updated
+  template:
+    src: templates/50-server.cnf.j2
+    dest: /etc/mysql/mariadb.conf.d/50-server.cnf
+  tags:
+    - mariadb
+
 - name: Conditionally include the user and database creation tasks 
   include_tasks: mariadb.yml
   when: mariadb_username is defined and mariadb_username != ""
+  tags:
+    - mariadb
