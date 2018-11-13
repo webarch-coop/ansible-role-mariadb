@@ -93,10 +93,18 @@
     tags:
       - mariadb
 
+  - debug:
+      msg: "mariadb_password: {{ mariadb_password }}"
+      verbosity: 1
+    when: mariadb_password is defined and mariadb_password != ""
+    tags:
+      - mariadb
+
   - name: "mariadb_password written to {{ mariadb_mycnf }}"
     template:
       src: templates/my.cnf.j2
       dest: "{{ mariadb_mycnf }}"
+    when: mariadb_password.changed
     tags:
       - mariadb
 
