@@ -113,14 +113,15 @@
 - block:
 
   - name: "mariadb_password loaded from {{ mariadb_mycnf }} since the file exists and the password was not set"
-    shell: "grep ^password {{ mariadb_mycnf }} | sed -e 's/[[:space:]]//' | sed -e 's/password=//' | tr -d '\"'"
-    register: mariadb_password_grep 
+    #shell: "grep ^password {{ mariadb_mycnf }} | sed -e 's/[[:space:]]//' | sed -e 's/password=//' | tr -d '\"'"
+    shell: "my_print_defaults --defaults-file='{{ mariadb_mycnf }}' | grep '^--password' | sed -e 's/password=//'"
+    register: mariadb_password_read
     tags:
       - mariadb
   
   - name: Set a fact for the mariadb_password
     set_fact:
-      mariadb_password: "{{ mariadb_password_grep.stdout | trim | quote }}"
+      mariadb_password: "{{ mariadb_password_read.stdout | trim | quote }}"
     tags:
       - mariadb
 
