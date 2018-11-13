@@ -120,7 +120,7 @@
   
   - name: Set a fact for the mariadb_password
     set_fact:
-      mariadb_password: "{{ mariadb_password_gen.stdout | trim | quote }}"
+      mariadb_password: "{{ mariadb_password_grep.stdout | trim | quote }}"
     tags:
       - mariadb
 
