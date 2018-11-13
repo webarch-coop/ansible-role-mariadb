@@ -27,6 +27,20 @@
   tags:
     - mariadb
 
+- name: Set the mariadb_database name to match the mariadb_username
+  set_fact:
+    mariadb_database: "{{ mariadb_username }}"
+  when: mariadb_database is not defined and mariadb_database == ""
+  tags:
+    - mariadb
+
+- debug:
+    msg: "mariadb_database: {{ mariadb_database }}"
+    verbosity: 1
+  when: mariadb_database is defined and mariadb_database != ""
+  tags:
+    - mariadb
+
 - name: Check if a user account matching the MariaDB username exists
   shell: "grep '^{{ mariadb_username }}:' /etc/passwd | awk -F : '{ print$6 }'" 
   register: mariadb_username_home_check
@@ -117,13 +131,6 @@
   template:
     src: templates/my.cnf.j2
     dest: "{{ mariadb_mycnf }}"
-  tags:
-    - mariadb
-
-- name: Set the mariadb_database name to match the mariadb_username
-  set_fact:
-    mariadb_database: "{{ mariadb_username }}"
-  when: mariadb_database is not defined and mariadb_database == ""
   tags:
     - mariadb
 
