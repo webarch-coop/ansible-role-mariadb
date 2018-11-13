@@ -109,7 +109,7 @@
     - mariadb
 
 - name: "mariadb_password loaded from {{ mariadb_mycnf }} since the file exists and the password was not set"
-  command: grep ^password {{ mariadb_mycnf }} | sed -e 's/[[:space:]]//' | sed -e 's/password=//' | tr -d '\"'
+  shell: "grep ^password {{ mariadb_mycnf }} | sed -e 's/[[:space:]]//' | sed -e 's/password=//' | tr -d '\"'"
   register: mariadb_password 
   when: mariadb_username_home_stat.stat.exists == True and ( mariadb_password is not defined or mariadb_password == "" )
   tags:
