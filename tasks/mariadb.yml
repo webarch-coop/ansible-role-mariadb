@@ -71,14 +71,6 @@
     path: "{{ mariadb_mycnf }}"
   register: mariadb_username_home_stat
 
-- name: "mariadb_password defined so written to {{ mariadb_mycnf }}"
-  template:
-    src: templates/my.cnf.j2
-    dest: "{{ mariadb_mycnf }}"
-  when: mariadb_password is defined
-  tags:
-    - mariadb
-
 - block:
 
   - name: "Generate a random password for {{ mariadb_username }} as it is not defined or empty"
@@ -90,19 +82,6 @@
   - name: Set a fact for the mariadb_password
     set_fact:
       mariadb_password: "{{ mariadb_password_gen.stdout | trim | quote }}"
-    tags:
-      - mariadb
-
-  - debug:
-      msg: "mariadb_password: {{ mariadb_password }}"
-      verbosity: 1
-    tags:
-      - mariadb
-
-  - name: "mariadb_password written to {{ mariadb_mycnf }}"
-    template:
-      src: templates/my.cnf.j2
-      dest: "{{ mariadb_mycnf }}"
     tags:
       - mariadb
 
@@ -131,6 +110,13 @@
 - fail:
     msg: "The mariadb_password appears not to be set"
   when: mariadb_password is not defined or mariadb_password == ""
+  tags:
+    - mariadb
+
+- name: "mariadb_password written to {{ mariadb_mycnf }}"
+  template:
+    src: templates/my.cnf.j2
+    dest: "{{ mariadb_mycnf }}"
   tags:
     - mariadb
 
