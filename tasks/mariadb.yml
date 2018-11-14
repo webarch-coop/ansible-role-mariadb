@@ -58,10 +58,43 @@
     verbosity: 1
   tags:
     - mariadb
+
+- name: Check if a user group matching the MariaDB username exists
+  command: "grep '^{{ mariadb_username }}:' /etc/group" 
+  register: mariadb_username_group_check
+  tags:
+    - mariadb
+
+- debug:
+    msg: "mariadb_username_group_check.stdout: {{ mariadb_username_group_check.stdout }}"
+    verbosity: 1
+  tags:
+    - mariadb
+
+- debug:
+    msg: "mariadb_username_group_check.stderr: {{ mariadb_username_group_check.stderr }}"
+    verbosity: 1
+  tags:
+    - mariadb
+
+- name: "Set mariadb_mycnf_group to {{ mariadb_username }} as the group exists"
+  set_fact:
+    mariadb_mycnf_group: "{{ mariadb_username }}"  
+  when: mariadb_username_group_check.stdout != ""
+  tags:
+    - mariadb
+
+- name: "Set mariadb_mycnf_group to staff as the {{ mariadb_username }} group doesn't exists"
+  set_fact:
+    mariadb_mycnf_group: "{{ mariadb_username }}"  
+  when: mariadb_username_group_check.stdout != ""
+  tags:
+    - mariadb
   
 - name: "Set mariadb_mycnf to /root/.{{ mariadb_username }}.my.cnf" 
   set_fact:
     mariadb_mycnf: "/root/.{{ mariadb_username }}.my.cnf" 
+    mariadb_mycnf_owner: root
   when: mariadb_mycnf is not defined and mariadb_username_home_check.stdout == ""
   tags:
     - mariadb
@@ -69,6 +102,8 @@
 - name: "Set mariadb_mycnf to {{ mariadb_username_home_check.stdout }}/.my.cnf" 
   set_fact:
     mariadb_mycnf: "{{ mariadb_username_home_check.stdout }}/.my.cnf" 
+    mariadb_mycnf_owner: "{{ mariadb_username }}"
+    mariadb_mycnf_group: "{{ mariadb_mycnf_group }}"
   when: mariadb_mycnf is not defined and mariadb_username_home_check.stdout != ""
   tags:
     - mariadb
@@ -144,6 +179,9 @@
   template:
     src: templates/my.cnf.j2
     dest: "{{ mariadb_mycnf }}"
+    owner: "{{ mariadb_mycnf_owner }}"
+    group: "{{ mariadb_mycnf_group }}"
+    mode: 0400
     force: yes
   tags:
     - mariadb
