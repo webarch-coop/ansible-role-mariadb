@@ -87,3 +87,9 @@
 
   when: mariadb_root_password == "set" 
 
+- debug:
+    msg: "mariadb_root_password: {{ mariadb_root_password }}"
+    verboisity: 1
+  tags:
+    - mariadb
+
