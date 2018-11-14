@@ -56,6 +56,18 @@
     tags:
       - mariadb
 
+  - name: MariaDB root user password set 
+    mysql_user:
+      login_user: root
+      login_unix_socket: /var/run/mysqld/mysqld.sock
+      name: root
+      password: "{{ mariadb_root_password }}"
+      state: present
+      update_password: always
+    register: mariadb_root_password_set
+    tags:
+      - mariadb
+
   - name: "mariadb_root_password written to {{ mariadb_mycnf }}"
     template:
       src: templates/root.my.cnf.j2
