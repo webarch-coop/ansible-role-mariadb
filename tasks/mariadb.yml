@@ -190,6 +190,7 @@
   mysql_db:
     name: "{{ mariadb_database }}"
     state: present
+  register: mariadb_database_creation
   tags:
     - mariadb
   
