@@ -127,4 +127,4 @@ ansible-playbook mariadb.yml
 
 * Check that the mariadb_username and mariadb_database are lowercase and contain no punctuation or white space 
 * Add additional optional `mariadb_` variables for values in `templates/50-server.cnf.j2`
-* Consider adding the ability to add multiple database users and databases 
+* Consider adding the ability to create multiple database users and databases 
