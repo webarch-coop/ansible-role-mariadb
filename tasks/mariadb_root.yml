@@ -56,6 +56,12 @@
     tags:
       - mariadb
 
+  - debug:
+      msg: "mariadb_root_password: {{ mariadb_root_password }}"
+      verboisity: 1
+    tags:
+      - mariadb
+
   - name: MariaDB root user password set 
     mysql_user:
       login_user: root
