@@ -89,7 +89,7 @@
 
 - debug:
     msg: "mariadb_root_password: {{ mariadb_root_password }}"
-    verboisity: 1
+    verbosity: 1
   tags:
     - mariadb
 
