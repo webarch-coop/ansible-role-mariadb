@@ -48,7 +48,7 @@
     - mariadb
 
 - debug:
-    msg: "mariadb_username_home_check.stdout: {{ mariadb_username_home_check.stdout }}"
+    msg: "mariadb_username_home_check.stdout: {{ mariadb_username_home_check.stdout | quote }}"
     verbosity: 1
   tags:
     - mariadb
@@ -66,7 +66,7 @@
     - mariadb
 
 - debug:
-    msg: "mariadb_username_group_check.stdout: {{ mariadb_username_group_check.stdout }}"
+    msg: "mariadb_username_group_check.stdout: {{ mariadb_username_group_check.stdout | quote }}"
     verbosity: 1
   tags:
     - mariadb
@@ -84,10 +84,10 @@
   tags:
     - mariadb
 
-- name: "Set mariadb_mycnf_group to staff as the {{ mariadb_username }} group doesn't exists"
+- name: "Set mariadb_mycnf_group to users as the {{ mariadb_username }} group doesn't exists"
   set_fact:
-    mariadb_mycnf_group: "{{ mariadb_username }}"  
-  when: mariadb_username_group_check.stdout != ""
+    mariadb_mycnf_group: users
+  when: mariadb_username_group_check.stdout == ""
   tags:
     - mariadb
   
@@ -99,9 +99,9 @@
   tags:
     - mariadb
 
-- name: "Set mariadb_mycnf to {{ mariadb_username_home_check.stdout }}/.my.cnf" 
+- name: "Set mariadb_mycnf to {{ mariadb_username_home_check.stdout | quote }}/.my.cnf" 
   set_fact:
-    mariadb_mycnf: "{{ mariadb_username_home_check.stdout }}/.my.cnf" 
+    mariadb_mycnf: "{{ mariadb_username_home_check.stdout | quote }}/.my.cnf" 
     mariadb_mycnf_owner: "{{ mariadb_username }}"
     mariadb_mycnf_group: "{{ mariadb_mycnf_group }}"
   when: mariadb_mycnf is not defined and mariadb_username_home_check.stdout != ""
