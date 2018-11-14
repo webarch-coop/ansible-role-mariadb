@@ -54,8 +54,8 @@
     - mariadb
 
 - debug:
-    msg: "mariadb_username_home_check.stderr: {{ mariadb_username_home_check.stderr }}"
-    verbosity: 1
+    msg: "mariadb_username_home_check.stderr: {{ mariadb_username_home_check.stderr | quote }}"
+    verbosity: 2
   tags:
     - mariadb
 
@@ -72,8 +72,8 @@
     - mariadb
 
 - debug:
-    msg: "mariadb_username_group_check.stderr: {{ mariadb_username_group_check.stderr }}"
-    verbosity: 1
+    msg: "mariadb_username_group_check.stderr: {{ mariadb_username_group_check.stderr | quote }}"
+    verbosity: 2
   tags:
     - mariadb
 
