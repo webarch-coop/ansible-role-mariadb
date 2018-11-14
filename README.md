@@ -86,3 +86,8 @@ Then it can be run as follows:
 ```bash
 ansible-playbook mariadb.yml 
 ```
+
+## TODO
+
+* Add additional optional `mariadb_` variables for values in `templates/50-server.cnf.j2`
+* Consider adding the ability to add multiple database users and databases 
