@@ -12,12 +12,19 @@
   tags:
     - mariadb
 
-- name: MariaDB defaults updated
+- name: MariaDB defaults set 
   template:
     src: templates/50-server.cnf.j2
     dest: /etc/mysql/mariadb.conf.d/50-server.cnf
+  register: mariadb_conf
   tags:
     - mariadb
+
+- name: MariaDB restarted
+  service:
+    name: mysql
+    state: restarted
+  when: mariadb_conf.changed
 
 - name: Conditionally include the user and database creation tasks 
   include_tasks: mariadb.yml
