@@ -1,0 +1,71 @@
+---
+- name: Stat /root/.my.cnf
+  stat:
+    path: /root/.my.cnf
+  register: root_mycnf_stat
+  tags:
+    - mariadb
+
+#  # when mariadb_root_password equals "absent", delete /root/.my.cnf 
+#  # if it exists and remove the password
+#  - block:
+#  
+#    - name: /root/.my.cnf Deleted
+#      file:
+#        path: /root/.my.cnf
+#        state: absent
+#      when: root_mycnf_stat.stat.exists
+#  
+#    
+#  
+#    when: mariadb_root_password == "absent"
+
+#  # when mariadb_root_password contains the passwd, set it and write it to
+#  # /root/.my.cnf
+#  - block:
+#  
+#    when: ( mariadb_root_password != "set" ) and ( mariadb_root_password != "absent" )
+
+# when mariadb_root_password equals "set", load the password from 
+# /root/.my.cnf if it exists and if not generate one and set it and
+# write it to /root/.my.cnf 
+- block:
+
+  - name: Load the passwd from /root/.my.cnf
+    shell: "my_print_defaults --defaults-file='/root/.my.cnf' client | grep '^--password' | sed -e 's/--password=//'"
+    register: mariadb_root_password_read
+    when: root_mycnf_stat.stat.exists == True
+    tags:
+      - mariadb
+
+  - name: Set a fact for the mariadb_root_password
+    set_fact:
+      mariadb_root_password: "{{ mariadb_root_password_read.stdout | trim | quote }}"
+    when: root_mycnf_stat.stat.exists == True
+    tags:
+      - mariadb
+
+  - name: "Generate a random password for MariaDB root" 
+    command: pwgen -n 16 1
+    register: mariadb_password_root_gen
+    when: root_mycnf_stat.stat.exists == False
+
+  - name: Set a fact for the mariadb_root_password
+    set_fact:
+      mariadb_root_password: "{{ mariadb_root_password_gen.stdout | trim | quote }}"
+    tags:
+      - mariadb
+
+  - name: "mariadb_root_password written to {{ mariadb_mycnf }}"
+    template:
+      src: templates/root.my.cnf.j2
+      dest: /root/.my.cnf
+      owner: root
+      group: root
+      mode: 0400
+      force: yes
+    tags:
+      - mariadb
+
+  when: mariadb_root_password == "set" 
+
