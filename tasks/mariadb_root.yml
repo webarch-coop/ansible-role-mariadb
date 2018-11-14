@@ -7,7 +7,7 @@
     - mariadb
 
 # when mariadb_root_password equals "set", load the password from 
-# /root/.my.cnf if it exists and if not generate one and set it 
+# /root/.my.cnf if it exists and if not generate one  
 - block:
 
   - name: Load the passwd from /root/.my.cnf
@@ -61,7 +61,6 @@
     state: present
     update_password: always
   register: mariadb_root_password_set
-  when: mariadb_root_password != "absent"
   tags:
     - mariadb
 
@@ -73,7 +72,6 @@
     group: root
     mode: 0400
     force: yes
-  when: mariadb_root_password != "absent"
   register: mariadb_root_password_written
   tags:
     - mariadb
