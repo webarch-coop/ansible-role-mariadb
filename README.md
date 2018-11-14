@@ -44,16 +44,41 @@ The other repo should also contain a `mariadb.yml` file that contains:
 
   # All these variables are optional
   #
-  # * If the username is not set no user account or database will be created
+  # * If the mariadb_username is not set no user account or database will be 
+  #   created 
   #
-  # * If the database name is not set the username will be used as the database
-  #   name 
+  # * If the mariadb_username is set but the mariadb_database name is not set 
+  #   then the mariadb_username will be used as the database name and the user 
+  #   and database will be created if they don't exist 
   #
-  # * If the password is not set a random one will be generated and saved to
-  #   ~/.my.cnf if the username matches a username in /etc/passwd or 
+  # * If the mariadb_password is set then mariadb_username will be created / 
+  #   updated with the password and this will also be written to  
+  #   ~/.my.cnf if the mariadb_username matches a username in /etc/passwd or 
   #   /root/.username.my.cnf if it doesn't
   #
+  #   If the mariadb_password is not set and the ~/.my.cnf or 
+  #   /root/.username.my.cnf files exist then the mariadb_password will be 
+  #   read from the file and the mariadb_username login updated to match
+  #
+  #   If the mariadb_password is not set and the ~/.my.cnf or
+  #   /root/.username.my.cnf files don't exist then a random mariadb_password
+  #   will be generated and written to ~/.my.cnf or /root/.username.my.cnf 
+  #   and the mariadb_username login updated to match
+  #
+  # * If mariadb_root_password is True then the MariaDB root password will 
+  #   be set from /root/.my.cnf if that file exists and if it doesn't a new 
+  #   password will be generated and written to /root/.my.cnf and the root
+  #   password will be set
+  #   
+  #   If mariadb_root_password is set to a string then the MariaDB root 
+  #   password will be set and /root/.my.cnf will be created / updated
+  #
+  #   If mariadb_root_password is set to False then password authentication 
+  #   the MariaDB root user will be removed (socket auth will still work) and 
+  #   a /root/.my.cnf file will be deleted if it exists 
+  #
   #vars:
+  #  - mariadb_root_password: True
   #  - mariadb_username:
   #  - mariadb_database:
   #  - mariadb_password: 
@@ -89,5 +114,6 @@ ansible-playbook mariadb.yml
 
 ## TODO
 
+* Check that the mariadb_username and mariadb_database are lowercase and contain no punctuation or white space 
 * Add additional optional `mariadb_` variables for values in `templates/50-server.cnf.j2`
 * Consider adding the ability to add multiple database users and databases 

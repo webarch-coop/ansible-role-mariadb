@@ -26,8 +26,14 @@
     state: restarted
   when: mariadb_conf.changed
 
+- name: Conditionally include the root password tasks 
+  include_tasks: mariadb_root.yml
+  when: mariadb_root is defined and mariadb_root != ""
+  tags:
+    - mariadb
+
 - name: Conditionally include the user and database creation tasks 
-  include_tasks: mariadb.yml
+  include_tasks: mariadb_user.yml
   when: mariadb_username is defined and mariadb_username != ""
   tags:
     - mariadb
