@@ -42,7 +42,29 @@ The other repo should also contain a `mariadb.yml` file that contains:
 - name: Install MariaDB
   become: yes
 
-  # All these variables are optional
+  # ALL OF THESE VARIABLES ARE OPTIONAL
+  # -----------------------------------
+  #
+  # If the following variables are not set then no tasks which depend on 
+  # them will be run
+  #
+  #vars:
+  #  - mariadb_root_password: set
+  #  - mariadb_username:
+  #  - mariadb_database:
+  #  - mariadb_password: 
+  #  - mariadb_character_set_client_handshake: FALSE
+  #
+  # NOTES ON THE VARIABLES
+  # ----------------------
+  #
+  # * If the value of mariadb_root_password is "set" and if /root/.my.cnf 
+  #   exists then mariadb_root_password will be read from the file, if the 
+  #   file doesn't exist then a new password will be generated and the 
+  #   mariadb_root_password variable will be set
+  #   
+  #   Then the mariadb_root_password is written to the database and 
+  #   /root/.my.cnf 
   #
   # * If the mariadb_username is not set no user account or database will be 
   #   created 
@@ -64,21 +86,6 @@ The other repo should also contain a `mariadb.yml` file that contains:
   #   /root/.username.my.cnf files don't exist then a random mariadb_password
   #   will be generated and written to ~/.my.cnf or /root/.username.my.cnf 
   #   and the mariadb_username login updated to match
-  #
-  # * If the value of mariadb_root_password is "set" and if /root/.my.cnf 
-  #   exists then mariadb_root_password will be read from the file, if the 
-  #   file doesn't exist then a new password will be generated and the 
-  #   mariadb_root_password variable will be set
-  #   
-  #   Then the mariadb_root_password is written to the database and 
-  #   /root/.my.cnf 
-  #
-  #vars:
-  #  - mariadb_root_password: set
-  #  - mariadb_username:
-  #  - mariadb_database:
-  #  - mariadb_password: 
-  #  - mariadb_character_set_client_handshake: FALSE
 
   hosts:
     - mariadb_servers

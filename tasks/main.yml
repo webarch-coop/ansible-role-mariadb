@@ -25,6 +25,8 @@
     name: mysql
     state: restarted
   when: mariadb_conf.changed
+  tags:
+    - mariadb
 
 - debug:
     msg: "mariadb_root_password: {{ mariadb_root_password }}"

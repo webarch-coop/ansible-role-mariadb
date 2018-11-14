@@ -28,6 +28,8 @@
     command: pwgen -n 16 1
     register: mariadb_root_password_gen
     when: root_mycnf_stat.stat.exists == False
+    tags:
+      - mariadb
 
   - name: Set a fact for the mariadb_root_password
     set_fact:
