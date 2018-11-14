@@ -58,34 +58,42 @@ The other repo should also contain a `mariadb.yml` file that contains:
   # NOTES ON THE VARIABLES
   # ----------------------
   #
-  # * If the value of mariadb_root_password is "set" and if /root/.my.cnf 
-  #   exists then mariadb_root_password will be read from the file, if the 
-  #   file doesn't exist then a new password will be generated and the 
-  #   mariadb_root_password variable will be set
-  #   
-  #   Then the mariadb_root_password is written to the database and 
+  # * If mariadb_root_password is not set nothing will be done to the 
+  #   root account login, which, by default, uses a scocket and
+  #   doesn't have a password set
+  #
+  # * If the value of mariadb_root_password is "set" and if 
+  #   /root/.my.cnf exists then mariadb_root_password will be read 
+  #   from the file, if the file doesn't exist then a new password 
+  #   will be generated and the mariadb_root_password variable will 
+  #   be set
+  # 
+  # * The mariadb_root_password will be written to the database and 
   #   /root/.my.cnf 
   #
-  # * If the mariadb_username is not set no user account or database will be 
-  #   created 
+  # * If the mariadb_username is not set then no user account or database 
+  #   will be created 
   #
   # * If the mariadb_username is set but the mariadb_database name is not set 
-  #   then the mariadb_username will be used as the mariadb_database name and 
-  #   then the database will be created, if it didn't already exist
+  #   then the mariadb_username will be used as the mariadb_database name 
+  # 
+  # * The mariadb_database will be created, if it didn't already exist
+  # 
+  # * If a system user account exists with the same name as the 
+  #   mariadb_username then mariadb_mycnf is set to ~/.my.cnf
   #
-  # * If the mariadb_password is set then mariadb_username will be created or
-  #   updated with the mariadb_password and this will also be written to  
-  #   ~/.my.cnf if the mariadb_username matches a username in /etc/passwd or 
-  #   /root/.username.my.cnf if it doesn't
+  # * If there is no system user account name that matches the 
+  #   mariadb_username then mariadb_mycnf is set to 
+  #   /root/.mariadb_username.my.cnf
   #
-  #   If the mariadb_password is not set and the ~/.my.cnf or 
-  #   /root/.username.my.cnf files exist then the mariadb_password will be 
-  #   read from the file and the mariadb_username login updated to match
+  # * If mariadb_mycnf doesn't exists and mariadb_password is not set then
+  #   a random password is generated for mariadb_password  
   #
-  #   If the mariadb_password is not set and the ~/.my.cnf or
-  #   /root/.username.my.cnf files don't exist then a random mariadb_password
-  #   will be generated and written to ~/.my.cnf or /root/.username.my.cnf 
-  #   and the mariadb_username login updated to match
+  # * If mariadb_mycnf does exist then the mariadb_password is loaded from
+  #   the file
+  #
+  # * The mariadb_password will be written to mariadb_mycnf
+  #   and the mariadb_username database login updated to match
 
   hosts:
     - mariadb_servers

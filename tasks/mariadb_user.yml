@@ -41,6 +41,14 @@
   tags:
     - mariadb
 
+- name: MariaDB database present
+  mysql_db:
+    name: "{{ mariadb_database }}"
+    state: present
+  register: mariadb_database_creation
+  tags:
+    - mariadb
+
 - name: Check if a user account matching the MariaDB username exists
   shell: "grep '^{{ mariadb_username }}:' /etc/passwd | awk -F : '{ print $6 }'" 
   register: mariadb_username_home_check
@@ -183,14 +191,6 @@
     group: "{{ mariadb_mycnf_group }}"
     mode: 0400
     force: yes
-  tags:
-    - mariadb
-
-- name: MariaDB database present
-  mysql_db:
-    name: "{{ mariadb_database }}"
-    state: present
-  register: mariadb_database_creation
   tags:
     - mariadb
   
