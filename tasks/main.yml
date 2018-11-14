@@ -26,9 +26,21 @@
     state: restarted
   when: mariadb_conf.changed
 
+- debug:
+    msg: "mariadb_root_password: {{ mariadb_root_password }}"
+    verbosity: 1
+  tags:
+    - mariadb
+
 - name: Conditionally include the root password tasks 
   include_tasks: mariadb_root.yml
-  when: mariadb_root is defined and mariadb_root != ""
+  when: mariadb_root_password is defined and mariadb_root_password != ""
+  tags:
+    - mariadb
+
+- debug:
+    msg: "mariadb_username: {{ mariadb_username }}"
+    verbosity: 1
   tags:
     - mariadb
 
