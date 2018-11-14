@@ -6,20 +6,6 @@
   tags:
     - mariadb
 
-# when mariadb_root_password equals "absent", delete /root/.my.cnf 
-# if it exists and remove the password
-- block:
-
-  - name: /root/.my.cnf Deleted
-    file:
-      path: /root/.my.cnf
-      state: absent
-    when: root_mycnf_stat.stat.exists
-
-  # TODO  
-
-  when: mariadb_root_password == "absent"
-
 # when mariadb_root_password equals "set", load the password from 
 # /root/.my.cnf if it exists and if not generate one and set it 
 - block:

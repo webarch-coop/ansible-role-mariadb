@@ -48,11 +48,11 @@ The other repo should also contain a `mariadb.yml` file that contains:
   #   created 
   #
   # * If the mariadb_username is set but the mariadb_database name is not set 
-  #   then the mariadb_username will be used as the database name and the user 
-  #   and database will be created if they don't exist 
+  #   then the mariadb_username will be used as the mariadb_database name and 
+  #   then the database will be created, if it didn't already exist
   #
-  # * If the mariadb_password is set then mariadb_username will be created / 
-  #   updated with the password and this will also be written to  
+  # * If the mariadb_password is set then mariadb_username will be created or
+  #   updated with the mariadb_password and this will also be written to  
   #   ~/.my.cnf if the mariadb_username matches a username in /etc/passwd or 
   #   /root/.username.my.cnf if it doesn't
   #
@@ -65,20 +65,16 @@ The other repo should also contain a `mariadb.yml` file that contains:
   #   will be generated and written to ~/.my.cnf or /root/.username.my.cnf 
   #   and the mariadb_username login updated to match
   #
-  # * If mariadb_root_password is True then the MariaDB root password will 
-  #   be set from /root/.my.cnf if that file exists and if it doesn't a new 
-  #   password will be generated and written to /root/.my.cnf and the root
-  #   password will be set
+  # * If the value of mariadb_root_password is "set" and if /root/.my.cnf 
+  #   exists then mariadb_root_password will be read from the file, if the 
+  #   file doesn't exist then a new password will be generated and the 
+  #   mariadb_root_password variable will be set
   #   
-  #   If mariadb_root_password is set to a string then the MariaDB root 
-  #   password will be set and /root/.my.cnf will be created / updated
-  #
-  #   If mariadb_root_password is set to False then password authentication 
-  #   the MariaDB root user will be removed (socket auth will still work) and 
-  #   a /root/.my.cnf file will be deleted if it exists 
+  #   Then the mariadb_root_password is written to the database and 
+  #   /root/.my.cnf 
   #
   #vars:
-  #  - mariadb_root_password: True
+  #  - mariadb_root_password: set
   #  - mariadb_username:
   #  - mariadb_database:
   #  - mariadb_password: 
