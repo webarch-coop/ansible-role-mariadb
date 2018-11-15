@@ -64,35 +64,18 @@
     - mariadb
 
 - name: Specify MySQL root password before installing
-  # without this, auth_socket will be used for root@localhost, and we won't be able to set the password
-  # https://stackoverflow.com/a/40059130
+  # https://dba.stackexchange.com/a/153837
   debconf: 
     name: mariadb-server
-    question: "mysql-server/root_password"
-    value: "{{ mariadb_root_password | quote }}"
+    question: "{{ item }}" 
     vtype: password
+    value: "{{ mariadb_root_password | quote }}"
   become: true
+  with_items:
+    - mysql-server/root_password
+    - mysql-server/root_password_again
   tags:
     - mariadb
-
-- name: Confirm MySQL root password before installing
-  debconf: 
-    name: mariadb-server
-    question: "mysql-server/root_password_again"
-    value: "{{ mariadb_root_password | quote }}"
-    vtype: password
-  become: true
-  tags:
-    - mariadb
-
-    - name: Specify MySQL root password before installing
-      # without this, auth_socket will be used for root@localhost, and we won't be able to set the password
-      debconf: name='mysql-server' question='mysql-server/root_password' value='{{mysql_root_password | quote}}' vtype='password'
-      become: true
-
-    - name: Confirm MySQL root password before installing
-      debconf: name='mysql-server' question='mysql-server/root_password_again' value='{{mysql_root_password | quote}}' vtype='password'
-      become: true
 
 - name: mariadb-server, mariadb-client and other packages present
   apt:
