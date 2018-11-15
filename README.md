@@ -58,11 +58,12 @@ The other repo should also contain a `mariadb.yml` file that contains:
   # NOTES ON THE VARIABLES
   # ----------------------
   #
-  # * If mariadb_root_password is not set nothing will be done to the 
-  #   root account login, which, by default, uses a socket for logins 
-  #   and doesn't have a password set, generally you will want to omit
-  #   this option, it is only for cases where non-root users need to 
-  #   login to MariaDB as root that you need to enable this
+  # * If the mariadb_root_password variable is not set then nothing will 
+  #   be done to the root account login, which, by default, uses a 
+  #   socket for logins and doesn't have a password set, generally you 
+  #   will want to omit this option -- it is only for cases where 
+  #   non-root users need to login to MariaDB as root that you need to 
+  #   enable this
   #
   # * If the value of mariadb_root_password is "set" and if 
   #   /root/.my.cnf exists then mariadb_root_password will be read 
