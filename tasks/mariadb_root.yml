@@ -79,8 +79,9 @@
     - mariadb
 
 - debug:
-    msg: "debconf results: {{ mariadb_debconf.stdout }}"
+    msg: "debconf results: {{ mariadb_debconf }}"
     verbosity: 1
+  when: mariadb_debconf.changed
   tags:
     - mariadb
 
