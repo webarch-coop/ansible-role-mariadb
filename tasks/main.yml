@@ -1,4 +1,10 @@
 ---
+- name: Conditionally include the root password tasks 
+  include_tasks: mariadb_root.yml
+  when: mariadb_root_password is defined and mariadb_root_password != ""
+  tags:
+    - mariadb
+
 - name: mariadb-server, mariadb-client and other packages present
   apt:
     pkg: 
@@ -9,6 +15,7 @@
       - python-mysqldb
     state: latest
     update_cache: yes
+  when: mariadb_root_password is not defined
   tags:
     - mariadb
 
@@ -25,12 +32,6 @@
     name: mysql
     state: restarted
   when: mariadb_conf.changed
-  tags:
-    - mariadb
-
-- name: Conditionally include the root password tasks 
-  include_tasks: mariadb_root.yml
-  when: mariadb_root_password is defined and mariadb_root_password != ""
   tags:
     - mariadb
 

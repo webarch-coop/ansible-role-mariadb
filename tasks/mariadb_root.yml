@@ -1,4 +1,15 @@
 ---
+# https://stackoverflow.com/a/40059130
+- name: debconf and debconf-utils packages present 
+  apt:
+    pkg:
+      - debconf
+      - debconf-utils
+    state: latest
+    update_cache: yes
+  tags:
+    - mariadb
+
 - name: Stat /root/.my.cnf
   stat:
     path: /root/.my.cnf
@@ -52,16 +63,39 @@
   tags:
     - mariadb
 
-- name: MariaDB root user password set 
-  mysql_user:
-    login_user: root
-    login_unix_socket: /var/run/mysqld/mysqld.sock
-    name: root
-    password: "{{ mariadb_root_password }}"
-    state: present
-    priv: "*.*:ALL"
-    update_password: always
-  register: mariadb_root_password_set
+- name: Specify MySQL root password before installing
+  # without this, auth_socket will be used for root@localhost, and we won't be able to set the password
+  # https://stackoverflow.com/a/40059130
+  debconf: 
+    name: mariadb-server
+    question: "mariadb-server/root_password"
+    value: "{{ mariadb_root_password | quote }}"
+    vtype: "password"
+  become: true
+  tags:
+    - mariadb
+
+- name: Confirm MySQL root password before installing
+  debconf: 
+    name: mariadb-server
+    question: "mariadb-server/root_password_again"
+    value: "{{ mysql_root_password | quote }}"
+    vtype: "password"
+  become: true
+  tags:
+    - mariadb
+
+- name: mariadb-server, mariadb-client and other packages present
+  apt:
+    pkg: 
+      - mariadb-server
+      - mariadb-client
+      - mysqltuner
+      - pwgen
+      - python-mysqldb
+    state: latest
+    update_cache: yes
+  when: mariadb_root_password is not defined 
   tags:
     - mariadb
 
@@ -77,3 +111,16 @@
   tags:
     - mariadb
 
+- name: MariaDB root user password set 
+  mysql_user:
+    #login_user: root
+    #login_unix_socket: /var/run/mysqld/mysqld.sock
+    name: root
+    password: "{{ mariadb_root_password | quote }}"
+    state: present
+    sql_log_bin: yes
+    priv: "*.*:ALL,GRANT"
+    update_password: always
+  register: mariadb_root_password_set
+  tags:
+    - mariadb
