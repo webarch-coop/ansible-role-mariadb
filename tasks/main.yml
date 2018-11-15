@@ -1,4 +1,13 @@
 ---
+- name: pwgen present
+  apt:
+    pkg:
+      - pwgen
+    state: latest
+    update_cache: yes
+  tags:
+    - mariadb
+
 - name: Conditionally include the root password tasks 
   include_tasks: mariadb_root.yml
   when: mariadb_root_password is defined and mariadb_root_password != ""
@@ -11,10 +20,9 @@
       - mariadb-server
       - mariadb-client
       - mysqltuner
-      - pwgen
       - python-mysqldb
     state: latest
-    update_cache: yes
+    update_cache: no 
   when: mariadb_root_password is not defined
   tags:
     - mariadb
