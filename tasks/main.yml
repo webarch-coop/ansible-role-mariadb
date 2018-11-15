@@ -9,7 +9,6 @@
       - pwgen
     state: latest
     update_cache: no 
-  when: mariadb_root_password is not defined
   tags:
     - mariadb
 
