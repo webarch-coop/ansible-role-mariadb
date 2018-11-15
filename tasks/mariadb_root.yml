@@ -66,7 +66,7 @@
 - name: Specify MySQL root password before installing
   # https://dba.stackexchange.com/a/153837
   debconf: 
-    name: mariadb-server
+    name: mariadb-server-10.1
     question: "{{ item }}" 
     vtype: password
     value: "{{ mariadb_root_password | quote }}"
@@ -83,7 +83,6 @@
     verbosity: 1
   tags:
     - mariadb
-
 
 - name: mariadb-server, mariadb-client and other packages present
   apt:
@@ -114,11 +113,17 @@
     #login_user: root
     #login_unix_socket: /var/run/mysqld/mysqld.sock
     name: root
+    host: "{{ item }}"
     password: "{{ mariadb_root_password | quote }}"
     state: present
     sql_log_bin: yes
     priv: "*.*:ALL,GRANT"
     update_password: always
   register: mariadb_root_password_set
+  with_items:
+    - "{{ ansible_hostname }}"
+    - 127.0.0.1
+    - ::1
+    - "localhost"
   tags:
     - mariadb
