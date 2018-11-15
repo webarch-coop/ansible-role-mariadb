@@ -74,8 +74,16 @@
   with_items:
     - mysql-server/root_password
     - mysql-server/root_password_again
+  register: mariadb_debconf
   tags:
     - mariadb
+
+- debug:
+    msg: "debconf results: {{ mariadb_debconf.stdout }}"
+    verbosity: 1
+  tags:
+    - mariadb
+
 
 - name: mariadb-server, mariadb-client and other packages present
   apt:
