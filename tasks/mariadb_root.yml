@@ -54,7 +54,10 @@
 
 # https://stackoverflow.com/a/40179258
 - name: Enable MariaDB root logins with a password
-  shell: mysql -u root -p{{ mariadb_root_password }} -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '{{ mariadb_root_password }}'; FLUSH PRIVILEGES;"
+  # shell: mysql -uroot -p{{ mariadb_root_password }} -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '{{ mariadb_root_password }}'; FLUSH PRIVILEGES;"
+  # UPDATE mysql.user SET authentication_string = PASSWORD(‘test’), plugin = ‘mysql_native_password’ WHERE User = ‘root’ AND Host = ‘localhost’;
+  # FLUSH PRIVILEGES;
+  shell: mysql -uroot -p{{ mariadb_root_password }} -e "UPDATE mysql.user SET authentication_string=PASSWORD('{{ mariadb_root_password }}'), plugin='mysql_native_password' WHERE User='root' AND Host='localhost'; FLUSH PRIVILEGES;"
   register: mariadb_root_password_update
   tags:
     - mariadb
