@@ -79,7 +79,7 @@
   debconf: 
     name: mariadb-server
     question: "mariadb-server/root_password_again"
-    value: "{{ mysql_root_password | quote }}"
+    value: "{{ mariadb_root_password | quote }}"
     vtype: "password"
   become: true
   tags:
