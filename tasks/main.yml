@@ -1,19 +1,4 @@
 ---
-- name: pwgen present
-  apt:
-    pkg:
-      - pwgen
-    state: latest
-    update_cache: yes
-  tags:
-    - mariadb
-
-- name: Conditionally include the root password tasks 
-  include_tasks: mariadb_root.yml
-  when: mariadb_root_password is defined and mariadb_root_password != ""
-  tags:
-    - mariadb
-
 - name: mariadb-server, mariadb-client and other packages present
   apt:
     pkg: 
@@ -21,6 +6,7 @@
       - mariadb-client
       - mysqltuner
       - python-mysqldb
+      - pwgen
     state: latest
     update_cache: no 
   when: mariadb_root_password is not defined
@@ -40,6 +26,12 @@
     name: mysql
     state: restarted
   when: mariadb_conf.changed
+  tags:
+    - mariadb
+
+- name: Conditionally include the root password tasks 
+  include_tasks: mariadb_root.yml
+  when: mariadb_root_password is defined and mariadb_root_password != ""
   tags:
     - mariadb
 

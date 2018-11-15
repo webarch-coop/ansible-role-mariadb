@@ -1,15 +1,4 @@
 ---
-# https://stackoverflow.com/a/40059130
-- name: debconf and debconf-utils packages present 
-  apt:
-    pkg:
-      - debconf
-      - debconf-utils
-    state: latest
-    update_cache: yes
-  tags:
-    - mariadb
-
 - name: Stat /root/.my.cnf
   stat:
     path: /root/.my.cnf
@@ -63,37 +52,16 @@
   tags:
     - mariadb
 
-- name: Specify MySQL root password before installing
-  # https://dba.stackexchange.com/a/153837
-  debconf: 
-    name: mariadb-server-10.1
-    question: "{{ item }}" 
-    vtype: password
-    value: "{{ mariadb_root_password | quote }}"
-  become: true
-  with_items:
-    - mysql-server/root_password
-    - mysql-server/root_password_again
-  register: mariadb_debconf
+# https://stackoverflow.com/a/40179258
+- name: Enable MariaDB root logins with a password
+  shell: mysql -u root -p{{ mariadb_root_password }} -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '{{ mariadb_root_password }}'; FLUSH PRIVILEGES;"
+  register: mariadb_root_password_update
   tags:
     - mariadb
 
-- debug:
-    msg: "debconf results: {{ mariadb_debconf }}"
+- debug: 
+    msg: "Results of MariaDB root password update: {{ mariadb_root_password_update.stdout }}"
     verbosity: 1
-  when: mariadb_debconf.changed
-  tags:
-    - mariadb
-
-- name: mariadb-server, mariadb-client and other packages present
-  apt:
-    pkg: 
-      - mariadb-server
-      - mariadb-client
-      - mysqltuner
-      - python-mysqldb
-    state: latest
-    update_cache: no
   tags:
     - mariadb
 
