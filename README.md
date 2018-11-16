@@ -160,6 +160,7 @@ Note that the `mariadb_password` variable will only contain the password for the
   vars:
     maria_databases:
       - wordpress
+      - civicrm
       - matomo
     mariadb_users:
       wordpress:
