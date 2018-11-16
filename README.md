@@ -128,7 +128,7 @@ ansible-playbook mariadb.yml
 
 ## Creating multiple users and databases
 
-You can call the `mariadb_user.yml` tasks multiple times, for example:
+YoThis is untested but you should be able to call the `mariadb_user.yml` tasks multiple times, for example:
 
 ```yml
 - name: Create database and user for WordPress
