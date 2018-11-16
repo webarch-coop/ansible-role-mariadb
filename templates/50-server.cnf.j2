@@ -111,10 +111,10 @@ innodb-large-prefix=1
 # MySQL/MariaDB default is Latin1, but in Debian we rather default to the full
 # utf8 4-byte character set. See also client.cnf
 #
-{% if mariadb_character_set_client_handshake is defined and mariadb_character_set_client_handshake == 'FALSE' %}
+{% if mariadb_character_set_client_handshake is defined and mariadb_character_set_client_handshake == False %}
 character-set-client-handshake	= FALSE
 {% else %}
-# character-set-client-handshake  = {{ mariadb_character_set_client_handshake }}
+# character-set-client-handshake  = FALSE
 {% endif %}
 character-set-server  		= utf8mb4
 collation-server      		= utf8mb4_general_ci

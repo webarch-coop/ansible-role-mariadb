@@ -53,7 +53,7 @@ The other repo should also contain a `mariadb.yml` file that contains:
   #  - mariadb_username:
   #  - mariadb_database:
   #  - mariadb_password: 
-  #  - mariadb_character_set_client_handshake: FALSE
+  #  - mariadb_character_set_client_handshake: False
   #
   # NOTES ON THE VARIABLES
   # ----------------------
