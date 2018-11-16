@@ -126,8 +126,40 @@ Then it can be run as follows:
 ansible-playbook mariadb.yml 
 ```
 
+## Creating multiple users and databases
+
+You can call the `mariadb_user.yml` tasks multiple times, for example:
+
+```yml
+- name: Create database and user for WordPress
+  include_tasks: galaxy/roles/mariadb/tasks/mariadb_user.yml
+  vars:
+    mariadb_user: wordpress
+
+- name: Create database and user for Matomo
+  include_tasks: galaxy/roles/mariadb/tasks/mariadb_user.yml
+  vars:
+    mariadb_user: matomo
+```
+
+
 ## TODO
 
 * Check that the mariadb_username and mariadb_database are lowercase and contain no punctuation or white space 
 * Add additional optional `mariadb_` variables for values in `templates/50-server.cnf.j2`
-* Consider adding the ability to create multiple database users and databases, reading these from a YAML dict
+* Consider adding the ability to create multiple database users and databases, reading these from a pair of YAML dicts, for example:
+```yml
+  vars:
+    mariadb_users:
+      wordpress:
+        privs: 
+         - wordpress.*:ALL
+         - civicrm.*:ALL
+      matomo:
+         privs:
+           - matomo.*:ALL
+    maria_databases:
+      - wordpress
+      - matomo
+```
+    
