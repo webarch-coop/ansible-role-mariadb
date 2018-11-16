@@ -113,6 +113,8 @@ innodb-large-prefix=1
 #
 {% if mariadb_character_set_client_handshake is defined and mariadb_character_set_client_handshake == 'FALSE' %}
 character-set-client-handshake	= FALSE
+{% else %}
+# character-set-client-handshake  = FALSE
 {% endif %}
 character-set-server  		= utf8mb4
 collation-server      		= utf8mb4_general_ci
