@@ -158,6 +158,9 @@ Note that the `mariadb_password` variable will only contain the password for the
 * Consider adding the ability to create multiple database users and databases, reading these from a pair of YAML dicts, for example:
 ```yml
   vars:
+    maria_databases:
+      - wordpress
+      - matomo
     mariadb_users:
       wordpress:
         privs: 
@@ -166,8 +169,5 @@ Note that the `mariadb_password` variable will only contain the password for the
       matomo:
          privs:
            - matomo.*:ALL
-    maria_databases:
-      - wordpress
-      - matomo
 ```
     
