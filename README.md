@@ -133,14 +133,22 @@ You can call the `mariadb_user.yml` tasks multiple times, for example:
 ```yml
 - name: Create database and user for WordPress
   include_tasks: galaxy/roles/mariadb/tasks/mariadb_user.yml
-  vars:
+  vars: 
     mariadb_user: wordpress
+
+- debug:
+    msg: "The MariaDB password for WordPress is: {{ mariadb_password }}"
 
 - name: Create database and user for Matomo
   include_tasks: galaxy/roles/mariadb/tasks/mariadb_user.yml
   vars:
     mariadb_user: matomo
+
+- debug:
+    msg: "The MariaDB password for Matomo is: {{ mariadb_password }}"
 ```
+
+Note that the `mariadb_password` variable will only contain the password for the last user created and will be overwritten when another user is created.
 
 
 ## TODO
