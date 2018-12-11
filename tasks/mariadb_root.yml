@@ -6,8 +6,8 @@
   tags:
     - mariadb
 
-# when mariadb_root_password equals "set", load the password from 
-# /root/.my.cnf if it exists and if not generate one  
+# when mariadb_root_password equals "set", load the password from
+# /root/.my.cnf if it exists and if not generate one
 - block:
 
   - name: Load the passwd from /root/.my.cnf
@@ -44,7 +44,7 @@
     tags:
       - mariadb
 
-  when: mariadb_root_password == "set" 
+  when: mariadb_root_password == "set"
 
 - debug:
     msg: "mariadb_root_password: {{ mariadb_root_password }}"
@@ -59,7 +59,7 @@
   tags:
     - mariadb
 
-- debug: 
+- debug:
     msg: "Results of MariaDB root password update: {{ mariadb_root_password_update.stdout }}"
     verbosity: 1
   tags:

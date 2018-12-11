@@ -50,7 +50,7 @@
     - mariadb
 
 - name: Check if a user account matching the MariaDB username exists
-  shell: "grep '^{{ mariadb_username }}:' /etc/passwd | awk -F : '{ print $6 }'" 
+  shell: "grep '^{{ mariadb_username }}:' /etc/passwd | awk -F : '{ print $6 }'"
   register: mariadb_username_home_check
   tags:
     - mariadb
@@ -68,7 +68,7 @@
     - mariadb
 
 - name: Check if a user group matching the MariaDB username exists
-  command: "grep '^{{ mariadb_username }}:' /etc/group" 
+  command: "grep '^{{ mariadb_username }}:' /etc/group"
   register: mariadb_username_group_check
   tags:
     - mariadb
@@ -87,7 +87,7 @@
 
 - name: "Set mariadb_mycnf_group to {{ mariadb_username }} as the group exists"
   set_fact:
-    mariadb_mycnf_group: "{{ mariadb_username }}"  
+    mariadb_mycnf_group: "{{ mariadb_username }}"
   when: mariadb_username_group_check.stdout != ""
   tags:
     - mariadb
@@ -98,18 +98,18 @@
   when: mariadb_username_group_check.stdout == ""
   tags:
     - mariadb
-  
-- name: "Set mariadb_mycnf to /root/.{{ mariadb_username }}.my.cnf" 
+
+- name: "Set mariadb_mycnf to /root/.{{ mariadb_username }}.my.cnf"
   set_fact:
-    mariadb_mycnf: "/root/.{{ mariadb_username }}.my.cnf" 
+    mariadb_mycnf: "/root/.{{ mariadb_username }}.my.cnf"
     mariadb_mycnf_owner: root
   when: mariadb_mycnf is not defined and mariadb_username_home_check.stdout == ""
   tags:
     - mariadb
 
-- name: "Set mariadb_mycnf to {{ mariadb_username_home_check.stdout | quote }}/.my.cnf" 
+- name: "Set mariadb_mycnf to {{ mariadb_username_home_check.stdout | quote }}/.my.cnf"
   set_fact:
-    mariadb_mycnf: "{{ mariadb_username_home_check.stdout | quote }}/.my.cnf" 
+    mariadb_mycnf: "{{ mariadb_username_home_check.stdout | quote }}/.my.cnf"
     mariadb_mycnf_owner: "{{ mariadb_username }}"
     mariadb_mycnf_group: "{{ mariadb_mycnf_group }}"
   when: mariadb_mycnf is not defined and mariadb_username_home_check.stdout != ""
@@ -136,7 +136,7 @@
     register: mariadb_password_gen
     tags:
       - mariadb
-  
+
   - name: Set a fact for the mariadb_password
     set_fact:
       mariadb_password: "{{ mariadb_password_gen.stdout | trim | quote }}"
@@ -161,7 +161,7 @@
     register: mariadb_password_read
     tags:
       - mariadb
-  
+
   - name: Set a fact for the mariadb_password
     set_fact:
       mariadb_password: "{{ mariadb_password_read.stdout | trim | quote }}"
@@ -193,7 +193,7 @@
     force: yes
   tags:
     - mariadb
-  
+
 - name: MariaDB user present
   mysql_user:
     login_user: root

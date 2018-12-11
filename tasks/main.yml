@@ -1,18 +1,18 @@
 ---
 - name: mariadb-server, mariadb-client and other packages present
   apt:
-    pkg: 
+    pkg:
       - mariadb-server
       - mariadb-client
       - mysqltuner
       - python-mysqldb
       - pwgen
     state: latest
-    update_cache: no 
+    update_cache: no
   tags:
     - mariadb
 
-- name: MariaDB defaults set 
+- name: MariaDB defaults set
   template:
     src: templates/50-server.cnf.j2
     dest: /etc/mysql/mariadb.conf.d/50-server.cnf
@@ -28,13 +28,13 @@
   tags:
     - mariadb
 
-- name: Conditionally include the root password tasks 
+- name: Conditionally include the root password tasks
   include_tasks: mariadb_root.yml
   when: mariadb_root_password is defined and mariadb_root_password != ""
   tags:
     - mariadb
 
-- name: Conditionally include the user and database creation tasks 
+- name: Conditionally include the user and database creation tasks
   include_tasks: mariadb_user.yml
   when: mariadb_username is defined and mariadb_username != ""
   tags:
