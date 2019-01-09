@@ -6,6 +6,7 @@
       - mariadb-client
       - mysqltuner
       - python-mysqldb
+      - python3-mysqldb
       - pwgen
     state: latest
     update_cache: no
