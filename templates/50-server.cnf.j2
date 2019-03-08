@@ -83,7 +83,7 @@ max_binlog_size   = 100M
 #
 # InnoDB is enabled by default with a 10MB datafile in /var/lib/mysql/.
 # Read the manual for more InnoDB related options. There are many!
-{% if mariadb_debian_version eq "stretch" %} 
+{% if "stretch" in mariadb_debian_version %} 
 innodb-file-format=barracuda
 innodb-file-per-table=1
 innodb-large-prefix=1
