@@ -14,7 +14,7 @@
     - mariadb
 
 - name: Check /etc/debian_version
-  command: "cat /etc/debian_version | awk -F/ '{ print $1 }'"
+  shell: "cat /etc/debian_version | awk -F/ '{ print $1 }'"
   register: mariadb_debian_version_check
   tags:
     - mariadb
