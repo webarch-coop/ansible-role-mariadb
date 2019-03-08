@@ -10,39 +10,39 @@
 # /root/.my.cnf if it exists and if not generate one
 - block:
 
-  - name: Load the passwd from /root/.my.cnf
-    shell: "my_print_defaults --defaults-file='/root/.my.cnf' client | grep '^--password' | sed -e 's/--password=//'"
-    register: mariadb_root_password_read
-    when: root_mycnf_stat.stat.exists == True
-    tags:
-      - mariadb
-
-  - name: Set a fact for the mariadb_root_password
-    set_fact:
-      mariadb_root_password: "{{ mariadb_root_password_read.stdout | trim | quote }}"
-    when: root_mycnf_stat.stat.exists == True
-    tags:
-      - mariadb
-
-  - name: Generate a random password for MariaDB root
-    command: pwgen -n 16 1
-    register: mariadb_root_password_gen
-    when: root_mycnf_stat.stat.exists == False
-    tags:
-      - mariadb
-
-  - name: Set a fact for the mariadb_root_password
-    set_fact:
-      mariadb_root_password: "{{ mariadb_root_password_gen.stdout | trim | quote }}"
-    when: root_mycnf_stat.stat.exists == False
-    tags:
-      - mariadb
-
-  - debug:
-      msg: "mariadb_root_password: {{ mariadb_root_password }}"
-      verbosity: 1
-    tags:
-      - mariadb
+    - name: Load the passwd from /root/.my.cnf
+      shell: "my_print_defaults --defaults-file='/root/.my.cnf' client | grep '^--password' | sed -e 's/--password=//'"
+      register: mariadb_root_password_read
+      when: root_mycnf_stat.stat.exists == True
+      tags:
+        - mariadb
+ 
+    - name: Set a fact for the mariadb_root_password
+      set_fact:
+        mariadb_root_password: "{{ mariadb_root_password_read.stdout | trim | quote }}"
+      when: root_mycnf_stat.stat.exists == True
+      tags:
+        - mariadb
+ 
+    - name: Generate a random password for MariaDB root
+      command: pwgen -n 16 1
+      register: mariadb_root_password_gen
+      when: root_mycnf_stat.stat.exists == False
+      tags:
+        - mariadb
+ 
+    - name: Set a fact for the mariadb_root_password
+      set_fact:
+        mariadb_root_password: "{{ mariadb_root_password_gen.stdout | trim | quote }}"
+      when: root_mycnf_stat.stat.exists == False
+      tags:
+        - mariadb
+ 
+    - debug:
+        msg: "mariadb_root_password: {{ mariadb_root_password }}"
+        verbosity: 1
+      tags:
+        - mariadb
 
   when: mariadb_root_password == "set"
 
@@ -72,7 +72,7 @@
     owner: root
     group: root
     mode: 0400
-    force: yes
+    force: true
   register: mariadb_root_password_written
   tags:
     - mariadb

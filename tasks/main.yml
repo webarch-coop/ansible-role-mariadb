@@ -9,7 +9,7 @@
       - python3-mysqldb
       - pwgen
     state: latest
-    update_cache: no
+    update_cache: false
   tags:
     - mariadb
 

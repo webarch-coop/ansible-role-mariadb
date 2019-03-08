@@ -131,17 +131,17 @@
 # Generate a password
 - block:
 
-  - name: "Generate a random password for {{ mariadb_username }} as it is not defined or empty"
-    command: pwgen -n 16 1
-    register: mariadb_password_gen
-    tags:
-      - mariadb
-
-  - name: Set a fact for the mariadb_password
-    set_fact:
-      mariadb_password: "{{ mariadb_password_gen.stdout | trim | quote }}"
-    tags:
-      - mariadb
+    - name: "Generate a random password for {{ mariadb_username }} as it is not defined or empty"
+      command: pwgen -n 16 1
+      register: mariadb_password_gen
+      tags:
+        - mariadb
+ 
+    - name: Set a fact for the mariadb_password
+      set_fact:
+        mariadb_password: "{{ mariadb_password_gen.stdout | trim | quote }}"
+      tags:
+        - mariadb
 
   when: mariadb_username_home_stat.stat.exists == False and ( mariadb_password is not defined or mariadb_password == "" )
 
@@ -155,18 +155,18 @@
 # Read a password
 - block:
 
-  - name: "mariadb_password loaded from {{ mariadb_mycnf }} since the file exists and the password was not set"
-    #shell: "grep ^password {{ mariadb_mycnf }} | sed -e 's/[[:space:]]//' | sed -e 's/password=//' | tr -d '\"'"
-    shell: "my_print_defaults --defaults-file='{{ mariadb_mycnf }}' client | grep '^--password' | sed -e 's/--password=//'"
-    register: mariadb_password_read
-    tags:
-      - mariadb
-
-  - name: Set a fact for the mariadb_password
-    set_fact:
-      mariadb_password: "{{ mariadb_password_read.stdout | trim | quote }}"
-    tags:
-      - mariadb
+    - name: "mariadb_password loaded from {{ mariadb_mycnf }} since the file exists and the password was not set"
+      # shell: "grep ^password {{ mariadb_mycnf }} | sed -e 's/[[:space:]]//' | sed -e 's/password=//' | tr -d '\"'"
+      shell: "my_print_defaults --defaults-file='{{ mariadb_mycnf }}' client | grep '^--password' | sed -e 's/--password=//'"
+      register: mariadb_password_read
+      tags:
+        - mariadb
+ 
+    - name: Set a fact for the mariadb_password
+      set_fact:
+        mariadb_password: "{{ mariadb_password_read.stdout | trim | quote }}"
+      tags:
+        - mariadb
 
   when: mariadb_username_home_stat.stat.exists == True and ( mariadb_password is not defined or mariadb_password == "" )
 
@@ -190,7 +190,7 @@
     owner: "{{ mariadb_mycnf_owner }}"
     group: "{{ mariadb_mycnf_group }}"
     mode: 0400
-    force: yes
+    force: true
   tags:
     - mariadb
 
