@@ -1,6 +1,6 @@
 # Ansible Debian MariaDB Role 
 
-This repository contains an Ansible role for installing [MariaDB](https://mariadb.org/) on Debian servers.
+This repository contains an Ansible role for installing [MariaDB](https://mariadb.org/) on Debian Stertch and Buster servers.
 
 To use this role you need to use Ansible Galaxy to install it into another repository under `galaxy/roles/mariadb` by adding a `requirements.yml` file in that repo that contains:
 
@@ -170,4 +170,3 @@ Note that the `mariadb_password` variable will only contain the password for the
          privs:
            - matomo.*:ALL
 ```
-    
