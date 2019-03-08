@@ -136,7 +136,7 @@
       register: mariadb_password_gen
       tags:
         - mariadb
-    
+
     - name: Set a fact for the mariadb_password
       set_fact:
         mariadb_password: "{{ mariadb_password_gen.stdout | trim | quote }}"
@@ -161,7 +161,7 @@
       register: mariadb_password_read
       tags:
         - mariadb
-     
+
     - name: Set a fact for the mariadb_password
       set_fact:
         mariadb_password: "{{ mariadb_password_read.stdout | trim | quote }}"
