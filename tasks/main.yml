@@ -15,7 +15,7 @@
 
 - name: Check /etc/debian_version
   shell: "lsb_release -c | awk '{ print $2 }'"
-  register: users_debian_version_check
+  register: mariadb_debian_version_check
   changed_when: false
   tags:
     - mariadb
