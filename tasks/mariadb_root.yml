@@ -76,3 +76,4 @@
   register: mariadb_root_password_written
   tags:
     - mariadb
+...

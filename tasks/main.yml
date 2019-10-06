@@ -54,3 +54,4 @@
   when: mariadb_username is defined and mariadb_username != ""
   tags:
     - mariadb
+...
