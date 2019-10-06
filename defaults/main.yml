@@ -13,17 +13,17 @@
 # then mariadb_root_password will be read from the file, if the file doesn't
 # exist then a new password will be generated and the mariadb_root_password
 # variable will be set
-# 
-# The mariadb_root_password will be written to the database and /root/.my.cnf 
+#
+# The mariadb_root_password will be written to the database and /root/.my.cnf
 #
 # If the mariadb_username is not set then no user account or database will be
-# created 
+# created
 #
 # If the mariadb_username is set but the mariadb_database name is not set then
-# the mariadb_username will be used as the mariadb_database name 
+# the mariadb_username will be used as the mariadb_database name
 #
 # The mariadb_database will be created, if it didn't already exist
-# 
+#
 # If a system user account exists with the same name as the mariadb_username
 # then mariadb_mycnf is set to ~/.my.cnf
 #
@@ -31,7 +31,7 @@
 # then mariadb_mycnf is set to /root/.mariadb_username.my.cnf
 #
 # If mariadb_mycnf doesn't exists and mariadb_password is not set then a random
-# password is generated for mariadb_password  
+# password is generated for mariadb_password 
 #
 # If mariadb_mycnf does exist then the mariadb_password is loaded from the file
 #
@@ -41,6 +41,6 @@
 # mariadb_root_password: set
 # mariadb_username:
 # mariadb_database:
-# mariadb_password: 
+# mariadb_password:
 # mariadb_mycnf:
 ...
