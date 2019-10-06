@@ -31,7 +31,7 @@
 # then mariadb_mycnf is set to /root/.mariadb_username.my.cnf
 #
 # If mariadb_mycnf doesn't exists and mariadb_password is not set then a random
-# password is generated for mariadb_password 
+# password is generated for mariadb_password
 #
 # If mariadb_mycnf does exist then the mariadb_password is loaded from the file
 #
