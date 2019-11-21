@@ -13,19 +13,6 @@
   tags:
     - mariadb
 
-- name: Check /etc/debian_version
-  shell: "lsb_release -c | awk '{ print $2 }'"
-  register: mariadb_debian_version_check
-  changed_when: false
-  tags:
-    - mariadb
-
-- name: Set a fact for the Debian version
-  set_fact:
-    mariadb_debian_version: "{{ mariadb_debian_version_check.stdout }}"
-  tags:
-    - mariadb
-
 - name: MariaDB defaults set
   template:
     src: templates/50-server.cnf.j2
