@@ -2,7 +2,7 @@
 - name: mariadb-server, mariadb-client and other packages present
   apt:
     pkg:
-      - lsb_release
+      - lsb-release
       - mariadb-server
       - mariadb-client
       - mysqltuner
