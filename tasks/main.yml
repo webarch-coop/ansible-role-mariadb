@@ -8,7 +8,7 @@
       - python-mysqldb
       - python3-mysqldb
       - pwgen
-    state: latest
+    state: present
     update_cache: false
   tags:
     - mariadb
@@ -22,23 +22,32 @@
   tags:
     - mariadb
 
+- name: MariaDB Systemd drop-in file in place
+  template:
+    src: templates/mariadb.conf.j2
+    dest: /etc/systemd/system/mariadb.service.d/mariadb.conf
+  register: mariadb_systemd
+  tags:
+    - mariadb
+
 - name: MariaDB restarted
-  service:
+  systemd:
     name: mysql
     state: restarted
-  when: mariadb_conf.changed
+    daemon_reload: true
+  when: ( mariadb_conf.changed ) or ( mariadb_systemd.changed )
   tags:
     - mariadb
 
 - name: Conditionally include the root password tasks
   include_tasks: mariadb_root.yml
-  when: mariadb_root_password is defined and mariadb_root_password != ""
+  when: ( mariadb_root_password is defined ) and ( mariadb_root_password != "" )
   tags:
     - mariadb
 
 - name: Conditionally include the user and database creation tasks
   include_tasks: mariadb_user.yml
-  when: mariadb_username is defined and mariadb_username != ""
+  when: ( mariadb_username is defined ) and ( mariadb_username != "" )
   tags:
     - mariadb
 ...

@@ -1,4 +1,9 @@
 ---
+# https://mariadb.com/kb/en/library/systemd/
+mariadb_systemd_no_new_privileges: true
+mariadb_systemd_private_network: true
+mariadb_systemd_private_tmp: true
+
 # -----------------------------------
 # ALL OF THESE VARIABLES ARE OPTIONAL
 # -----------------------------------
