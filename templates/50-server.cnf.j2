@@ -138,6 +138,12 @@ collation-server      		= utf8mb4_general_ci
 # If you use the same .cnf file for MySQL and MariaDB,
 # you can put MariaDB-only options here
 [mariadb]
+# https://mariadb.com/kb/en/library/performance-schema-overview/
+performance_schema=ON
+performance-schema-instrument='stage/%=ON'
+performance-schema-consumer-events-stages-current=ON
+performance-schema-consumer-events-stages-history=ON
+performance-schema-consumer-events-stages-history-long=ON
 
 # This group is only read by MariaDB-10.1 servers.
 # If you use the same .cnf file for MariaDB of different versions,
