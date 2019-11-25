@@ -3,4 +3,5 @@
 NoNewPrivileges={{ mariadb_systemd_no_new_privileges | default('false') }}
 PrivateNetwork={{ mariadb_systemd_private_network | default('false') }}
 PrivateTmp={{ mariadb_systemd_private_tmp | default('false') }}
+LimitNOFILE={{ mariadb_open_files_limit | default('16364') }}
 # vim: set ft=systemd:
