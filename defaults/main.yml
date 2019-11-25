@@ -1,8 +1,17 @@
 ---
+# Systemd security settings
 # https://mariadb.com/kb/en/library/systemd/
 mariadb_systemd_no_new_privileges: true
 mariadb_systemd_private_network: true
 mariadb_systemd_private_tmp: true
+
+# Performance settings
+mariadb_join_buffer_size: 256K
+mariadb_open_files_limit: 8000
+mariadb_table_open_cache: 4000
+mariadb_tmp_table_size: 32M
+mariadb_innodb_buffer_pool_size: 1G
+mariadb_innodb_log_file_size: 256M
 
 # -----------------------------------
 # ALL OF THESE VARIABLES ARE OPTIONAL

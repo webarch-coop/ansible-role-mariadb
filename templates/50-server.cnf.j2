@@ -41,6 +41,10 @@ myisam_recover_options  = BACKUP
 #max_connections        = 100
 #table_cache            = 64
 #thread_concurrency     = 10
+open_files_limit	= {{ mariadb_open_files_limit | default('8000') }}
+table_open_cache        = {{ mariadb_table_open_cache | default('2000') }}
+tmp_table_size		= {{ mariadb_tmp_table_size | default('32M') }}
+join_buffer_size	= {{ mariadb_join_buffer_size | default('256K') }}
 
 #
 # * Query Cache Configuration
@@ -88,8 +92,9 @@ innodb-file-format=barracuda
 innodb-file-per-table=1
 innodb-large-prefix=1
 {% endif %}
+innodb_buffer_pool_size: {{ mariadb_innodb_buffer_pool_size | default('1G') }}
+innodb_log_file_size: {{ mariadb_innodb_log_file_size | default('256M') }}
 
-#
 # * Security Features
 #
 # Read the manual, too, if you want chroot!
