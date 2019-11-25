@@ -12,6 +12,7 @@ mariadb_table_open_cache: 4000
 mariadb_tmp_table_size: 32M
 mariadb_innodb_buffer_pool_size: 1G
 mariadb_innodb_log_file_size: 256M
+mariadb_innodb_buffer_pool_instances: 1
 
 # -----------------------------------
 # ALL OF THESE VARIABLES ARE OPTIONAL

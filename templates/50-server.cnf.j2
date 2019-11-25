@@ -92,8 +92,9 @@ innodb-file-format=barracuda
 innodb-file-per-table=1
 innodb-large-prefix=1
 {% endif %}
-innodb_buffer_pool_size	= {{ mariadb_innodb_buffer_pool_size | default('1G') }}
-innodb_log_file_size 	= {{ mariadb_innodb_log_file_size | default('256M') }}
+innodb_buffer_pool_size		= {{ mariadb_innodb_buffer_pool_size | default('1G') }}
+innodb_log_file_size 		= {{ mariadb_innodb_log_file_size | default('256M') }}
+innodb_buffer_pool_instances	= {{ mariadb_innodb_buffer_pool_instances | default('1') }}
 
 # * Security Features
 #
