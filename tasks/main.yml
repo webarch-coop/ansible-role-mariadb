@@ -75,13 +75,19 @@
 
 - name: Conditionally include the root password tasks
   include_tasks: mariadb_root.yml
-  when: ( mariadb_root_password is defined ) and ( mariadb_root_password != "" )
+  when: ( mariadb_root_password is defined ) and ( mariadb_root_password | length > 0 )
+  tags:
+    - mariadb
+
+- name: Conditionally import the time zone tables import tasks
+  include_tasks: tz.yml
+  when: ( mariadb_time_zone_import is defined ) and ( mariadb_time_zone_import | bool == True )
   tags:
     - mariadb
 
 - name: Conditionally include the user and database creation tasks
   include_tasks: mariadb_user.yml
-  when: ( mariadb_username is defined ) and ( mariadb_username != "" )
+  when: ( mariadb_username is defined ) and ( mariadb_username | length > 0 )
   tags:
     - mariadb
 ...

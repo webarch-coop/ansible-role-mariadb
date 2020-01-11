@@ -15,10 +15,9 @@ mariadb_innodb_buffer_pool_size: 1G
 mariadb_innodb_log_file_size: 256M
 mariadb_innodb_buffer_pool_instances: 1
 
-# -----------------------------------
-# ALL OF THESE VARIABLES ARE OPTIONAL
-# -----------------------------------
-#
+# Import time zone tables
+mariadb_time_zone_import: false
+
 # If the mariadb_root_password variable is not set then nothing will be done to
 # the root account login, which, by default, uses a socket for logins and
 # doesn't have a password set, generally you will want to omit this option --
@@ -32,6 +31,8 @@ mariadb_innodb_buffer_pool_instances: 1
 #
 # The mariadb_root_password will be written to the database and /root/.my.cnf
 #
+# mariadb_root_password: set
+
 # If the mariadb_username is not set then no user account or database will be
 # created
 #
@@ -54,7 +55,6 @@ mariadb_innodb_buffer_pool_instances: 1
 # The mariadb_password will be written to mariadb_mycnf and the
 # mariadb_username database login updated to match
 #
-# mariadb_root_password: set
 # mariadb_username:
 # mariadb_database:
 # mariadb_password:
