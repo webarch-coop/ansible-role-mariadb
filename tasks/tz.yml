@@ -50,9 +50,9 @@
       shell: mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql mysql
 
     - name: Update the /root/.my.tzdata file
-      shell: dpkg-parsechangelog -l /usr/share/doc/tzdata/changelog.Debian.gz -S Date > /root/.my.tzdata 
+      shell: dpkg-parsechangelog -l /usr/share/doc/tzdata/changelog.Debian.gz -S Date > /root/.my.tzdata
 
-  when: ( not mariadb_tzdata_mariadb_file.stat.exists ) or ( mariadb_tzdata_mariadb_file.stat.exists and mariadb_tzdata_mariadb != mariadb_tzdata_latest ) 
+  when: ( not mariadb_tzdata_mariadb_file.stat.exists ) or ( mariadb_tzdata_mariadb_file.stat.exists and mariadb_tzdata_mariadb != mariadb_tzdata_latest )
   tags:
     - mariadb
 ...
