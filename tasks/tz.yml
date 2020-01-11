@@ -1,5 +1,5 @@
 ---
-- name: Check the latest date for the tzdata package
+- name: Get the latest date from the tzdata package changelog
   command: dpkg-parsechangelog -l /usr/share/doc/tzdata/changelog.Debian.gz -S Date
   check_mode: false
   changed_when: false
