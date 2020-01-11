@@ -6,6 +6,12 @@
   tags:
     - mariadb
 
+- name: Set a fact for the date of the latest version
+  set_fact:
+    mariadb_tzdata_latest: mariadb_tzdata_deb_date.stdout
+  tags:
+    - mariadb
+
 - name: Check if the /root/.my.tzdata file exists
   stat:
     path: /root/.my.tzdata
@@ -28,7 +34,7 @@
     - name: Debug the value of mariadb_tzdata_mariadb and mariadb_tzdata_deb_date
       debug:
         msg:
-          - "mariadb_tzdata_deb_date: {{ mariadb_tzdata_deb_date }}"
+          - "mariadb_tzdata_latest: {{ mariadb_tzdata_latest }}"
           - "mariadb_tzdata_mariadb: {{ mariadb_tzdata_mariadb }}"
         verbosity: 1
 
@@ -45,7 +51,7 @@
     - name: Update the /root/.my.tzdata file
       shell: dpkg-parsechangelog -l /usr/share/doc/tzdata/changelog.Debian.gz -S Date > /root/.my.tzdata 
 
-  when: ( not mariadb_tzdata_mariadb_file.stat.exists ) or ( mariadb_tzdata_mariadb_file.stat.exists and mariadb_tzdata_mariadb != mariadb_tzdata_deb_date ) 
+  when: ( not mariadb_tzdata_mariadb_file.stat.exists ) or ( mariadb_tzdata_mariadb_file.stat.exists and mariadb_tzdata_mariadb != mariadb_tzdata_latest ) 
   tags:
     - mariadb
 ...
