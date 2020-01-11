@@ -1,6 +1,7 @@
 ---
 - name: Check the latest date for the tzdata package
   command: dpkg-parsechangelog -l /usr/share/doc/tzdata/changelog.Debian.gz -S Date
+  check_mode: false
   register: mariadb_tzdata_deb_date
   tags:
     - mariadb
@@ -23,6 +24,13 @@
     - name: Set a fact for the date in the /root/.my.tzdata file
       set_fact:
         mariadb_tzdata_mariadb: "{{ mariadb_tzdata_mariadb_file_b64encoded['content'] | b64decode | trim }}"
+
+    - name: Debug the value of mariadb_tzdata_mariadb and mariadb_tzdata_deb_date
+      debug:
+        msg:
+          - "mariadb_tzdata_deb_date: {{ mariadb_tzdata_deb_date }}"
+          - "mariadb_tzdata_mariadb: {{ mariadb_tzdata_mariadb }}"
+        verbosity: 1
 
   when: mariadb_tzdata_mariadb_file.stat.exists
   tags:
