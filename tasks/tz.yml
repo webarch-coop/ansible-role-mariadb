@@ -8,7 +8,7 @@
 
 - name: Set a fact for the date of the latest version
   set_fact:
-    mariadb_tzdata_latest: mariadb_tzdata_deb_date.stdout
+    mariadb_tzdata_latest: "{{ mariadb_tzdata_deb_date.stdout }}"
   tags:
     - mariadb
 
