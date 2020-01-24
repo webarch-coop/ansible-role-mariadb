@@ -56,6 +56,13 @@
   tags:
     - mariadb
 
+- name: MariaDB Systemd directory present
+  file:
+    path: /etc/systemd/system/mariadb.service.d
+    state: directory
+  tags:
+    - mariadb
+
 - name: MariaDB Systemd drop-in file in place
   template:
     src: templates/mariadb.conf.j2
