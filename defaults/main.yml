@@ -19,9 +19,9 @@ mariadb_innodb_buffer_pool_instances: 1
 
 # Query cache configuration
 # https://mariadb.com/kb/en/query-cache/
-mariadb_query_cache_type: "0"
-mariadb_query_cache_limit: "0"
-mariadb_query_cache_size: "0"
+mariadb_query_cache_type: 0
+mariadb_query_cache_limit: 0
+mariadb_query_cache_size: 0
 
 # Import time zone tables
 mariadb_time_zone_import: false
