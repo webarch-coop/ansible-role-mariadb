@@ -53,7 +53,7 @@ max_heap_table_size     = {{ mariadb_max_heap_table_size | default('16M') }}
 # Disabled by default in MariaDB >= 10.1.7 see:
 # https://mariadb.com/kb/en/query-cache/
 query_cache_type	= {{ mariadb_query_cache_type | default('0') }}
-query_cache_limit	= {{ mariadb_query_cache_limit | default('0) }}
+query_cache_limit	= {{ mariadb_query_cache_limit | default('0') }}
 query_cache_size        = {{ mariadb_query_cache_size | default('0') }}
 
 #
