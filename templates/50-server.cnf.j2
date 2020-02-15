@@ -31,7 +31,7 @@ bind-address		= 127.0.0.1
 #
 # * Fine Tuning
 #
-key_buffer_size		= 16M
+key_buffer_size		= {{ mariadb_key_buffer_size | default('16M') }}
 max_allowed_packet	= {{ mariadb_max_allowed_packet | default('64M') }}
 thread_stack		= 192K
 thread_cache_size       = 8
@@ -45,12 +45,16 @@ open_files_limit	= {{ mariadb_open_files_limit | default('8000') }}
 table_open_cache        = {{ mariadb_table_open_cache | default('2000') }}
 tmp_table_size		= {{ mariadb_tmp_table_size | default('32M') }}
 join_buffer_size	= {{ mariadb_join_buffer_size | default('256K') }}
+max_heap_table_size     = {{ mariadb_max_heap_table_size | default('16M') }}
 
 #
 # * Query Cache Configuration
 #
-query_cache_limit	= 1M
-query_cache_size        = 16M
+# Disabled by default in MariaDB >= 10.1.7 see:
+# https://mariadb.com/kb/en/query-cache/
+query_cache_type	= {{ mariadb_query_cache_type | default('0') }}
+query_cache_limit	= {{ mariadb_query_cache_limit | default('0) }}
+query_cache_size        = {{ mariadb_query_cache_size | default('0') }}
 
 #
 # * Logging and Replication

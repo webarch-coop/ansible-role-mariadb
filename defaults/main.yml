@@ -11,9 +11,17 @@ mariadb_open_files_limit: 16364
 mariadb_table_open_cache: 4000
 mariadb_tmp_table_size: 32M
 mariadb_max_allowed_packet: 64M
+mariadb_key_buffer_size: 16M
+mariadb_max_heap_table_size: 16M
 mariadb_innodb_buffer_pool_size: 1G
 mariadb_innodb_log_file_size: 256M
 mariadb_innodb_buffer_pool_instances: 1
+
+# Query cache configuration
+# https://mariadb.com/kb/en/query-cache/
+mariadb_query_cache_type: 0
+mariadb_query_cache_limit: 0
+mariadb_query_cache_size: 0
 
 # Import time zone tables
 mariadb_time_zone_import: false
