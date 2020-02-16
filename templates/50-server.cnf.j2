@@ -39,6 +39,7 @@ thread_cache_size       = 8
 # the first time they are touched
 myisam_recover_options  = BACKUP
 max_connections         = {{ mariadb_max_connections | default('100') }}
+max_user_connections    = {{ mariadb_max_user_connections | default('0') }}
 table_cache             = {{ mariadb_table_cache | default('64') }}
 thread_concurrency      = {{ mariadb_thread_concurrency | default('10') }}
 open_files_limit	= {{ mariadb_open_files_limit | default('8000') }}
