@@ -143,7 +143,9 @@
       tags:
         - mariadb
 
-  when: mariadb_username_home_stat.stat.exists == False and ( mariadb_password is not defined or mariadb_password == "" )
+  when:
+    - ( mariadb_username_home_stat is defined) and ( mariadb_username_home_stat.stat.exists == False )
+    - ( mariadb_password is not defined ) or ( mariadb_password == "" )
 
 - debug:
     msg: "mariadb_password: {{ mariadb_password }}"
