@@ -116,7 +116,8 @@
   tags:
     - mariadb
 
-- debug:
+- name: Print the path for the .my.cnf file
+  debug:
     msg: "mariadb_mycnf: {{ mariadb_mycnf }}"
     verbosity: 1
   when: mariadb_mycnf is defined and mariadb_mycnf != ""
@@ -127,6 +128,8 @@
   stat:
     path: "{{ mariadb_mycnf }}"
   register: mariadb_username_home_stat
+  tags:
+    - mariadb
 
 # Generate a password
 - block:
@@ -134,18 +137,16 @@
     - name: "Generate a random password for {{ mariadb_username }} as it is not defined or empty"
       command: pwgen -n 16 1
       register: mariadb_password_gen
-      tags:
-        - mariadb
 
     - name: Set a fact for the mariadb_password
       set_fact:
         mariadb_password: "{{ mariadb_password_gen.stdout | trim | quote }}"
-      tags:
-        - mariadb
 
   when:
     - ( mariadb_username_home_stat is defined) and ( mariadb_username_home_stat.stat.exists == False )
     - ( mariadb_password is not defined ) or ( mariadb_password == "" )
+  tags:
+    - mariadb
 
 - debug:
     msg: "mariadb_password: {{ mariadb_password }}"
