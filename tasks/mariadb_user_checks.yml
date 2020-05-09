@@ -175,7 +175,7 @@
           - mariadb_password is defined
           - mariadb_password | length => 8
           - mariadb_password | length <= 24
-      no_log: true
+      # no_log: true
 
     - name: Fail if any variables are not defined
       assert:
