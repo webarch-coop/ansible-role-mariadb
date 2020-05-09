@@ -1,47 +1,10 @@
 ---
-- debug:
-    msg: "mariadb_username: {{ mariadb_username }}"
-    verbosity: 1
-  when: mariadb_username is defined and mariadb_username != ""
+- name: Include user variable checks
+  include_tasks: mariadb_user_checks.yml
   tags:
     - mariadb
 
-- debug:
-    msg: "mariadb_database: {{ mariadb_database }}"
-    verbosity: 1
-  when: mariadb_database is defined and mariadb_database != ""
-  tags:
-    - mariadb
-
-- debug:
-    msg: "mariadb_password: {{ mariadb_password }}"
-    verbosity: 1
-  when: mariadb_password is defined and mariadb_password != ""
-  tags:
-    - mariadb
-
-- debug:
-    msg: "mariadb_mycnf: {{ mariadb_mycnf }}"
-    verbosity: 1
-  when: mariadb_mycnf is defined and mariadb_mycnf != ""
-  tags:
-    - mariadb
-
-- name: Set the mariadb_database name to match the mariadb_username
-  set_fact:
-    mariadb_database: "{{ mariadb_username }}"
-  when: mariadb_database is not defined and mariadb_database == ""
-  tags:
-    - mariadb
-
-- debug:
-    msg: "mariadb_database: {{ mariadb_database }}"
-    verbosity: 1
-  when: mariadb_database is defined and mariadb_database != ""
-  tags:
-    - mariadb
-
-- name: MariaDB database present
+- name: "MariaDB database {{ mariadb_database }} present"
   mysql_db:
     name: "{{ mariadb_database }}"
     state: present
@@ -49,151 +12,15 @@
   tags:
     - mariadb
 
-- name: Check if a user account matching the MariaDB username exists
-  shell: "grep '^{{ mariadb_username }}:' /etc/passwd | awk -F : '{ print $6 }'"
-  register: mariadb_username_home_check
-  tags:
-    - mariadb
-
-- debug:
-    msg: "mariadb_username_home_check.stdout: {{ mariadb_username_home_check.stdout | quote }}"
-    verbosity: 1
-  tags:
-    - mariadb
-
-- debug:
-    msg: "mariadb_username_home_check.stderr: {{ mariadb_username_home_check.stderr | quote }}"
-    verbosity: 2
-  tags:
-    - mariadb
-
-- name: Check if a user group matching the MariaDB username exists
-  command: "grep '^{{ mariadb_username }}:' /etc/group"
-  register: mariadb_username_group_check
-  tags:
-    - mariadb
-
-- debug:
-    msg: "mariadb_username_group_check.stdout: {{ mariadb_username_group_check.stdout | quote }}"
-    verbosity: 1
-  tags:
-    - mariadb
-
-- debug:
-    msg: "mariadb_username_group_check.stderr: {{ mariadb_username_group_check.stderr | quote }}"
-    verbosity: 2
-  tags:
-    - mariadb
-
-- name: "Set mariadb_mycnf_group to {{ mariadb_username }} as the group exists"
-  set_fact:
-    mariadb_mycnf_group: "{{ mariadb_username }}"
-  when: mariadb_username_group_check.stdout != ""
-  tags:
-    - mariadb
-
-- name: "Set mariadb_mycnf_group to users as the {{ mariadb_username }} group doesn't exists"
-  set_fact:
-    mariadb_mycnf_group: users
-  when: mariadb_username_group_check.stdout == ""
-  tags:
-    - mariadb
-
-- name: "Set mariadb_mycnf to /root/.{{ mariadb_username }}.my.cnf"
-  set_fact:
-    mariadb_mycnf: "/root/.{{ mariadb_username }}.my.cnf"
-    mariadb_mycnf_owner: root
-  when: mariadb_mycnf is not defined and mariadb_username_home_check.stdout == ""
-  tags:
-    - mariadb
-
-- name: "Set mariadb_mycnf to {{ mariadb_username_home_check.stdout | quote }}/.my.cnf"
-  set_fact:
-    mariadb_mycnf: "{{ mariadb_username_home_check.stdout | quote }}/.my.cnf"
-    mariadb_mycnf_owner: "{{ mariadb_username }}"
-    mariadb_mycnf_group: "{{ mariadb_mycnf_group }}"
-  when: mariadb_mycnf is not defined and mariadb_username_home_check.stdout != ""
-  tags:
-    - mariadb
-
-- name: Print the path for the .my.cnf file
-  debug:
-    msg: "mariadb_mycnf: {{ mariadb_mycnf }}"
-    verbosity: 1
-  when: mariadb_mycnf is defined and mariadb_mycnf != ""
-  tags:
-    - mariadb
-
-- name: "Stat {{ mariadb_mycnf }}"
-  stat:
-    path: "{{ mariadb_mycnf }}"
-  register: mariadb_username_home_stat
-  tags:
-    - mariadb
-
-# Generate a password
-- block:
-
-    - name: "Generate a random password for {{ mariadb_username }} as it is not defined or empty"
-      command: pwgen -n 16 1
-      register: mariadb_password_gen
-
-    - name: Set a fact for the mariadb_password
-      set_fact:
-        mariadb_password: "{{ mariadb_password_gen.stdout | trim | quote }}"
-
-  when:
-    - ( mariadb_username_home_stat is defined) and ( mariadb_username_home_stat.stat.exists == False )
-    - ( mariadb_password is not defined ) or ( mariadb_password == "" )
-  tags:
-    - mariadb
-
-- debug:
-    msg: "mariadb_password: {{ mariadb_password }}"
-    verbosity: 1
-  when: mariadb_password is defined and mariadb_password != ""
-  tags:
-    - mariadb
-
-# Read a password
-- block:
-
-    - name: "mariadb_password loaded from {{ mariadb_mycnf }} since the file exists and the password was not set"
-      # shell: "grep ^password {{ mariadb_mycnf }} | sed -e 's/[[:space:]]//' | sed -e 's/password=//' | tr -d '\"'"
-      shell: "my_print_defaults --defaults-file='{{ mariadb_mycnf }}' client | grep '^--password' | sed -e 's/--password=//'"
-      register: mariadb_password_read
-      tags:
-        - mariadb
-
-    - name: Set a fact for the mariadb_password
-      set_fact:
-        mariadb_password: "{{ mariadb_password_read.stdout | trim | quote }}"
-      tags:
-        - mariadb
-
-  when: mariadb_username_home_stat.stat.exists == True and ( mariadb_password is not defined or mariadb_password == "" )
-
-- debug:
-    msg: "mariadb_password: {{ mariadb_password }}"
-    verbosity: 1
-  when: mariadb_password is defined and mariadb_password != ""
-  tags:
-    - mariadb
-
-- fail:
-    msg: "The mariadb_password appears not to be set"
-  when: mariadb_password is not defined or mariadb_password == ""
-  tags:
-    - mariadb
-
-- name: "mariadb_password written to {{ mariadb_mycnf }}"
+- name: "MariaDB .my.cnf for {{ mariadb_username }} present at {{ mariadb_mycnf }}"
   template:
     src: templates/my.cnf.j2
     dest: "{{ mariadb_mycnf }}"
     owner: "{{ mariadb_mycnf_owner }}"
     group: "{{ mariadb_mycnf_group }}"
-    mode: 0400
+    mode: 0640
     force: true
+  no_log: true
   tags:
     - mariadb
 
@@ -203,7 +30,7 @@
     login_unix_socket: /var/run/mysqld/mysqld.sock
     name: "{{ mariadb_username }}"
     password: "{{ mariadb_password }}"
-    priv: "{{ mariadb_database }}.*:ALL"
+    priv: "{{ mariadb_database }}.*:{{ mariadb_priv }}"
     state: present
     update_password: always
   register: mariadb_user_creation

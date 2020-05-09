@@ -2,13 +2,12 @@
 - name: mariadb-server, mariadb-client and other packages present
   apt:
     pkg:
-      - lsb-release
-      - mariadb-server
       - mariadb-client
+      - mariadb-server
       - mysqltuner
+      - pwgen
       - python-mysqldb
       - python3-mysqldb
-      - pwgen
     state: present
     update_cache: false
   tags:
