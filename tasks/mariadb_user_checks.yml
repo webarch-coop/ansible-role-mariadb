@@ -23,7 +23,7 @@
         - ( mariadb_privs is not defined ) or ( mariadb_privs | length <= 0 )
 
     # https://mariadb.com/kb/en/library/grant/#table-privileges
-    - name: Check that the MariaDB database privileges are valid for
+    - name: Check that the MariaDB database privileges are valid
       assert:
         that:
           - ( mariadb_privs is defined ) and ( mariadb_privs | length > 0 ) and ( mariadb_privs[0] is not defined )
