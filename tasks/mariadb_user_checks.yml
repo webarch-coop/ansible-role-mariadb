@@ -139,7 +139,7 @@
           set_fact:
             mariadb_password: "{{ line | regex_replace('^--password=') }}"
           when: line is regex('^--password=')
-          loop: "{{ mariadb_password_read.stdout_lines }}"
+          loop: "{{ mariadb_my_print_defaults_command.stdout_lines }}"
           loop_control:
             loop_var: line
           # no_log: true
