@@ -3,7 +3,7 @@
   block:
 
     - name: Include debugging
-      include_tasks: mariadb_user_check_debug.yml
+      include_tasks: mariadb_user_checks_debug.yml
       # when:
         # - enable_task_debugger is defined
         # - enable_task_debugger == True
@@ -15,6 +15,19 @@
           - ( mariadb_username is defined ) and ( mariadb_username | length > 0 )
           - ( mariadb_username is regex("^[a-z0-9_]*$") )
           - ( mariadb_username is regex("^.{2,25}$") )
+
+    - name: Set the privs to ALL if not defined
+      set_fact:
+        mariadb_privs: "ALL"
+      when:
+        - ( mariadb_privs is not defined ) or ( mariadb_privs | length <= 0 )
+
+    # https://mariadb.com/kb/en/library/grant/#table-privileges
+    - name: Check that the MariaDB database privileges are valid for
+      assert:
+        that:
+          - ( mariadb_privs is defined ) and ( mariadb_privs | length > 0 ) and ( mariadb_privs[0] is not defined )
+          - ( mariadb_priv is regex("^ALL|ALTER|CREATE|CREATEVIEW|DELETE|DELETEHISTORY|DROP|GRANTOPTION|INDEX|INSERT|REFERENCES|SELECT|SHOWVIEW|TRIGGER|UPDATE$") )
 
     - name: Check the mariadb_database is valid if defined 
       assert:
@@ -163,7 +176,7 @@
           - mariadb_priv is defined
 
     - name: Include debugging
-      include_tasks: mariadb_user_check_debug.yml
+      include_tasks: mariadb_user_checks_debug.yml
       # when:
         # - enable_task_debugger is defined
         # - enable_task_debugger == True
