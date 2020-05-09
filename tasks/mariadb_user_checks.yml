@@ -16,17 +16,17 @@
           - ( mariadb_username is regex("^[a-z0-9_]*$") )
           - ( mariadb_username is regex("^.{2,25}$") )
 
-    - name: Set the privs to ALL if not defined
+    - name: Set the priv to ALL if not defined
       set_fact:
-        mariadb_privs: "ALL"
+        mariadb_priv: "ALL"
       when:
-        - ( mariadb_privs is not defined ) or ( mariadb_privs | length <= 0 )
+        - ( mariadb_priv is not defined ) or ( mariadb_priv | length <= 0 )
 
     # https://mariadb.com/kb/en/library/grant/#table-privileges
     - name: Check that the MariaDB database privileges are valid
       assert:
         that:
-          - ( mariadb_privs is defined ) and ( mariadb_privs | length > 0 )
+          - ( mariadb_priv is defined ) and ( mariadb_priv | length > 0 )
           - ( mariadb_priv is regex("^ALL|ALTER|CREATE|CREATEVIEW|DELETE|DELETEHISTORY|DROP|GRANTOPTION|INDEX|INSERT|REFERENCES|SELECT|SHOWVIEW|TRIGGER|UPDATE$") )
 
     - name: Check the mariadb_database is valid if defined
