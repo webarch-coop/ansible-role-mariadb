@@ -109,23 +109,23 @@
     - name: "Stat {{ mariadb_mycnf }}"
       stat:
         path: "{{ mariadb_mycnf }}"
-      register: mariadb_mycnf_stat
+      register: mariadb_mycnf_path
 
-    - name: Debug mariadb_mycnf_stat
+    - name: Debug mariadb_mycnf_path
       debug:
-        var: mariadb_mycnf_stat
+        var: mariadb_mycnf_path
         verbosity: 1
-      when: mariadb_mycnf_stat is defined
+      when: mariadb_mycnf_path is defined
 
     - name: "Set a fact if {{ mariadb_mycnf }} exists"
       set_fact:
         mariadb_mycnf_present: true
-      when: ( mariadb_mycnf_stat is defined ) and ( mariadb_mycnf_stat.exists == True )
+      when: ( mariadb_mycnf_path is defined ) and ( mariadb_mycnf_path.stat.exists == True )
 
     - name: "Set a fact if {{ mariadb_mycnf }} doesn't exist"
       set_fact:
         mariadb_mycnf_present: false
-      when: ( mariadb_mycnf_stat is not defined ) or ( mariadb_mycnf_stat is defined and mariadb_mycnf_stat.exists == False )
+      when: ( mariadb_mycnf_path is not defined ) or ( mariadb_mycnf_path is defined and mariadb_mycnf_path.stat.exists == False )
 
     - name: "Read the password from {{ mariadb_mycnf }}"
       block:
