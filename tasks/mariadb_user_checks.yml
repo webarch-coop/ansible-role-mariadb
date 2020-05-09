@@ -5,8 +5,8 @@
     - name: Include debugging
       include_tasks: mariadb_user_checks_debug.yml
       # when:
-        # - enable_task_debugger is defined
-        # - enable_task_debugger == True
+      #   - enable_task_debugger is defined
+      #   - enable_task_debugger == True
 
     # Max length is 64 characters https://dev.mysql.com/doc/refman/8.0/en/identifier-length.html
     - name: Check the mariadb_username is valid
@@ -29,7 +29,7 @@
           - ( mariadb_privs is defined ) and ( mariadb_privs | length > 0 ) and ( mariadb_privs[0] is not defined )
           - ( mariadb_priv is regex("^ALL|ALTER|CREATE|CREATEVIEW|DELETE|DELETEHISTORY|DROP|GRANTOPTION|INDEX|INSERT|REFERENCES|SELECT|SHOWVIEW|TRIGGER|UPDATE$") )
 
-    - name: Check the mariadb_database is valid if defined 
+    - name: Check the mariadb_database is valid if defined
       assert:
         that:
           - ( mariadb_username | length > 0 )
@@ -178,8 +178,8 @@
     - name: Include debugging
       include_tasks: mariadb_user_checks_debug.yml
       # when:
-        # - enable_task_debugger is defined
-        # - enable_task_debugger == True
+      #   - enable_task_debugger is defined
+      #   - enable_task_debugger == True
 
   tags:
     - mariadb

@@ -24,12 +24,12 @@
 
     - debug:
         msg: "mariadb_mycnf_owner: {{ mariadb_mycnf_owner }}"
-          verbosity: 1
+        verbosity: 1
       when: ( mariadb_mycnf_owner is defined ) and ( mariadb_mycnf_owner | length > 0 )
 
     - debug:
         msg: "mariadb_mycnf_group: {{ mariadb_mycnf_group }}"
-          verbosity: 1
+        verbosity: 1
       when: ( mariadb_mycnf_group is defined ) and ( mariadb_mycnf_group | length > 0 )
 
   tags:
