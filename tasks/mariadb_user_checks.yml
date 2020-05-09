@@ -1,0 +1,173 @@
+---
+- name: Set variables and paths
+  block:
+
+    - name: Include debugging
+      include_tasks: mariadb_user_check_debug.yml
+      # when:
+        # - enable_task_debugger is defined
+        # - enable_task_debugger == True
+
+    # Max length is 64 characters https://dev.mysql.com/doc/refman/8.0/en/identifier-length.html
+    - name: Check the mariadb_username is valid
+      assert:
+        that:
+          - ( mariadb_username is defined ) and ( mariadb_username | length > 0 )
+          - ( mariadb_username is regex("^[a-z0-9_]*$") )
+          - ( mariadb_username is regex("^.{2,25}$") )
+
+    - name: Check the mariadb_database is valid if defined 
+      assert:
+        that:
+          - ( mariadb_username | length > 0 )
+          - ( mariadb_database is regex("^[a-z0-9_]*$") )
+          - ( mariadb_database is regex("^.{2,25}$") )
+      when: ( mariadb_database is defined )
+
+    - name: Set the mariadb_database name to match the mariadb_username if it is not defined
+      set_fact:
+        mariadb_database: "{{ mariadb_username }}"
+      when: ( mariadb_database is not defined ) or ( mariadb_database | length <= 0 )
+
+    - name: Set the mariadb_mycnf path is it is not defined
+      block:
+
+        - name: Getent passwd
+          getent:
+            database: passwd
+
+        - name: Set a variable for the getent users
+          set_fact:
+            getent_users: "{{ getent_passwd | dict2items }}"
+
+        - name: Set a fact for .my.cnf path if a user account matching the MariaDB username exists
+          set_fact:
+            mariadb_mycnf: "{{ user.value[4] }}/.my.cnf"
+            mariadb_mycnf_owner: "{{ user.key }}"
+          when:
+            - ( mariadb_username  == user.key )
+          loop: "{{ getent_users | dict2items }}"
+          loop_control:
+            loop_var: user
+
+        - name: Get a group name when a user account matching the MariaDB username exists
+          block:
+
+            - name: Getent groups
+              getent:
+                database: group
+                split: ':'
+
+            - name: Set a variable for the getent groups
+              set_fact:
+                getent_users: "{{ getent_passwd | dict2items }}"
+
+            - name: Set a fact if a user group matching the MariaDB username exists
+              set_fact:
+                mariadb_mycnf_group: "{{ group.key }}"
+              when:
+                - ( mariadb_username  == group.key )
+              loop: "{{ getent_users | dict2items }}"
+              loop_control:
+                loop_var: group
+
+            - name: "Set mariadb_mycnf_group to users as the {{ mariadb_username }} group doesn't exists"
+              set_fact:
+                mariadb_mycnf_group: users
+
+          when:
+            - ( mariadb_mycnf_group is not defined ) or ( mariadb_mycnf_group | length > 0 )
+            - ( mariadb_mycnf_owner is defined )
+            - ( mariadb_mycnf_owner | length > 0 )
+            - ( mariadb_mycnf_owner != "root" )
+
+        - name: "Set mariadb_mycnf to /root/.{{ mariadb_username }}.my.cnf"
+          set_fact:
+            mariadb_mycnf: "/root/.{{ mariadb_username }}.my.cnf"
+            mariadb_mycnf_owner: root
+            mariadb_mycnf_group: root
+          when:
+            - ( mariadb_mycnf_owner is not defined ) or ( mariadb_mycnf_owner | length > 0 )
+            - ( mariadb_mycnf_group is not defined ) or ( mariadb_mycnf_owner | length > 0 )
+
+      when:
+        - ( mariadb_mycnf is not defined ) or ( mariadb_mycnf | length > 0 )
+
+    - name: "Stat {{ mariadb_mycnf }}"
+      stat:
+        path: "{{ mariadb_mycnf }}"
+      register: mariadb_mycnf_stat
+
+    - name: "Set a fact if {{ mariadb_mycnf }} exists"
+      set_fact:
+        mariadb_mycnf_present: true
+      when: mariadb_mycnf_stat.exists
+
+    - name: "Read the password from {{ mariadb_mycnf }}"
+      block:
+
+        - name: "mariadb_password loaded from {{ mariadb_mycnf }} since the file exists and the password was not set"
+          command: "my_print_defaults --defaults-file='{{ mariadb_mycnf }}' client"
+          register: mariadb_my_print_defaults_command
+          no_log: true
+
+        - name: Set a fact for mariadb_password
+          set_fact:
+            mariadb_password: "{{ line | regex_replace('^--password=') }}"
+          when: line is regex('^--password=')
+          loop: "{{ mariadb_password_read.stdout_lines }}"
+          loop_control:
+            loop_var: line
+          no_log: true
+
+      when:
+        - ( mariadb_mycnf_exists is defined ) and ( mariadb_mycnf_exists == True )
+        - ( mariadb_password is not defined ) or ( mariadb_password | length <= 0 )
+      tags:
+        - mariadb
+
+    - name: Generate a password
+      block:
+
+        - name: "Generate a random password for {{ mariadb_username }} as it is not defined or empty"
+          command: pwgen -n 20 1
+          register: mariadb_password_gen
+          no_log: true
+
+        - name: Set a fact for the mariadb_password
+          set_fact:
+            mariadb_password: "{{ mariadb_password_gen.stdout | trim | quote }}"
+          no_log: true
+
+      when:
+        - ( mariadb_mycnf_exists is defined ) and ( mariadb_mycnf_exists == False )
+        - ( mariadb_password is not defined ) or ( mariadb_password | length <= 0 )
+      tags:
+        - mariadb
+
+    - name: Check that the mariadb_password is a variable of a sensible length
+      assert:
+        that:
+          - mariadb_password[0] is not defined
+          - mariadb_password | length => 8
+          - mariadb_password | length <= 24
+      no_log: true
+
+    - name: Fail if any variables are not defined
+      assert:
+        that:
+          - mariadb_username is defined
+          - mariadb_password is defined
+          - mariadb_database is defined
+          - mariadb_mycnf is defined
+          - mariadb_priv is defined
+
+    - name: Include debugging
+      include_tasks: mariadb_user_check_debug.yml
+      # when:
+        # - enable_task_debugger is defined
+        # - enable_task_debugger == True
+
+  tags:
+    - mariadb
+...

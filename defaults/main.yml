@@ -68,6 +68,7 @@ mariadb_time_zone_import: false
 # mariadb_username database login updated to match
 #
 # mariadb_username:
+# mariadb_priv: ALL
 # mariadb_database:
 # mariadb_password:
 # mariadb_mycnf:

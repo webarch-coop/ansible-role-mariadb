@@ -1,0 +1,37 @@
+---
+- name: Debug variables and paths
+  block:
+
+    - debug:
+        msg: "mariadb_username: {{ mariadb_username }}"
+        verbosity: 1
+      when: ( mariadb_username is defined ) and ( mariadb_username | length > 0 )
+
+    - debug:
+        msg: "mariadb_database: {{ mariadb_database }}"
+        verbosity: 1
+      when: ( mariadb_database is defined ) and ( mariadb_database | length > 0 )
+
+    - debug:
+        msg: "mariadb_password: {{ mariadb_password }}"
+        verbosity: 3
+      when: ( mariadb_password is defined ) and ( mariadb_password | length > 0 )
+
+    - debug:
+        msg: "mariadb_mycnf: {{ mariadb_mycnf }}"
+        verbosity: 1
+      when: ( mariadb_mycnf is defined ) and ( mariadb_mycnf | length > 0 )
+
+    - debug:
+        msg: "mariadb_mycnf_owner: {{ mariadb_mycnf_owner }}"
+          verbosity: 1
+      when: ( mariadb_mycnf_owner is defined ) and ( mariadb_mycnf_owner | length > 0 )
+
+    - debug:
+        msg: "mariadb_mycnf_group: {{ mariadb_mycnf_group }}"
+          verbosity: 1
+      when: ( mariadb_mycnf_group is defined ) and ( mariadb_mycnf_group | length > 0 )
+
+  tags:
+    - mariadb
+...
