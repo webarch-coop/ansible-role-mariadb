@@ -59,7 +59,7 @@
             mariadb_mycnf_owner: "{{ user.key }}"
           when:
             - ( mariadb_username  == user.key )
-          loop: "{{ getent_users | dict2items }}"
+          loop: "{{ getent_users }}"
           loop_control:
             loop_var: user
 
