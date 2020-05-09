@@ -51,7 +51,7 @@
 
         - name: Set a variable for the getent users
           set_fact:
-            getent_users: "{{ getent_passwd | dict2items }}"
+            getent_users: "{{ getent_passwd }}"
 
         - name: Set a fact for .my.cnf path if a user account matching the MariaDB username exists
           set_fact:
@@ -59,7 +59,7 @@
             mariadb_mycnf_owner: "{{ user.key }}"
           when:
             - ( mariadb_username  == user.key )
-          loop: "{{ getent_users }}"
+          loop: "{{ getent_users | dict2items }}"
           loop_control:
             loop_var: user
 
@@ -73,7 +73,7 @@
 
             - name: Set a variable for the getent groups
               set_fact:
-                getent_users: "{{ getent_passwd | dict2items }}"
+                getent_users: "{{ getent_passwd }}"
 
             - name: Set a fact if a user group matching the MariaDB username exists
               set_fact:
