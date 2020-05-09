@@ -26,7 +26,7 @@
     - name: Check that the MariaDB database privileges are valid
       assert:
         that:
-          - ( mariadb_privs is defined ) and ( mariadb_privs | length > 0 ) and ( mariadb_privs[0] is not defined )
+          - ( mariadb_privs is defined ) and ( mariadb_privs | length > 0 )
           - ( mariadb_priv is regex("^ALL|ALTER|CREATE|CREATEVIEW|DELETE|DELETEHISTORY|DROP|GRANTOPTION|INDEX|INSERT|REFERENCES|SELECT|SHOWVIEW|TRIGGER|UPDATE$") )
 
     - name: Check the mariadb_database is valid if defined
