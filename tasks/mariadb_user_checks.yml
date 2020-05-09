@@ -133,7 +133,7 @@
         - name: "mariadb_password loaded from {{ mariadb_mycnf }} since the file exists and the password was not set"
           command: "my_print_defaults --defaults-file='{{ mariadb_mycnf }}' client"
           register: mariadb_my_print_defaults_command
-          # no_log: true
+          no_log: true
 
         - name: Set a fact for mariadb_password
           set_fact:
@@ -142,11 +142,10 @@
           loop: "{{ mariadb_my_print_defaults_command.stdout_lines }}"
           loop_control:
             loop_var: line
-          # no_log: true
+          no_log: true
 
       when:
         - ( mariadb_mycnf_present is defined ) and ( mariadb_mycnf_present == True )
-        - ( mariadb_password is not defined ) or ( mariadb_password | length <= 0 )
       tags:
         - mariadb
 
@@ -165,16 +164,8 @@
 
       when:
         - ( mariadb_mycnf_present is defined ) and ( mariadb_mycnf_present == False )
-        - ( mariadb_password is not defined ) or ( mariadb_password | length <= 0 )
       tags:
         - mariadb
-
-    - name: Check that the mariadb_password is defined and a variable of a sensible length
-      assert:
-        that:
-          - mariadb_password is defined
-          - mariadb_password is regex("^.{2,24}$")
-      no_log: true
 
     - name: Fail if any variables are not defined
       assert:

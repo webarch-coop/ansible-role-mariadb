@@ -14,12 +14,6 @@
         verbosity: 1
       when: ( mariadb_database is defined ) and ( mariadb_database | length > 0 )
 
-    - name: Debug the mariadb_password variable
-      debug:
-        msg: "mariadb_password: {{ mariadb_password }}"
-        verbosity: 3
-      when: ( mariadb_password is defined ) and ( mariadb_password | length > 0 )
-
     - name: Debug the mariadb_mycnf variable
       debug:
         msg: "mariadb_mycnf: {{ mariadb_mycnf }}"

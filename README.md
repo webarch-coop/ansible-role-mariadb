@@ -101,19 +101,19 @@ Note that the `mariadb_password` variable will only contain the password for the
 
 * Check that the mariadb_username and mariadb_database are lowercase and contain no punctuation or white space 
 * Add additional optional `mariadb_` variables for values in `templates/50-server.cnf.j2`
-* <strike>Consider adding the ability to create multiple database users and databases, reading these from YAML dicts, for example:</strike> This has been implemented in the [users role](https://git.coop/webarch/users)
+* Consider adding the ability to create multiple database users and databases, reading these from YAML dicts, for example:
 ```yml
   vars:
-    maria_databases:
-      - wordpress
-      - civicrm
-      - matomo
-    mariadb_users:
-      wordpress:
-        privs: 
-         - wordpress.*:ALL
-         - civicrm.*:ALL
-      matomo:
-         privs:
-           - matomo.*:ALL
+    mariadb_databases_present:
+      - wordpress_prod
+      - wordpress_stage
+    mariadb_databases_absent:
+      - drupal_prod
+      - drupal_stage
+    mariadb_users_present:
+      - name: wordpress
+        priv:
+          - 'wordpress_prod.*:ALL'
+          - 'wordpress_stage.*:ALL'
+      
 ```
