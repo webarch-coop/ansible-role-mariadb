@@ -111,6 +111,12 @@
         path: "{{ mariadb_mycnf }}"
       register: mariadb_mycnf_stat
 
+    - name: Debug mariadb_mycnf_stat
+      debug:
+        var: mariadb_mycnf_stat
+        verbosity: 1
+      when: mariadb_mycnf_stat is defined
+
     - name: "Set a fact if {{ mariadb_mycnf }} exists"
       set_fact:
         mariadb_mycnf_present: true
