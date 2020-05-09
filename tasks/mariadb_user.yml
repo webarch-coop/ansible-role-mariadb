@@ -1,6 +1,6 @@
 ---
 - name: Include user variable checks
-  include_tasks: mariadb_users_checks.yml
+  include_tasks: mariadb_user_checks.yml
   tags:
     - mariadb
 
