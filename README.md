@@ -74,28 +74,32 @@ ansible-playbook mariadb.yml
 
 ## Creating multiple users and databases
 
-This is untested but you should be able to call the `mariadb_user.yml` tasks multiple times, for example:
+You can call the `mariadb_user.yml` tasks multiple times, for example:
 
 ```yml
 - name: Create database and user for WordPress
-  include_tasks: galaxy/roles/mariadb/tasks/mariadb_user.yml
+  include_role: mariadd
+    tasks_from: mariadb_user.yml
   vars: 
-    mariadb_user: wordpress
+    mariadb_database: wordpress
+    mariadb_username: wordpress
 
 - debug:
     msg: "The MariaDB password for WordPress is: {{ mariadb_password }}"
 
 - name: Create database and user for Matomo
-  include_tasks: galaxy/roles/mariadb/tasks/mariadb_user.yml
+  include_role: mariadd
+    tasks_from: mariadb_user.yml
   vars:
-    mariadb_user: matomo
+    mariadb_database: matomo
+    mariadb_username: matomo
 
 - debug:
     msg: "The MariaDB password for Matomo is: {{ mariadb_password }}"
 ```
 
-Note that the `mariadb_password` variable will only contain the password for the last user created and will be overwritten when another user is created.
-
+Note that the `mariadb_password` variable will contain the password for
+the last user created.
 
 ## TODO
 
