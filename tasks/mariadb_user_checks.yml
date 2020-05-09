@@ -114,7 +114,12 @@
     - name: "Set a fact if {{ mariadb_mycnf }} exists"
       set_fact:
         mariadb_mycnf_present: true
-      when: mariadb_mycnf_stat.exists
+      when: ( mariadb_mycnf_stat is defined ) and ( mariadb_mycnf_stat.exists == True )
+
+    - name: "Set a fact if {{ mariadb_mycnf }} doesn't exist"
+      set_fact:
+        mariadb_mycnf_present: false
+      when: ( mariadb_mycnf_stat is not defined ) or ( mariadb_mycnf_stat is defined and mariadb_mycnf_stat.exists == False )
 
     - name: "Read the password from {{ mariadb_mycnf }}"
       block:
