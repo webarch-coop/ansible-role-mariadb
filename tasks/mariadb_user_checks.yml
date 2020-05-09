@@ -173,9 +173,8 @@
       assert:
         that:
           - mariadb_password is defined
-          - mariadb_password | length => 8
-          - mariadb_password | length <= 24
-      # no_log: true
+          - mariadb_password is regex("^.{2,24}$")
+      no_log: true
 
     - name: Fail if any variables are not defined
       assert:
