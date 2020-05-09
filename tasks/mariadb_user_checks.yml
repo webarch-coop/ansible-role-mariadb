@@ -133,7 +133,7 @@
         - name: "mariadb_password loaded from {{ mariadb_mycnf }} since the file exists and the password was not set"
           command: "my_print_defaults --defaults-file='{{ mariadb_mycnf }}' client"
           register: mariadb_my_print_defaults_command
-          no_log: true
+          # no_log: true
 
         - name: Set a fact for mariadb_password
           set_fact:
@@ -142,7 +142,7 @@
           loop: "{{ mariadb_password_read.stdout_lines }}"
           loop_control:
             loop_var: line
-          no_log: true
+          # no_log: true
 
       when:
         - ( mariadb_mycnf_present is defined ) and ( mariadb_mycnf_present == True )
