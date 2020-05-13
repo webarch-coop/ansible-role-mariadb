@@ -6,9 +6,9 @@
       - mariadb-server
       - mysqltuner
       - pwgen
-      # - python-mysqldb
-      # - python3-mysqldb
-      # - python-pymysql
+      - python-mysqldb
+      - python3-mysqldb
+      - python-pymysql
       - python3-pymysql
     state: present
     update_cache: false
