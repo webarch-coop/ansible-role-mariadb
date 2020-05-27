@@ -8,6 +8,8 @@
   mysql_db:
     name: "{{ mariadb_database }}"
     state: present
+    login_user: root
+    login_unix_socket: /var/run/mysqld/mysqld.sock
   register: mariadb_database_creation
   tags:
     - mariadb
