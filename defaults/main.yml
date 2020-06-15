@@ -30,22 +30,20 @@ mariadb_query_cache_size: 0
 # Import time zone tables
 mariadb_time_zone_import: false
 
-# If the mariadb_root_password variable is not set then nothing will be done to
-# the root account login, which, by default, uses a socket for logins and
-# doesn't have a password set, generally you will want to omit this option --
-# it is only for cases where non-root users need to login to MariaDB as root
-# that you need to enable this
+# If the mariadb_root_auth variable is not set then nothing will be done to the
+# root account login, which, by default, uses a socket for logins and doesn't
+# have a password set, generally you will want to omit this option -- it is
+# only for cases where non-root users need to login to MariaDB as root that you
+# need to enable this.
 #
-# If the value of mariadb_root_password is "set" and if /root/.my.cnf exists
-# then mariadb_root_password will be read from the file, if the file doesn't
-# exist then a new password will be generated and the mariadb_root_password
-# variable will be set
-#
-# The mariadb_root_password will be written to the database and /root/.my.cnf
+# If the value of mariadb_root_auth is "password" and if /root/.my.cnf exists
+# then the MariaDB root password will be read from the file and set, if the
+# file doesn't exist then a new password will be generated, set and written to
+# that file.
 #
 # To reverse the setting of a root password set this variable to "socket"
 #
-# mariadb_root_password: set
+# mariadb_root_auth: password
 
 # If the mariadb_username is not set then no user account or database will be
 # created

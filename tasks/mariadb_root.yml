@@ -1,7 +1,7 @@
 ---
 - name: Debug mariadb_root_password
   debug:
-    var: mariadb_root_password
+    var: mariadb_root_auth
     verbosity: 1
   tags:
     - mariadb
@@ -36,13 +36,13 @@
 
 - name: Set the MariaDB root password
   include_tasks: mariadb_root_password.yml
-  when: ( mariadb_root_password is defined ) and ( mariadb_root_password == "set" )
+  when: ( mariadb_root_auth is defined ) and ( mariadb_root_auth == "password" )
   tags:
     - mariadb
 
 - name: Set the MariaDB root use to use socket authentication
   include_tasks: mariadb_root_socket.yml
-  when: ( mariadb_root_password is defined ) and ( mariadb_root_password == "socket" )
+  when: ( mariadb_root_auth is defined ) and ( mariadb_root_auth == "socket" )
   tags:
     - mariadb
 ...
