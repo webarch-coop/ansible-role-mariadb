@@ -36,6 +36,7 @@
 
 - name: Check the current auth method
   command: mysql -uroot -B -N -e "SELECT Plugin FROM user WHERE User='root';" mysql
+  check_mode: false
   register: mariadb_root_auth_plugin
   tags:
     - mariadb
