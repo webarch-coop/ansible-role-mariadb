@@ -1,0 +1,16 @@
+---
+# https://mariadb.com/kb/en/authentication-plugin-unix-socket/
+- name: Set the MariaDB root use to use socket authentication
+  block:
+
+    - name: Enable MariaDB root logins with a socket
+      command: mysql -uroot -p{{ mariadb_root_password }} -e "UPDATE USER root IDENTIFIED VIA unix_socket; FLUSH PRIVILEGES;" mysql
+
+    - name: Remove /root/.my.cnf
+      file:
+        path: /root/.my.cnf
+        state: absent
+
+  tags:
+    - mariadb
+...
