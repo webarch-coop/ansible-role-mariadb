@@ -70,7 +70,7 @@
         force: true
       # no_log: true
 
-  when: mariadb_root_password == "set"
+  when: ( mariadb_root_password is defined ) and ( mariadb_root_password == "set" )
   tags:
     - mariadb
 
@@ -86,7 +86,7 @@
         path: /root/.my.cnf
         state: absent
 
-  when: mariadb_root_password == "socket"
+  when: ( mariadb_root_password is defined ) and ( mariadb_root_password == "socket" )
   tags:
     - mariadb
 ...
