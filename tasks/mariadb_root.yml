@@ -35,7 +35,7 @@
     - mariadb
 
 - name: Check the current auth method
-  command: mysql -uroot -e "SELECT Plugin FROM user WHERE User='root';" mysql
+  command: mysql -uroot -B -N -e "SELECT Plugin FROM user WHERE User='root';" mysql
   register: mariadb_root_auth_plugin
   tags:
     - mariadb
@@ -49,13 +49,17 @@
 
 - name: Set the MariaDB root password
   include_tasks: mariadb_root_password.yml
-  when: ( mariadb_root_auth is defined ) and ( mariadb_root_auth == "password" )
+  when:
+    - ( mariadb_root_auth is defined ) and ( mariadb_root_auth == "password" )
+    - ( mariadb_root_auth_plugin is defined ) and ( mariadb_root_auth_plugin.stdout == "unix_socket" )
   tags:
     - mariadb
 
 - name: Set the MariaDB root use to use socket authentication
   include_tasks: mariadb_root_socket.yml
-  when: ( mariadb_root_auth is defined ) and ( mariadb_root_auth == "socket" )
+  when:
+    - ( mariadb_root_auth is defined ) and ( mariadb_root_auth == "socket" )
+    - ( mariadb_root_auth_plugin is defined ) and ( mariadb_root_auth_plugin.stdout == "mysql_native_password" )
   tags:
     - mariadb
 ...
