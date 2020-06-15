@@ -34,10 +34,10 @@
   tags:
     - mariadb
 
-# When mariadb_root_password equals "set"
-- block:
+- name: Set the  MariaDB root password
+  block:
 
-    - name: Set a root password when /root/.my.cnf doesn't exist
+    - name: Generate a root password when /root/.my.cnf doesn't exist
       block:
 
         - name: Generate a random password for MariaDB root
@@ -56,7 +56,8 @@
 
     # https://www.percona.com/blog/2016/03/16/change-user-password-in-mysql-5-7-with-plugin-auth_socket/
     - name: Enable MariaDB root logins with a password
-      command: mysql -uroot -p{{ mariadb_root_password }} -e "UPDATE mysql.user SET authentication_string=PASSWORD('{{ mariadb_root_password }}'), plugin='mysql_native_password' WHERE User='root' AND Host='localhost'; FLUSH PRIVILEGES;"
+      #command: mysql -uroot -p{{ mariadb_root_password }} -e "UPDATE mysql.user SET authentication_string=PASSWORD('{{ mariadb_root_password }}'), plugin='mysql_native_password' WHERE User='root' AND Host='localhost'; FLUSH PRIVILEGES;"
+      command: mysql -uroot -e "UPDATE mysql.user SET authentication_string=PASSWORD('{{ mariadb_root_password }}'), plugin='mysql_native_password' WHERE User='root' AND Host='localhost'; FLUSH PRIVILEGES;"
       # no_log: true
 
     - name: MariaDB root password written to /root/.my.cnf
