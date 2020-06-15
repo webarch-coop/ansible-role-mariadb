@@ -6,74 +6,77 @@
   tags:
     - mariadb
 
-# when mariadb_root_password equals "set", load the password from
-# /root/.my.cnf if it exists and if not generate one
-- block:
+- name: Read the MariaDB root password from /root/.my.cnf
+  block:
 
     - name: Load the passwd from /root/.my.cnf
-      shell: "my_print_defaults --defaults-file='/root/.my.cnf' client | grep '^--password' | sed -e 's/--password=//'"
-      register: mariadb_root_password_read
-      when: root_mycnf_stat.stat.exists == True
-      tags:
-        - mariadb
+      command: "my_print_defaults --defaults-file='/root/.my.cnf' client"
+      register: mariadb_my_print_defaults_command
+      no_log: true
 
     - name: Set a fact for the mariadb_root_password
       set_fact:
-        mariadb_root_password: "{{ mariadb_root_password_read.stdout | trim | quote }}"
-      when: root_mycnf_stat.stat.exists == True
-      tags:
-        - mariadb
+        mariadb_root_password: "{{ line | regex_replace('^--password=') | trim }}"
+      when: line is regex('^--password=')
+      loop: "{{ mariadb_my_print_defaults_command.stdout_lines }}"
+      loop_control:
+        loop_var: line
+      no_log: true
 
-    - name: Generate a random password for MariaDB root
-      command: pwgen -n 16 1
-      register: mariadb_root_password_gen
+  when: root_mycnf_stat.stat.exists == True
+  tags:
+    - mariadb
+
+# When mariadb_root_password equals "set"
+- block:
+
+    - name: Set a root password when /root/.my.cnf doesn't exist
+      block:
+
+        - name: Generate a random password for MariaDB root
+          command: pwgen -n 20 1
+          register: mariadb_root_password_gen
+          no_log: true
+
+        - name: Set a fact for the mariadb_root_password
+          set_fact:
+            mariadb_root_password: "{{ mariadb_root_password_gen.stdout | trim }}"
+          no_log: true
+
       when: root_mycnf_stat.stat.exists == False
-      tags:
-        - mariadb
 
-    - name: Set a fact for the mariadb_root_password
-      set_fact:
-        mariadb_root_password: "{{ mariadb_root_password_gen.stdout | trim | quote }}"
-      when: root_mycnf_stat.stat.exists == False
-      tags:
-        - mariadb
+    # https://www.percona.com/blog/2016/03/16/change-user-password-in-mysql-5-7-with-plugin-auth_socket/
+    - name: Enable MariaDB root logins with a password
+      command: mysql -uroot -p{{ mariadb_root_password }} -e "UPDATE mysql.user SET authentication_string=PASSWORD('{{ mariadb_root_password }}'), plugin='mysql_native_password' WHERE User='root' AND Host='localhost'; FLUSH PRIVILEGES;"
+      no_log: true
 
-    - debug:
-        msg: "mariadb_root_password: {{ mariadb_root_password }}"
-        verbosity: 1
-      tags:
-        - mariadb
+    - name: "mariadb_root_password written to {{ mariadb_mycnf }}"
+      template:
+        src: templates/root.my.cnf.j2
+        dest: /root/.my.cnf
+        owner: root
+        group: root
+        mode: 0400
+        force: true
+      no_log: true
 
   when: mariadb_root_password == "set"
-
-- debug:
-    msg: "mariadb_root_password: {{ mariadb_root_password }}"
-    verbosity: 1
   tags:
     - mariadb
 
-# https://www.percona.com/blog/2016/03/16/change-user-password-in-mysql-5-7-with-plugin-auth_socket/
-- name: Enable MariaDB root logins with a password
-  command: mysql -uroot -p{{ mariadb_root_password }} -e "UPDATE mysql.user SET authentication_string=PASSWORD('{{ mariadb_root_password }}'), plugin='mysql_native_password' WHERE User='root' AND Host='localhost'; FLUSH PRIVILEGES;"
-  register: mariadb_root_password_update
-  tags:
-    - mariadb
+# https://mariadb.com/kb/en/authentication-plugin-unix-socket/
+- name: Set the MariaDB root use to use socket authentication
+  block:
 
-- debug:
-    msg: "Results of MariaDB root password update: {{ mariadb_root_password_update.stdout }}"
-    verbosity: 1
-  tags:
-    - mariadb
+    - name: Enable MariaDB root logins with a socket
+      command: mysql -uroot -p{{ mariadb_root_password }} -e "UPDATE USER root IDENTIFIED VIA unix_socket; FLUSH PRIVILEGES;"
 
-- name: "mariadb_root_password written to {{ mariadb_mycnf }}"
-  template:
-    src: templates/root.my.cnf.j2
-    dest: /root/.my.cnf
-    owner: root
-    group: root
-    mode: 0400
-    force: true
-  register: mariadb_root_password_written
+    - name: Remove /root/.my.cnf
+      file:
+        path: /root/.my.cnf
+        state: absent
+
+  when: mariadb_root_password == "socket"
   tags:
     - mariadb
 ...

@@ -43,6 +43,8 @@ mariadb_time_zone_import: false
 #
 # The mariadb_root_password will be written to the database and /root/.my.cnf
 #
+# To reverse the setting of a root password set this variable to "socket"
+#
 # mariadb_root_password: set
 
 # If the mariadb_username is not set then no user account or database will be
