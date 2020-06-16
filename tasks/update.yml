@@ -1,0 +1,7 @@
+---
+- name: Upgrade from Debian Jessie MySQL configuration
+  command: update-alternatives --remove my.cnf /etc/mysql/my.cnf.migrated
+  notify: Restart mariadb
+  tags:
+    - mariadb
+...

@@ -18,7 +18,7 @@
     src: templates/50-server.cnf.j2
     dest: /etc/mysql/mariadb.conf.d/50-server.cnf
     backup: true
-  register: mariadb_conf
+  notify: Restart mariadb 
   tags:
     - mariadb
 
@@ -33,16 +33,20 @@
   template:
     src: templates/mariadb.conf.j2
     dest: /etc/systemd/system/mariadb.service.d/mariadb.conf
-  register: mariadb_systemd
+  notify: Restart mariadb 
   tags:
     - mariadb
 
-- name: MariaDB restarted
-  systemd:
-    name: mysql
-    state: restarted
-    daemon_reload: true
-  when: ( mariadb_conf.changed ) or ( mariadb_systemd.changed )
+- name: Stat /etc/mysql/my.cnf
+  stat:
+    path: /etc/mysql/my.cnf
+  register: mariadb_etc_my_cnf
+  tags:
+    - mariadb
+
+- name: Conditionally include the update-alternatives tasks
+  include_tasks: update.yml
+  when: ( mariadb_etc_my_cnf is defined ) and ( not mariadb_etc_my_cnf.stat.islnk )
   tags:
     - mariadb
 

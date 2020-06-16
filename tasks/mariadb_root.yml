@@ -19,7 +19,7 @@
     - name: Load the passwd from /root/.my.cnf
       command: "my_print_defaults --defaults-file='/root/.my.cnf' client"
       register: mariadb_my_print_defaults_command
-      # no_log: true
+      no_log: true
 
     - name: Set a fact for the mariadb_root_password
       set_fact:
@@ -28,7 +28,7 @@
       loop: "{{ mariadb_my_print_defaults_command.stdout_lines }}"
       loop_control:
         loop_var: line
-      # no_log: true
+      no_log: true
 
   when: root_mycnf_stat.stat.exists == True
   tags:
