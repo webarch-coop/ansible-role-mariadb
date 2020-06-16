@@ -18,7 +18,7 @@
     src: templates/50-server.cnf.j2
     dest: /etc/mysql/mariadb.conf.d/50-server.cnf
     backup: true
-  notify: Restart mariadb 
+  notify: Restart mariadb
   tags:
     - mariadb
 
@@ -33,7 +33,7 @@
   template:
     src: templates/mariadb.conf.j2
     dest: /etc/systemd/system/mariadb.service.d/mariadb.conf
-  notify: Restart mariadb 
+  notify: Restart mariadb
   tags:
     - mariadb
 
