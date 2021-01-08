@@ -1,67 +1,62 @@
 ---
-- name: Debug mariadb_root_auth
-  debug:
-    var: mariadb_root_auth
-    verbosity: 1
-  tags:
-    - mariadb
-
-- name: Stat /root/.my.cnf
-  stat:
-    path: /root/.my.cnf
-  register: root_mycnf_stat
-  tags:
-    - mariadb
-
-- name: Read the MariaDB root password from /root/.my.cnf
+- name: Set MariaDB root auth method
   block:
 
-    - name: Load the passwd from /root/.my.cnf
-      command: "my_print_defaults --defaults-file='/root/.my.cnf' client"
-      register: mariadb_my_print_defaults_command
-      no_log: true
+    - name: Debug mariadb_root_auth
+      debug:
+        var: mariadb_root_auth
+        verbosity: 1
 
-    - name: Set a fact for the mariadb_root_password
+    - name: Stat /root/.my.cnf
+      stat:
+        path: /root/.my.cnf
+      register: root_mycnf_stat
+
+    - name: Read the MariaDB root password from /root/.my.cnf
+      block:
+
+        - name: Load the passwd from /root/.my.cnf
+          command: "my_print_defaults --defaults-file='/root/.my.cnf' client"
+          register: mariadb_my_print_defaults_command
+          no_log: true
+
+        - name: Set a fact for the mariadb_root_password
+          set_fact:
+            mariadb_root_password: "{{ line | regex_replace('^--password=') | trim }}"
+          when: line is regex('^--password=')
+          loop: "{{ mariadb_my_print_defaults_command.stdout_lines }}"
+          loop_control:
+            loop_var: line
+          no_log: true
+
+      when: root_mycnf_stat.stat.exists
+
+    - name: Check the current auth method
+      command: mysql -uroot -B -N -e "SELECT Plugin FROM user WHERE User='root';" mysql
+      check_mode: false
+      changed_when: false
+      register: mariadb_root_auth_plugin
+
+    - name: Debug current auth method
+      debug:
+        var: mariadb_root_auth_plugin.stdout
+        verbosity: 1
+
+    - name: Set a variable for the current auth method
       set_fact:
-        mariadb_root_password: "{{ line | regex_replace('^--password=') | trim }}"
-      when: line is regex('^--password=')
-      loop: "{{ mariadb_my_print_defaults_command.stdout_lines }}"
-      loop_control:
-        loop_var: line
-      no_log: true
+        mariadb_root_auth_current: "{{ mariadb_root_auth_plugin.stdout | trim }}"
 
-  when: root_mycnf_stat.stat.exists
-  tags:
-    - mariadb
+    - name: Set the MariaDB root password
+      include_tasks: mariadb_root_password.yml
+      when:
+        - ( mariadb_root_auth is defined ) and ( mariadb_root_auth == "password" )
+        - ( mariadb_root_auth_current == "unix_socket" )
 
-- name: Check the current auth method
-  command: mysql -uroot -B -N -e "SELECT Plugin FROM user WHERE User='root';" mysql
-  check_mode: false
-  changed_when: false
-  register: mariadb_root_auth_plugin
-  tags:
-    - mariadb
-
-- name: Debug current auth method
-  debug:
-    var: mariadb_root_auth_plugin.stdout
-    verbosity: 1
-  tags:
-    - mariadb
-
-- name: Set the MariaDB root password
-  include_tasks: mariadb_root_password.yml
-  when:
-    - ( mariadb_root_auth is defined ) and ( mariadb_root_auth == "password" )
-    - ( mariadb_root_auth_plugin is defined ) and ( mariadb_root_auth_plugin.stdout == "unix_socket" )
-  tags:
-    - mariadb
-
-- name: Set the MariaDB root use to use socket authentication
-  include_tasks: mariadb_root_socket.yml
-  when:
-    - ( mariadb_root_auth is defined ) and ( mariadb_root_auth == "socket" )
-    - ( mariadb_root_auth_plugin is defined ) and ( mariadb_root_auth_plugin.stdout == "mysql_native_password" )
+    - name: Set the MariaDB root use to use socket authentication
+      include_tasks: mariadb_root_socket.yml
+      when:
+        - ( mariadb_root_auth is defined ) and ( mariadb_root_auth == "socket" )
+        - ( mariadb_root_auth_current == "mysql_native_password" ) or ( mariadb_root_auth_current | length == 0 )
   tags:
     - mariadb
 ...
