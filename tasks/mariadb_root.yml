@@ -30,13 +30,14 @@
         loop_var: line
       no_log: true
 
-  when: root_mycnf_stat.stat.exists == True
+  when: root_mycnf_stat.stat.exists
   tags:
     - mariadb
 
 - name: Check the current auth method
   command: mysql -uroot -B -N -e "SELECT Plugin FROM user WHERE User='root';" mysql
   check_mode: false
+  changed_when: false
   register: mariadb_root_auth_plugin
   tags:
     - mariadb

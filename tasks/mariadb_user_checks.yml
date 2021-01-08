@@ -120,12 +120,12 @@
     - name: "Set a fact if {{ mariadb_mycnf }} exists"
       set_fact:
         mariadb_mycnf_present: true
-      when: ( mariadb_mycnf_path is defined ) and ( mariadb_mycnf_path.stat.exists == True )
+      when: ( mariadb_mycnf_path is defined ) and ( mariadb_mycnf_path.stat.exists )
 
     - name: "Set a fact if {{ mariadb_mycnf }} doesn't exist"
       set_fact:
         mariadb_mycnf_present: false
-      when: ( mariadb_mycnf_path is not defined ) or ( mariadb_mycnf_path is defined and mariadb_mycnf_path.stat.exists == False )
+      when: ( mariadb_mycnf_path is not defined ) or ( mariadb_mycnf_path is defined and not mariadb_mycnf_path.stat.exists )
 
     - name: "Read the password from {{ mariadb_mycnf }}"
       block:
@@ -146,7 +146,7 @@
           no_log: true
 
       when:
-        - ( mariadb_mycnf_present is defined ) and ( mariadb_mycnf_present == True )
+        - ( mariadb_mycnf_present is defined ) and ( mariadb_mycnf_present )
       tags:
         - mariadb
 
@@ -164,7 +164,7 @@
           no_log: true
 
       when:
-        - ( mariadb_mycnf_present is defined ) and ( mariadb_mycnf_present == False )
+        - ( mariadb_mycnf_present is defined ) and ( not mariadb_mycnf_present )
       tags:
         - mariadb
 
@@ -181,7 +181,7 @@
       include_tasks: mariadb_user_checks_debug.yml
       # when:
       #   - enable_task_debugger is defined
-      #   - enable_task_debugger == True
+      #   - enable_task_debugger
 
   tags:
     - mariadb

@@ -1,70 +1,76 @@
 ---
-- name: mariadb-server, mariadb-client and other packages present
-  apt:
-    pkg:
-      - mariadb-client
-      - mariadb-server
-      - mysqltuner
-      - pwgen
-      - python-mysqldb
-      - python3-mysqldb
-    state: present
-    update_cache: false
-  tags:
-    - mariadb
+- name: Install and configure MariaDB
+  block:
 
-- name: MariaDB defaults set
-  template:
-    src: templates/50-server.cnf.j2
-    dest: /etc/mysql/mariadb.conf.d/50-server.cnf
-    backup: true
-  notify: Restart mariadb
-  tags:
-    - mariadb
+    - name: mariadb-server, mariadb-client and other packages present
+      apt:
+        pkg:
+          - mariadb-client
+          - mariadb-server
+          - mysqltuner
+          - pwgen
+          - python-mysqldb
+          - python3-mysqldb
+        state: present
+        update_cache: false
 
-- name: MariaDB Systemd directory present
-  file:
-    path: /etc/systemd/system/mariadb.service.d
-    state: directory
-  tags:
-    - mariadb
+    - name: MariaDB server defaults in place
+      template:
+        src: templates/50-server.cnf.j2
+        dest: /etc/mysql/mariadb.conf.d/50-server.cnf
+        owner: root
+        group: root
+        mode: 0644
+      notify: Restart mariadb
 
-- name: MariaDB Systemd drop-in file in place
-  template:
-    src: templates/mariadb.conf.j2
-    dest: /etc/systemd/system/mariadb.service.d/mariadb.conf
-  notify: Restart mariadb
-  tags:
-    - mariadb
+    - name: MariaDB client defaults in place
+      template:
+        src: templates/50-client.cnf.j2
+        dest: /etc/mysql/mariadb.conf.d/50-client.cnf
+        owner: root
+        group: root
+        mode: 0644
 
-- name: Stat /etc/mysql/my.cnf
-  stat:
-    path: /etc/mysql/my.cnf
-  register: mariadb_etc_my_cnf
-  tags:
-    - mariadb
+    - name: MariaDB mysqldump defaults in place
+      template:
+        src: templates/mysqldump.cnf.j2
+        dest: /etc/mysql/conf.d/mysqldump.cnf
+        owner: root
+        group: root
+        mode: 0644
 
-- name: Conditionally include the update-alternatives tasks
-  include_tasks: update.yml
-  when: ( mariadb_etc_my_cnf is defined ) and ( not mariadb_etc_my_cnf.stat.islnk )
-  tags:
-    - mariadb
+    - name: MariaDB Systemd directory present
+      file:
+        path: /etc/systemd/system/mariadb.service.d
+        state: directory
 
-- name: Conditionally include the root password tasks
-  include_tasks: mariadb_root.yml
-  when: ( mariadb_root_auth is defined ) and ( mariadb_root_auth is regex("^password|socket$") )
-  tags:
-    - mariadb
+    - name: MariaDB Systemd drop-in file in place
+      template:
+        src: templates/mariadb.conf.j2
+        dest: /etc/systemd/system/mariadb.service.d/mariadb.conf
+      notify: Restart mariadb
 
-- name: Conditionally import the time zone tables import tasks
-  include_tasks: tz.yml
-  when: ( mariadb_time_zone_import is defined ) and ( mariadb_time_zone_import | bool == True )
-  tags:
-    - mariadb
+    - name: Stat /etc/mysql/my.cnf
+      stat:
+        path: /etc/mysql/my.cnf
+      register: mariadb_etc_my_cnf
 
-- name: Conditionally include the user and database creation tasks
-  include_tasks: mariadb_user.yml
-  when: ( mariadb_username is defined ) and ( mariadb_username | length > 0 )
+    - name: Conditionally include the update-alternatives tasks
+      include_tasks: update.yml
+      when: ( mariadb_etc_my_cnf is defined ) and ( not mariadb_etc_my_cnf.stat.islnk )
+
+    - name: Conditionally include the root password tasks
+      include_tasks: mariadb_root.yml
+      when: ( mariadb_root_auth is defined ) and ( mariadb_root_auth is regex("^password|socket$") )
+
+    - name: Conditionally import the time zone tables import tasks
+      include_tasks: tz.yml
+      when: ( mariadb_time_zone_import is defined ) and ( mariadb_time_zone_import )
+
+    - name: Conditionally include the user and database creation tasks
+      include_tasks: mariadb_user.yml
+      when: ( mariadb_username is defined ) and ( mariadb_username | length > 0 )
+
   tags:
     - mariadb
 ...
