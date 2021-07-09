@@ -9,10 +9,17 @@
           - mariadb-server
           - mysqltuner
           - pwgen
-          - python-mysqldb
           - python3-mysqldb
         state: present
         update_cache: false
+
+    - name: python-mysqldb present on Debian Jessie and Stretch
+      apt:
+        pkg:
+          - python-mysqldb
+        state: present
+        update_cache: false
+      when: ansible_distribution_release is regex('jessie|stretch')
 
     - name: MariaDB server defaults in place
       template:
