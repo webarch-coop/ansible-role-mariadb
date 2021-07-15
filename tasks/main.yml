@@ -50,11 +50,17 @@
       file:
         path: /etc/systemd/system/mariadb.service.d
         state: directory
+        owner: root
+        group: root
+        mode: 0755
 
     - name: MariaDB Systemd drop-in file in place
       template:
         src: templates/mariadb.conf.j2
         dest: /etc/systemd/system/mariadb.service.d/mariadb.conf
+        owner: root
+        group: root
+        mode: 0644
       notify: Restart mariadb
 
     - name: Stat /etc/mysql/my.cnf
