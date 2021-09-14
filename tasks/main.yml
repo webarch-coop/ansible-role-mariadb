@@ -66,7 +66,7 @@
     - name: Run mysql_upgrade
       command: mysql_upgrade
       register: mariadb_upgrade
-      changed_when: ( "This installation of MariaDB is already upgraded" not in mariadb_upgrade.stdout
+      changed_when: ( "This installation of MariaDB is already upgraded" not in mariadb_upgrade.stdout )
 
     - name: Stat /etc/mysql/my.cnf
       stat:
