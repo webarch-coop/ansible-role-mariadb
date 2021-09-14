@@ -6,7 +6,9 @@
 [client]
 # Default is Latin1, if you need UTF-8 set this (also in server section)
 default-character-set = utf8mb4
-max_allowed_packet    = {{ mariadb_max_allowed_packet | default('64M') }}
+# With MariaDB 10.5 on Debian Bullseye setting max_allowed_packet here
+# generates an error: unknown variable 'max_allowed_packet=64M'
+# max_allowed_packet    = {{ mariadb_max_allowed_packet | default('64M') }}
 
 # socket location
 socket = /var/run/mysqld/mysqld.sock
