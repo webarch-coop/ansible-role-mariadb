@@ -21,6 +21,16 @@
         update_cache: false
       when: ansible_distribution_release is regex('jessie|stretch')
 
+    - name: Run mariadb -V to get the version string
+      command: mariadb -V
+      check_mode: false
+      changed_when: false
+      register: mariadb_v
+
+    - name: Set a variable for the Mariadb version
+      set_fact:
+        mariadb_version: "{{ mariadb_v.stdout.split(' ')[0] | regex_replace('-MariaDB') }}"
+
     - name: MariaDB server defaults in place
       template:
         src: templates/50-server.cnf.j2
