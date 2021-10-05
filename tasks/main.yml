@@ -29,7 +29,7 @@
 
     - name: Set a variable for the Mariadb version
       set_fact:
-        mariadb_version: "{{ mariadb_v.stdout.split(' ')[0] | regex_replace('-MariaDB,') }}"
+        mariadb_version: "{{ mariadb_v.stdout.split(' ')[5] | regex_replace('-MariaDB,') }}"
 
     - name: MariaDB server defaults in place
       template:
