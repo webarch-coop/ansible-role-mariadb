@@ -4,7 +4,7 @@ galaxy_info:
   author: Chris Croome
   description: Ansible role for installing MariaDB on Debian servers
   company: Webarchitects Co-operative
-  license: license (GPLv3)
+  license: GNU General Public License v3.0 (GPLv3)
   min_ansible_version: 2.9
   platforms:
     - name: debian
