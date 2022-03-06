@@ -20,7 +20,7 @@
       check_mode: false
       changed_when: false
       register: which_bash
-      failed_when: mariadb_which_bash.stdout is not regex('\/bash$')
+      failed_when: which_bash.stdout is not regex('\/bash$')
 
     - name: Set a variable for the path to Bash
       set_fact:
