@@ -73,6 +73,15 @@
         mode: 0644
       notify: Restart mariadb
 
+    # TODO Update the following task to use community.mysql.mysql_query when it is in Debian Ansible
+    - name: Query the databases
+      command: mysql -BNe "show databases"
+      register: mariadb_show_databases
+
+    - name: Include the MariaDB sys schema tasks
+      include_tasks: sys.yml
+      when: ( "sys" not in mariadb_show_databases.stdout_lines )
+
     - name: Run mysql_upgrade
       command: mysql_upgrade
       register: mariadb_upgrade
