@@ -10,9 +10,9 @@ mariadb_join_buffer_size: 256K
 mariadb_open_files_limit: 122880
 mariadb_table_open_cache: 4000
 mariadb_tmp_table_size: 32M
+mariadb_max_heap_table_size: "{{ mariadb_tmp_table_size }}"
 mariadb_max_allowed_packet: 64M
 mariadb_key_buffer_size: 16M
-mariadb_max_heap_table_size: 16M
 mariadb_max_connections: 100
 max_user_connections: 0
 mariadb_table_cache: 64
