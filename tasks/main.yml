@@ -76,6 +76,8 @@
     # TODO Update the following task to use community.mysql.mysql_query when it is in Debian Ansible
     - name: Query the databases
       command: mysql -BNe "show databases"
+      check_mode: false
+      changed_when: false
       register: mariadb_show_databases
 
     - name: Include the MariaDB sys schema tasks
