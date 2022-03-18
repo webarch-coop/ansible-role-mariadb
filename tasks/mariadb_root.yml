@@ -57,6 +57,7 @@
       when:
         - ( mariadb_root_auth is defined ) and ( mariadb_root_auth == "socket" )
         - ( mariadb_root_auth_current == "mysql_native_password" ) or ( mariadb_root_auth_current | length == 0 )
+
   tags:
     - mariadb
 ...

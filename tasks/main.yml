@@ -7,6 +7,7 @@
         pkg:
           - mariadb-client
           - mariadb-server
+          - mycli
           - mysqltuner
           - pwgen
           - python3-mysqldb
