@@ -48,6 +48,11 @@
         - name: Getent passwd
           getent:
             database: passwd
+            key: "{{ mariadb_username }}"
+
+        - name: Print getent_users
+          debug:
+            var: getent_users
 
         - name: Set a variable for the getent users
           set_fact:
@@ -69,7 +74,12 @@
             - name: Getent groups
               getent:
                 database: group
+                key: "{{ mariadb_username }}" 
                 split: ':'
+
+             - name: Print getent_users
+               debug:
+                 var: getent_users
 
             - name: Set a variable for the getent groups
               set_fact:
