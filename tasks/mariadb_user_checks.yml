@@ -77,9 +77,9 @@
                 key: "{{ mariadb_username }}" 
                 split: ':'
 
-             - name: Print getent_users
-               debug:
-                 var: getent_users
+            - name: Print getent_users
+              debug:
+                var: getent_users
 
             - name: Set a variable for the getent groups
               set_fact:
