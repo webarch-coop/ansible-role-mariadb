@@ -77,7 +77,7 @@
               getent:
                 database: group
                 key: "{{ mariadb_username }}"
-                split: ':'
+                # split: ':'
 
             - name: "Debug the group values for {{ mariadb_username }}"
               debug:
