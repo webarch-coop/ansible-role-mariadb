@@ -50,10 +50,13 @@
             database: passwd
             key: "{{ mariadb_username }}"
 
+        - name: "Set a fact for the name of the passwd variable for $HOME for {{ mariadb_username }}"
+          set_fact:
+            mariadb_user_home: "getent_passwd.{{ mariadb_username }}"
+
         - name: Print getent_passwd
           debug:
-            var: "getent_passwd.{{ mariadb_username }}"
-          when: "getent_passwd.{{ mariadb_username }} is defined"
+            var: "mariadb_user_home[5]"
 
         - name: Set a variable for the getent users
           set_fact:
