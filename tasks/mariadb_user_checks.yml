@@ -80,7 +80,7 @@
 
             - name: "Debug the group for {{ mariadb_username }}"
               debug:
-                var: getent_group[1]
+                var: getent_group[mariadb_username]
 
             - name: "Set a fact if a user group matching {{ mariadb_username }} exists"
               set_fact:
