@@ -60,7 +60,7 @@
             - name: Set a fact for .my.cnf path if a user account matching the MariaDB username exists
               set_fact:
                 mariadb_mycnf: "{{ getent_passwd[mariadb_username][4] }}/.my.cnf"
-                mariadb_mycnf_owner: "{{ user.key }}"
+                mariadb_mycnf_owner: "{{ mariadb_username }}"
 
           rescue:
 
@@ -80,7 +80,11 @@
 
             - name: "Debug the group for {{ mariadb_username }}"
               debug:
-                var: getent_group
+                var: getent_group[1]
+
+            - name: "Set a fact if a user group matching {{ mariadb_username }} exists"
+              set_fact:
+                mariadb_mycnf_group: "{{ mariadb_username }}"
 
           rescue:
 
