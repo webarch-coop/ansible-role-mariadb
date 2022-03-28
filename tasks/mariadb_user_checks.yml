@@ -52,7 +52,8 @@
 
         - name: Print getent_passwd
           debug:
-            var: getent_passwd
+            var: "getent_passwd.{{ mariadb_username }}[6]"
+          when: "getent_passwd.{{ mariadb_username }} is defined"
 
         - name: Set a variable for the getent users
           set_fact:
