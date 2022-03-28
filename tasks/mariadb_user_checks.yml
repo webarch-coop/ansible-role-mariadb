@@ -50,9 +50,9 @@
             database: passwd
             key: "{{ mariadb_username }}"
 
-        - name: Print getent_users
+        - name: Print getent_passwd
           debug:
-            var: getent_users
+            var: getent_passwd
 
         - name: Set a variable for the getent users
           set_fact:
