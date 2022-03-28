@@ -56,6 +56,7 @@
             - name: "Debug $HOME for {{ mariadb_username }}"
               debug:
                 var: getent_passwd[mariadb_username][4]
+                verbosity: 2
 
             - name: Set a fact for .my.cnf path if a user account matching the MariaDB username exists
               set_fact:
@@ -78,9 +79,10 @@
                 key: "{{ mariadb_username }}"
                 split: ':'
 
-            - name: "Debug the group for {{ mariadb_username }}"
+            - name: "Debug the group values for {{ mariadb_username }}"
               debug:
                 var: getent_group[mariadb_username]
+                verbosity: 2
 
             - name: "Set a fact if a user group matching {{ mariadb_username }} exists"
               set_fact:
@@ -91,51 +93,6 @@
             - name: "Set mariadb_mycnf to /root/.{{ mariadb_username }}.my.cnf"
               set_fact:
                 mariadb_mycnf_group: root
-
-        - name: Get a group name when a user account matching the MariaDB username exists
-          block:
-
-            - name: Getent groups
-              getent:
-                database: group
-                key: "{{ mariadb_username }}" 
-                split: ':'
-
-            - name: Print getent_users
-              debug:
-                var: getent_users
-
-            - name: Set a variable for the getent groups
-              set_fact:
-                getent_users: "{{ getent_passwd }}"
-
-            - name: Set a fact if a user group matching the MariaDB username exists
-              set_fact:
-                mariadb_mycnf_group: "{{ group.key }}"
-              when:
-                - ( mariadb_username  == group.key )
-              loop: "{{ getent_users | dict2items }}"
-              loop_control:
-                loop_var: group
-
-            - name: "Set mariadb_mycnf_group to users as the {{ mariadb_username }} group doesn't exists"
-              set_fact:
-                mariadb_mycnf_group: users
-
-          when:
-            - ( mariadb_mycnf_group is not defined ) or ( mariadb_mycnf_group | length > 0 )
-            - ( mariadb_mycnf_owner is defined )
-            - ( mariadb_mycnf_owner | length > 0 )
-            - ( mariadb_mycnf_owner != "root" )
-
-        - name: "Set mariadb_mycnf to /root/.{{ mariadb_username }}.my.cnf"
-          set_fact:
-            mariadb_mycnf: "/root/.{{ mariadb_username }}.my.cnf"
-            mariadb_mycnf_owner: root
-            mariadb_mycnf_group: root
-          when:
-            - ( mariadb_mycnf_owner is not defined ) or ( mariadb_mycnf_owner | length > 0 )
-            - ( mariadb_mycnf_group is not defined ) or ( mariadb_mycnf_owner | length > 0 )
 
       when:
         - ( mariadb_mycnf is not defined ) or ( mariadb_mycnf | length > 0 )
