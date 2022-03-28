@@ -72,7 +72,9 @@
         owner: root
         group: root
         mode: 0644
-      notify: Restart mariadb
+      notify:
+        - Reload systemd
+        - Restart mariadb
 
     # TODO Update the following task to use community.mysql.mysql_query when it is in Debian Ansible
     - name: Query the databases
