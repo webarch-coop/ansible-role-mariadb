@@ -22,12 +22,32 @@
         update_cache: false
       when: ansible_distribution_release is regex('jessie|stretch')
 
-    - name: Collect info about databases and version
+    - name: Stat /root/.my.cnf
+      stat:
+        path: /root/.my.cnf
+      register: mariadb_root_mycnf
+
+    - name: Query the MariaDB version and databases using the /root/.my.cnf file
       community.mysql.mysql_info:
         filter:
           - databases
           - version
+        config_file: /root/.my.cnf
+        login_user: root
+        login_host: localhost
+        login_port: 3306
       register: mariadb_info
+      when: mariadb_root_mycnf.stat.exists
+
+    - name: Query the MariaDB version and databases using a socket
+      community.mysql.mysql_info:
+        filter:
+          - databases
+          - version
+        login_user: root
+        login_unix_socket: /run/mysqld/mysqld.sock
+      register: mariadb_info
+      when: not mariadb_root_mycnf.stat.exists
 
     - name: Debug MariaDB info
       debug:
