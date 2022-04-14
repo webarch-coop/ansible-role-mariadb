@@ -3,32 +3,32 @@
   block:
 
     - name: MariaDB sys repo directory present
-      file:
+      ansible.builtin.file:
         path: /usr/local/src/mariadb-sys
         state: directory
         mode: 0750
 
     - name: MariaDB sys schema repo present
-      git:
+      ansible.builtin.git:
         repo: https://github.com/webarch-coop/mariadb-sys.git
         dest: /usr/local/src/mariadb-sys
         clone: true
         version: master
 
     - name: Run which bash
-      command: which bash
+      ansible.builtin.command: which bash
       check_mode: false
       changed_when: false
       register: which_bash
       failed_when: which_bash.stdout is not regex('\/bash$')
 
     - name: Set a variable for the path to Bash
-      set_fact:
+      ansible.builtin.set_fact:
         bash: "{{ which_bash.stdout }}"
 
     # TODO Update the following task to use community.mysql.mysql_db when it is in Debian Ansible
     - name: Import the sys schema
-      shell: |
+      ansible.builtin.shell: |
         set -e -o pipefail
         mysql < ./mariadb_sys_install.sql
       args:

@@ -3,7 +3,7 @@
   block:
 
     - name: mariadb-server, mariadb-client and other packages present
-      apt:
+      ansible.builtin.apt:
         pkg:
           - mariadb-client
           - mariadb-server
@@ -15,25 +15,39 @@
         update_cache: false
 
     - name: python-mysqldb present on Debian Jessie and Stretch
-      apt:
+      ansible.builtin.apt:
         pkg:
           - python-mysqldb
         state: present
         update_cache: false
       when: ansible_distribution_release is regex('jessie|stretch')
 
+    - name: Collect info about databases and version
+      community.mysql.mysql_info:
+        filter:
+          - databases
+          - version
+      register: mariadb_info
+
+    - name: Debug MariaDB info
+      debug:
+        var: mariadb_info
+
     - name: Run mariadb -V to get the version string
-      command: mariadb -V
+      ansible.builtin.command: mariadb -V
       check_mode: false
       changed_when: false
       register: mariadb_v
 
     - name: Set a variable for the Mariadb version
-      set_fact:
+      ansible.builtin.set_fact:
         mariadb_version: "{{ mariadb_v.stdout.split(' ')[5] | regex_replace('-MariaDB,') }}"
 
+    - name: Fail
+      fail:
+
     - name: MariaDB server defaults in place
-      template:
+      ansible.builtin.template:
         src: templates/50-server.cnf.j2
         dest: /etc/mysql/mariadb.conf.d/50-server.cnf
         owner: root
@@ -42,7 +56,7 @@
       notify: Restart mariadb
 
     - name: MariaDB client defaults in place
-      template:
+      ansible.builtin.template:
         src: templates/50-client.cnf.j2
         dest: /etc/mysql/mariadb.conf.d/50-client.cnf
         owner: root
@@ -50,7 +64,7 @@
         mode: 0644
 
     - name: MariaDB mysqldump defaults in place
-      template:
+      ansible.builtin.template:
         src: templates/mysqldump.cnf.j2
         dest: /etc/mysql/conf.d/mysqldump.cnf
         owner: root
@@ -58,7 +72,7 @@
         mode: 0644
 
     - name: MariaDB Systemd directory present
-      file:
+      ansible.builtin.file:
         path: /etc/systemd/system/mariadb.service.d
         state: directory
         owner: root
@@ -66,7 +80,7 @@
         mode: 0755
 
     - name: MariaDB Systemd drop-in file in place
-      template:
+      ansible.builtin.template:
         src: templates/mariadb.conf.j2
         dest: /etc/systemd/system/mariadb.service.d/mariadb.conf
         owner: root
@@ -76,72 +90,52 @@
         - Reload systemd
         - Restart mariadb
 
-    - name: Test MySQL query module
+    - name: Get a list of the databases
       community.mysql.mysql_query:
         query: SHOW DATABASES
         login_unix_socket: /run/mysqld/mysqld.sock
       register: mariadb_query_show_databases
     
     - name: Debug
-      debug:
-        var: mariadb_query_show_databases.query_result
-
-    - name: Debug
-      debug:
-        msg: "{{ result | map(attribute='Database') }}"
-      loop: "{{ mariadb_query_show_databases.query_result }}"
-      loop_control:
-        loop_var: result
+      ansible.builtin.debug:
+        var: mariadb_query_show_databases
+        verbosity: 2
 
     - name: Set a variable for the list of databases present
-      set_fact:
+      ansible.builtin.set_fact:
         mariadb_databases: "{{ result | map(attribute='Database') }}"
       loop: "{{ mariadb_query_show_databases.query_result }}"
       loop_control:
         loop_var: result
 
-    - name: Debug
-      debug:
-        var: mariadb_databases
-
-    - name: Fail
-      fail:
-
-    # TODO Update the following task to use community.mysql.mysql_query
-    - name: Query the databases
-      command: mysql -BNe "show databases"
-      check_mode: false
-      changed_when: false
-      register: mariadb_show_databases
-
     - name: Include the MariaDB sys schema tasks
-      include_tasks: sys.yml
-      when: ( "sys" not in mariadb_show_databases.stdout_lines )
+      ansible.builtin.include_tasks: sys.yml
+      when: ( "sys" not in mariadb_databases )
 
     - name: Run mysql_upgrade
-      command: mysql_upgrade
+      ansible.builtin.command: mysql_upgrade
       register: mariadb_upgrade
       changed_when: ( "This installation of MariaDB is already upgraded" not in mariadb_upgrade.stdout )
 
     - name: Stat /etc/mysql/my.cnf
-      stat:
+      ansible.builtin.stat:
         path: /etc/mysql/my.cnf
       register: mariadb_etc_my_cnf
 
     - name: Conditionally include the update-alternatives tasks
-      include_tasks: update.yml
+      ansible.builtin.include_tasks: update.yml
       when: ( mariadb_etc_my_cnf is defined ) and ( not mariadb_etc_my_cnf.stat.islnk )
 
     - name: Conditionally include the root password tasks
-      include_tasks: mariadb_root.yml
+      ansible.builtin.include_tasks: mariadb_root.yml
       when: ( mariadb_root_auth is defined ) and ( mariadb_root_auth is regex("^password|socket$") )
 
     - name: Conditionally import the time zone tables import tasks
-      include_tasks: tz.yml
+      ansible.builtin.include_tasks: tz.yml
       when: ( mariadb_time_zone_import is defined ) and ( mariadb_time_zone_import )
 
     - name: Conditionally include the user and database creation tasks
-      include_tasks: mariadb_user.yml
+      ansible.builtin.include_tasks: mariadb_user.yml
       when: ( mariadb_username is defined ) and ( mariadb_username | length > 0 )
 
   when: mariadb

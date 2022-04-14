@@ -1,41 +1,39 @@
 ---
-- name: Include user variable checks
-  include_tasks: mariadb_user_checks.yml
-  tags:
-    - mariadb
+- name: database user, database and login details present
+  block:
 
-- name: "MariaDB database {{ mariadb_database }} present"
-  mysql_db:
-    name: "{{ mariadb_database }}"
-    state: present
-    login_user: root
-    login_unix_socket: /var/run/mysqld/mysqld.sock
-  register: mariadb_database_creation
-  tags:
-    - mariadb
+    - name: Include user variable checks
+      ansible.builtin.include_tasks: mariadb_user_checks.yml
 
-- name: "MariaDB .my.cnf for {{ mariadb_username }} present at {{ mariadb_mycnf }}"
-  template:
-    src: templates/my.cnf.j2
-    dest: "{{ mariadb_mycnf }}"
-    owner: "{{ mariadb_mycnf_owner }}"
-    group: "{{ mariadb_mycnf_group }}"
-    mode: 0640
-    force: true
-  no_log: true
-  tags:
-    - mariadb
+    - name: "MariaDB database {{ mariadb_database }} present"
+      ansible.builtin.mysql_db:
+        name: "{{ mariadb_database }}"
+        state: present
+        login_user: root
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+      register: mariadb_database_creation
 
-- name: MariaDB user present
-  mysql_user:
-    login_user: root
-    login_unix_socket: /var/run/mysqld/mysqld.sock
-    name: "{{ mariadb_username }}"
-    password: "{{ mariadb_password }}"
-    priv: "{{ mariadb_database }}.*:{{ mariadb_priv }}"
-    state: present
-    update_password: always
-  register: mariadb_user_creation
+    - name: "MariaDB .my.cnf for {{ mariadb_username }} present at {{ mariadb_mycnf }}"
+      ansible.builtin.template:
+        src: templates/my.cnf.j2
+        dest: "{{ mariadb_mycnf }}"
+        owner: "{{ mariadb_mycnf_owner }}"
+        group: "{{ mariadb_mycnf_group }}"
+        mode: 0640
+        force: true
+      no_log: true
+
+    - name: MariaDB user present
+      ansible.builtin.mysql_user:
+        login_user: root
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+        name: "{{ mariadb_username }}"
+        password: "{{ mariadb_password }}"
+        priv: "{{ mariadb_database }}.*:{{ mariadb_priv }}"
+        state: present
+        update_password: always
+      register: mariadb_user_creation
+
   tags:
     - mariadb
 ...

@@ -3,34 +3,34 @@
   block:
 
     - name: Include debugging
-      include_tasks: mariadb_user_checks_debug.yml
+      ansible.builtin.include_tasks: mariadb_user_checks_debug.yml
       # when:
       #   - enable_task_debugger is defined
       #   - enable_task_debugger == True
 
     # Max length is 64 characters https://dev.mysql.com/doc/refman/8.0/en/identifier-length.html
     - name: Check the mariadb_username is valid
-      assert:
+      ansible.builtin.assert:
         that:
           - ( mariadb_username is defined ) and ( mariadb_username | length > 0 )
           - ( mariadb_username is regex("^[a-z0-9_]*$") )
           - ( mariadb_username is regex("^.{2,25}$") )
 
     - name: Set the priv to ALL if not defined
-      set_fact:
+      ansible.builtin.set_fact:
         mariadb_priv: "ALL"
       when:
         - ( mariadb_priv is not defined ) or ( mariadb_priv | length <= 0 )
 
     # https://mariadb.com/kb/en/library/grant/#table-privileges
     - name: Check that the MariaDB database privileges are valid
-      assert:
+      ansible.builtin.assert:
         that:
           - ( mariadb_priv is defined ) and ( mariadb_priv | length > 0 )
           - ( mariadb_priv is regex("^ALL|ALTER|CREATE|CREATEVIEW|DELETE|DELETEHISTORY|DROP|GRANTOPTION|INDEX|INSERT|REFERENCES|SELECT|SHOWVIEW|TRIGGER|UPDATE$") )
 
     - name: Check the mariadb_database is valid if defined
-      assert:
+      ansible.builtin.assert:
         that:
           - ( mariadb_username | length > 0 )
           - ( mariadb_database is regex("^[a-z0-9_]*$") )
@@ -38,7 +38,7 @@
       when: ( mariadb_database is defined )
 
     - name: Set the mariadb_database name to match the mariadb_username if it is not defined
-      set_fact:
+      ansible.builtin.set_fact:
         mariadb_database: "{{ mariadb_username }}"
       when: ( mariadb_database is not defined ) or ( mariadb_database | length <= 0 )
 
@@ -49,25 +49,25 @@
           block:
 
             - name: "Getent passwd for {{ mariadb_username }}"
-              getent:
+              ansible.builtin.getent:
                 database: passwd
                 key: "{{ mariadb_username }}"
                 fail_key: true
 
             - name: "Debug $HOME for {{ mariadb_username }}"
-              debug:
+              ansible.builtin.debug:
                 var: getent_passwd[mariadb_username][4]
                 verbosity: 2
 
             - name: Set a fact for .my.cnf path and owner if a user account matching the MariaDB username exists
-              set_fact:
+              ansible.builtin.set_fact:
                 mariadb_mycnf: "{{ getent_passwd[mariadb_username][4] }}/.my.cnf"
                 mariadb_mycnf_owner: "{{ mariadb_username }}"
 
           rescue:
 
             - name: "Set mariadb_mycnf to /root/.{{ mariadb_username }}.my.cnf"
-              set_fact:
+              ansible.builtin.set_fact:
                 mariadb_mycnf: "/root/.{{ mariadb_username }}.my.cnf"
                 mariadb_mycnf_owner: root
 
@@ -75,13 +75,13 @@
           block:
 
             - name: "Getent group for {{ mariadb_username }}"
-              getent:
+              ansible.builtin.getent:
                 database: group
                 key: "{{ mariadb_username }}"
                 fail_key: true
 
             - name: Set a fact for .my.cnf path if a user account matching the MariaDB username exists
-              set_fact:
+              ansible.builtin.set_fact:
                 mariadb_mycnf: "{{ getent_passwd[mariadb_username][4] }}/.my.cnf"
                 mariadb_mycnf_owner: "{{ mariadb_username }}"
                 mariadb_mycnf_group: "{{ mariadb_username }}"
@@ -89,32 +89,31 @@
           rescue:
 
             - name: Set mariadb_mycnf_group to root if a group matching the username doesn't exist
-              set_fact:
+              ansible.builtin.set_fact:
                 mariadb_mycnf: "/root/.{{ mariadb_username }}.my.cnf"
                 mariadb_mycnf_owner: root
                 mariadb_mycnf_group: root
 
-      when:
-        - ( mariadb_mycnf is not defined ) or ( mariadb_mycnf | length > 0 )
+      when: ( mariadb_mycnf is not defined ) or ( mariadb_mycnf | length > 0 )
 
     - name: "Stat {{ mariadb_mycnf }}"
-      stat:
+      ansible.builtin.stat:
         path: "{{ mariadb_mycnf }}"
       register: mariadb_mycnf_path
 
     - name: Debug mariadb_mycnf_path
-      debug:
+      ansible.builtin.debug:
         var: mariadb_mycnf_path
         verbosity: 1
       when: mariadb_mycnf_path is defined
 
     - name: "Set a fact if {{ mariadb_mycnf }} exists"
-      set_fact:
+      ansible.builtin.set_fact:
         mariadb_mycnf_present: true
       when: ( mariadb_mycnf_path is defined ) and ( mariadb_mycnf_path.stat.exists )
 
     - name: "Set a fact if {{ mariadb_mycnf }} doesn't exist"
-      set_fact:
+      ansible.builtin.set_fact:
         mariadb_mycnf_present: false
       when: ( mariadb_mycnf_path is not defined ) or ( ( mariadb_mycnf_path is defined ) and ( not mariadb_mycnf_path.stat.exists ) )
 
@@ -122,13 +121,13 @@
       block:
 
         - name: "mariadb_password loaded from {{ mariadb_mycnf }} since the file exists and the password was not set"
-          command: "my_print_defaults --defaults-file='{{ mariadb_mycnf }}' client"
+          ansible.builtin.command: "my_print_defaults --defaults-file='{{ mariadb_mycnf }}' client"
           changed_when: false
           register: mariadb_my_print_defaults_command
           no_log: true
 
         - name: Set a fact for mariadb_password
-          set_fact:
+          ansible.builtin.set_fact:
             mariadb_password: "{{ line | regex_replace('^--password=') }}"
           when: line is regex('^--password=')
           loop: "{{ mariadb_my_print_defaults_command.stdout_lines }}"
@@ -143,12 +142,12 @@
       block:
 
         - name: "Generate a random password for {{ mariadb_username }} as it is not defined or empty"
-          command: "pwgen -n {{ 24 | random(14) }} 1"
+          ansible.builtin.command: "pwgen -n {{ 24 | random(14) }} 1"
           register: mariadb_password_gen
           no_log: true
 
         - name: Set a fact for the mariadb_password
-          set_fact:
+          ansible.builtin.set_fact:
             mariadb_password: "{{ mariadb_password_gen.stdout | trim | quote }}"
           no_log: true
 
@@ -156,7 +155,7 @@
         - ( mariadb_mycnf_present is defined ) and ( not mariadb_mycnf_present )
 
     - name: Fail if any variables are not defined
-      assert:
+      ansible.builtin.assert:
         that:
           - mariadb_username is defined
           - mariadb_password is defined
@@ -165,7 +164,7 @@
           - mariadb_priv is defined
 
     - name: Include debugging
-      include_tasks: mariadb_user_checks_debug.yml
+      ansible.builtin.include_tasks: mariadb_user_checks_debug.yml
       # when:
       #   - enable_task_debugger is defined
       #   - enable_task_debugger
