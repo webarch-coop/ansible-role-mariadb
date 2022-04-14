@@ -85,6 +85,10 @@
     - name: Debug
       debug:
         var: mariadb_query_show_databases.query_result
+
+    - name: Debug
+      debug:
+        msg: "YAML {{ mariadb_query_show_databases.query_result | to_nice_yaml }}"
     
     - name: Debug
       debug:
@@ -95,7 +99,7 @@
 
     - name: Set a variable for the list of databases present
       set_fact:
-        mariadb_databases: "{{ mariadb_query_show_databases.query_result | selectattr('Database') | list }}"
+        mariadb_databases: "{{ mariadb_query_show_databases.query_result }}"
 
     - name: Debug
       debug:
