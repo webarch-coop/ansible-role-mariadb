@@ -89,7 +89,7 @@
     - name: Debug
       debug:
         var: result
-      loop: "{{ mariadb_query_show_databases.query_result | dict2items }}"
+      loop: "{{ mariadb_query_show_databases.query_result }}"
       loop_control:
         loop_var: result
 
