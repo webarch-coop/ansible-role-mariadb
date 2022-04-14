@@ -58,7 +58,7 @@
                 var: getent_passwd[mariadb_username][4]
                 verbosity: 2
 
-            - name: Set a fact for .my.cnf path if a user account matching the MariaDB username exists
+            - name: Set a fact for .my.cnf path and owner if a user account matching the MariaDB username exists
               set_fact:
                 mariadb_mycnf: "{{ getent_passwd[mariadb_username][4] }}/.my.cnf"
                 mariadb_mycnf_owner: "{{ mariadb_username }}"
@@ -90,7 +90,7 @@
 
           rescue:
 
-            - name: "Set mariadb_mycnf to /root/.{{ mariadb_username }}.my.cnf"
+            - name: Set mariadb_mycnf_group to root if a group matching the username doesn't exist
               set_fact:
                 mariadb_mycnf_group: root
 
