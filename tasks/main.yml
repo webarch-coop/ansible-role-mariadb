@@ -88,7 +88,7 @@
 
     - name: Debug
       debug:
-        var: result
+        msg: "{{ result | map(attribute='Database') }}"
       loop: "{{ mariadb_query_show_databases.query_result }}"
       loop_control:
         loop_var: result
