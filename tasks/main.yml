@@ -95,7 +95,10 @@
 
     - name: Set a variable for the list of databases present
       set_fact:
-        mariadb_databases: "{{ mariadb_query_show_databases.query_result | map('extract', {'Database'}) | list ) }}"
+        mariadb_databases: "{{ result | map(attribute='Database') }}"
+      loop: "{{ mariadb_query_show_databases.query_result }}"
+      loop_control:
+        loop_var: result
 
     - name: Debug
       debug:
