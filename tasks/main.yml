@@ -93,6 +93,14 @@
       loop_control:
         loop_var: result
 
+    - name: Set a variable for the list of databases present
+      set_fact:
+        mariadb_databases: "{{ mariadb_query_show_databases.query_result | map(attribute='Database') | list }}"
+
+    - name: Debug
+      debug:
+        var: mariadb_databases
+
     - name: Fail
       fail:
 
