@@ -6,13 +6,13 @@
     # This version is untested, so commented out for now
     # - name: Enable MariaDB root logins with a socket
     #   community.mysql.mysql_query:
-    #     query: 
+    #     query:
     #       - ALTER USER root@localhost IDENTIFIED VIA unix_socket
     #       - FLUSH PRIVILEGES
     #     login_db: mysql
     #     login_user: root
     #     login_password: "{{ mariadb_root_password }}"
-    #   when: ( mariadb_root_password is defined ) and ( mariadb_root_password | length > 0 )  
+    #   when: ( mariadb_root_password is defined ) and ( mariadb_root_password | length > 0 )
     #   no_log: true
 
     - name: Enable MariaDB root logins with a socket
