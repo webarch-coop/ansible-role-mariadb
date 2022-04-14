@@ -84,7 +84,7 @@
     
     - name: Debug
       debug:
-        var: mariadb_query_show_databases
+        var: mariadb_query_show_databases.query_result.Database
 
     - name: Fail
       fail:
