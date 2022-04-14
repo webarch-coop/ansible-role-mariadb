@@ -85,6 +85,13 @@
     - name: Debug
       debug:
         var: mariadb_query_show_databases.query_result
+    
+    - name: Debug
+      debug:
+        var: result
+      loop: "{{ mariadb_query_show_databases.query_result | dict2items }}"
+      loop_control:
+        loop_var: result
 
     - name: Fail
       fail:
