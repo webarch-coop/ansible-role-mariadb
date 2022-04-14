@@ -1,4 +1,7 @@
 ---
+# The mariadb variable needs to be true for the tasks in this role to be run
+mariadb: true
+
 # Systemd security settings
 # https://mariadb.com/kb/en/library/systemd/
 mariadb_systemd_no_new_privileges: true
