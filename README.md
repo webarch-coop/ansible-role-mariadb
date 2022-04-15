@@ -1,6 +1,10 @@
 # Ansible Debian MariaDB Role 
 
-This repository contains an Ansible role for installing [MariaDB](https://mariadb.org/) on Debian Stertch and Buster servers.
+This repository contains an Ansible role for installing [MariaDB](https://mariadb.org/) on Debian Stertch and Buster servers, it requires a recent version of the [community.mysql collection](https://docs.ansible.com/ansible/latest/collections/community/mysql/), this can be installed into `~/.ansible/collections/ansible_collections` like this:
+
+```bash
+ansible-galaxy collection install community.mysql
+```
 
 See the [defaults/main.yml](defaults/main.yml) for the options that can be set.
 

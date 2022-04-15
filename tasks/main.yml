@@ -23,51 +23,45 @@
       when: ansible_distribution_release is regex('jessie|stretch')
 
     - name: Stat /root/.my.cnf
-      stat:
+      ansible.builtin.stat:
         path: /root/.my.cnf
       register: mariadb_root_mycnf
 
-    # The following is commented out since the version of community.mysql that ships
-    # with Debian Bullseye is 1.2.0 which was released on 18 Jan 2021
-    # https://github.com/ansible-collections/community.mysql/issues/31#issuecomment-762024683
-    # and that version fails when there are databases
-    # without tables present, as reported on 18 Aug 2021
-    # https://github.com/ansible-collections/community.mysql/issues/204
-    # - name: Query the MariaDB version and databases using the /root/.my.cnf file
-    #   community.mysql.mysql_info:
-    #     filter:
-    #       - databases
-    #       - version
-    #     config_file: /root/.my.cnf
-    #     login_user: root
-    #     login_host: localhost
-    #     login_port: 3306
-    #   register: mariadb_info
-    #   when: mariadb_root_mycnf.stat.exists
+    - name: Query the MariaDB version and databases using the /root/.my.cnf file
+      community.mysql.mysql_info:
+        filter:
+          - databases
+          - version
+        config_file: /root/.my.cnf
+        login_user: root
+        login_host: localhost
+        login_port: 3306
+      register: mariadb_info
+      when: mariadb_root_mycnf.stat.exists
 
-    # - name: Query the MariaDB version and databases using a socket
-    #   community.mysql.mysql_info:
-    #     filter:
-    #       - databases
-    #       - version
-    #     login_user: root
-    #     login_unix_socket: /run/mysqld/mysqld.sock
-    #   register: mariadb_info
-    #   when: not mariadb_root_mycnf.stat.exists
+    - name: Query the MariaDB version and databases using a socket
+      community.mysql.mysql_info:
+        filter:
+          - databases
+          - version
+        login_user: root
+        login_unix_socket: /run/mysqld/mysqld.sock
+      register: mariadb_info
+      when: not mariadb_root_mycnf.stat.exists
 
-    # - name: Debug MariaDB info
-    #   debug:
-    #     var: mariadb_info
+    - name: Debug MariaDB info
+      debug:
+        var: mariadb_info
 
-    - name: Run mariadb -V to get the version string
-      ansible.builtin.command: mariadb -V
-      check_mode: false
-      changed_when: false
-      register: mariadb_v
+    # - name: Run mariadb -V to get the version string
+    #   ansible.builtin.command: mariadb -V
+    #   check_mode: false
+    #   changed_when: false
+    #   register: mariadb_v
 
-    - name: Set a variable for the Mariadb version
-      ansible.builtin.set_fact:
-        mariadb_version: "{{ mariadb_v.stdout.split(' ')[5] | regex_replace('-MariaDB,') }}"
+    # - name: Set a variable for the Mariadb version
+    #   ansible.builtin.set_fact:
+    #     mariadb_version: "{{ mariadb_v.stdout.split(' ')[5] | regex_replace('-MariaDB,') }}"
 
     - name: Fail
       fail:
