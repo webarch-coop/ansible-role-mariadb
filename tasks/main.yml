@@ -50,7 +50,7 @@
       when: not mariadb_root_mycnf.stat.exists
 
     - name: Debug MariaDB info
-      debug:
+      ansible.builtin.debug:
         var: mariadb_info
         verbosity: 3
 
@@ -59,7 +59,7 @@
         mariadb_version: "{{ mariadb_info.version.major }}.{{ mariadb_info.version.minor }}.{{ mariadb_info.version.release }}"
 
     - name: Debug MariaDB version
-      debug:
+      ansible.builtin.debug:
         var: mariadb_version
         verbosity: 2
 
@@ -72,22 +72,9 @@
         label: "{{ db.key }}"
 
     - name: Debug MariaDB databases
-      debug:
+      ansible.builtin.debug:
         var: mariadb_databases
         verbosity: 2
-
-    # - name: Run mariadb -V to get the version string
-    #   ansible.builtin.command: mariadb -V
-    #   check_mode: false
-    #   changed_when: false
-    #   register: mariadb_v
-
-    # - name: Set a variable for the Mariadb version
-    #   ansible.builtin.set_fact:
-    #     mariadb_version: "{{ mariadb_v.stdout.split(' ')[5] | regex_replace('-MariaDB,') }}"
-
-    - name: Fail
-      fail:
 
     - name: MariaDB server defaults in place
       ansible.builtin.template:
@@ -132,24 +119,6 @@
       notify:
         - Reload systemd
         - Restart mariadb
-
-    - name: Get a list of the databases
-      community.mysql.mysql_query:
-        query: SHOW DATABASES
-        login_unix_socket: /run/mysqld/mysqld.sock
-      register: mariadb_query_show_databases
-
-    - name: Debug
-      ansible.builtin.debug:
-        var: mariadb_query_show_databases
-        verbosity: 2
-
-    - name: Set a variable for the list of databases present
-      ansible.builtin.set_fact:
-        mariadb_databases: "{{ result | map(attribute='Database') }}"
-      loop: "{{ mariadb_query_show_databases.query_result }}"
-      loop_control:
-        loop_var: result
 
     - name: Include the MariaDB sys schema tasks
       ansible.builtin.include_tasks: sys.yml
