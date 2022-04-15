@@ -52,10 +52,16 @@
     - name: Debug MariaDB info
       debug:
         var: mariadb_info
+        verbosity: 3
 
     - name: Set a variable for the MariaDB version
       ansible.builtin.set_fact:
         mariadb_version: "{{ mariadb_info.version.major }}.{{ mariadb_info.version.minor }}.{{ mariadb_info.version.release }}"
+
+    - name: Debug MariaDB version
+      debug:
+        var: mariadb_version
+        verbosity: 3
 
     - name: Set a variable for the MariaDB databases
       ansible.builtin.set_fact:
@@ -64,6 +70,11 @@
       loop_control:
         loop_var: db
         label: "{{ db.key }}"
+
+    - name: Debug MariaDB databases
+      debug:
+        var: mariadb_databases
+        verbosity: 3
 
     # - name: Run mariadb -V to get the version string
     #   ansible.builtin.command: mariadb -V
