@@ -25,9 +25,9 @@
       debug:
         var: mariadb_root_auth_plugin
 
-    - name: Debug
+    - name: Debug result path
       debug:
-        var: mariadb_root_auth_plugin.rowcount
+        var: mariadb_root_auth_plugin.query_result.plugin
 
     - name: Set a variable for root authentication method using select
       set_fact:
