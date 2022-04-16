@@ -23,7 +23,15 @@
 
     - name: Debug
       debug:
-        var: mariadb_root_auth_plugin.query_result
+        var: mariadb_root_auth_plugin
+
+    - name: Set a variable for root authentication method
+      set_fact:
+        mariadb_root_auth_current: "{{ mariadb_root_auth_plugin.query_result }}"
+
+    - name: Debug
+      debug:
+        var: mariadb_root_auth_current
 
     - name: Set a variable for root authentication method
       set_fact:

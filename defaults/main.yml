@@ -2,6 +2,10 @@
 # The mariadb variable needs to be true for the tasks in this role to be run
 mariadb: true
 
+# To use community.mysql modules set mariadb_community to true
+# https://docs.ansible.com/ansible/latest/collections/community/mysql/index.html
+mariadb_community: true
+
 # Systemd security settings
 # https://mariadb.com/kb/en/library/systemd/
 mariadb_systemd_no_new_privileges: true

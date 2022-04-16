@@ -32,10 +32,25 @@
       when: root_mycnf_stat.stat.exists
 
     - name: Check the current auth method
+      community.mysql.mysql_query:
+        query: "SELECT Plugin FROM user WHERE User='root'"
+        login_db: mysql
+        login_user: root 
+        login_password: "{{ mariadb_root_password }}"
+      register: mariadb_root_auth_plugin
+      when: mariadb_community
+
+    - name: Debug current auth method
+      ansible.builtin.debug:
+        var: mariadb_root_auth_plugin.query_result
+        verbosity: 1
+
+    - name: Check the current auth method
       ansible.builtin.command: mysql -uroot -BNe "SELECT Plugin FROM user WHERE User='root'" mysql
       check_mode: false
       changed_when: false
       register: mariadb_root_auth_plugin
+      when: not mariadb_community
 
     - name: Debug current auth method
       ansible.builtin.debug:
