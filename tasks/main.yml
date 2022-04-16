@@ -28,7 +28,7 @@
 
     - name: Debug MariaDB package
       debug:
-        var: ansible_facts.packages.mariadb
+        var: ansible_facts.packages
 
     - name: Query the MariaDB version and databases using a socket
       community.mysql.mysql_info:
