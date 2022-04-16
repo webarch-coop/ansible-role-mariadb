@@ -40,6 +40,7 @@
           - "{{ mariadb_root_auth_plugin.query_result[0] | map(attribute='plugin') }}"
           - "{{ mariadb_root_auth_plugin.query_result[0] | map(attribute='plugin') | type_debug }}"
           - "{{ mariadb_root_auth_plugin.query_result[0] | map(attribute='plugin') | first }}"
+          - "{{ mariadb_root_auth_plugin.query_result | map(attribute='plugin') | first }}"
 
     - name: Set a variable for root authentication method using select
       set_fact:
