@@ -2,6 +2,19 @@
 - name: Install and configure MariaDB
   block:
 
+    - name: Check the current auth method
+      ansible.builtin.command: mysql -uroot -BNe "SELECT Plugin FROM user WHERE User='root'" mysql
+      check_mode: false
+      changed_when: false
+      register: mariadb_root_auth_plugin
+
+    - name: Debug
+      debug:
+        var: mariadb_root_auth_plugin
+
+    - name: Debug fail
+      fail:
+
     - name: mariadb-server, mariadb-client and other packages present
       ansible.builtin.apt:
         pkg:
