@@ -23,7 +23,7 @@
 
     - name: Set a variable for root authentication method using flatten
       set_fact:
-        mariadb_root_auth_current: "{{ mariadb_root_auth_plugin | map(attribute='plugin') | flatten }}"
+        mariadb_root_auth_current: "{{ mariadb_root_auth_plugin.query_result[0] | map(attribute='plugin') | flatten }}"
 
     - name: Set a variable for root authentication method using select
       set_fact:
