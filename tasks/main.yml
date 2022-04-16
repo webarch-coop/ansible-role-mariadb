@@ -31,7 +31,7 @@
 
     - name: Set a variable for root authentication method
       set_fact:
-        mariadb_root_auth_current: "{{ mariadb_root_auth_plugin.query_result | selectattr('plugin') }}"
+        mariadb_root_auth_current: "{{ mariadb_root_auth_plugin.query_result | select('match', 'plugin') }}"
 
     - name: Debug
       debug:
