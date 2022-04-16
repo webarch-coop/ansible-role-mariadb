@@ -2,32 +2,6 @@
 - name: Install and configure MariaDB
   block:
 
-    - name: Check the current auth method
-      ansible.builtin.command: mysql -uroot -BNe "SELECT Plugin FROM user WHERE User='root'" mysql
-      check_mode: false
-      changed_when: false
-      register: mariadb_root_auth_plugin
-
-    - name: Debug
-      debug:
-        var: mariadb_root_auth_plugin
-
-    - name: Check the current auth method
-      community.mysql.mysql_query:
-        query: "SELECT plugin FROM user WHERE User='root'"
-        login_db: mysql
-        login_user: root  
-        # login_password: "{{ mariadb_root_password }}"
-        login_unix_socket: /run/mysqld/mysqld.sock
-      register: mariadb_root_auth_plugin
-
-    - name: Set a variable for root authentication method using select
-      set_fact:
-        mariadb_root_auth_current: "{{ mariadb_root_auth_plugin.query_result[0] | map(attribute='plugin') | first }}"
-
-    - name: Debug fail
-      fail:
-
     - name: mariadb-server, mariadb-client and other packages present
       ansible.builtin.apt:
         pkg:
@@ -47,6 +21,24 @@
         state: present
         update_cache: false
       when: ansible_distribution_release is regex('jessie|stretch')
+
+    - name: Query the MariaDB version and databases using a socket
+      community.mysql.mysql_info:
+        filter:
+          - databases
+          - engines
+          - global_status
+          - settings
+          - users
+          - version
+        return_empty_dbs: true
+        login_user: root
+        login_unix_socket: /run/mysqld/mysqld.sock
+      register: mariadb_info
+
+    - name: Debug info
+      debug:
+        var: mariadb_info
 
     - name: Stat /root/.my.cnf
       ansible.builtin.stat:
@@ -70,6 +62,7 @@
         filter:
           - databases
           - version
+        return_empty_dbs: true
         login_user: root
         login_unix_socket: /run/mysqld/mysqld.sock
       register: mariadb_info
