@@ -1,5 +1,5 @@
----
 # https://mariadb.com/kb/en/authentication-plugin-unix-socket/
+---
 - name: Set the MariaDB root use to use socket authentication
   block:
 
@@ -11,16 +11,17 @@
         login_db: mysql
         login_user: root
         login_password: "{{ mariadb_root_password }}"
-      no_log: true
       when:
         - mariadb_community
         - ( mariadb_root_password is defined ) and ( mariadb_root_password | length > 0 )
+      no_log: true
 
     - name: Enable MariaDB root logins with a socket
       ansible.builtin.command: mysql -uroot -p{{ mariadb_root_password }} -e "ALTER USER root@localhost IDENTIFIED VIA unix_socket; FLUSH PRIVILEGES;" mysql
       when:
         - not mariadb_community 
         - ( mariadb_root_password is defined ) and ( mariadb_root_password | length > 0 )
+      no_log: true
 
     - name: Remove /root/.my.cnf
       ansible.builtin.file:

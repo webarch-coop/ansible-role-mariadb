@@ -1,5 +1,5 @@
 ---
-- name: database user, database and login details present
+- name: MariaDB database user, database and login details present
   block:
 
     - name: Include user variable checks

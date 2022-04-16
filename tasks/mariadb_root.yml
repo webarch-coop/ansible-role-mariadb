@@ -31,35 +31,47 @@
 
       when: root_mycnf_stat.stat.exists
 
-    - name: Check the current auth method
-      community.mysql.mysql_query:
-        query: "SELECT Plugin FROM user WHERE User='root'"
-        login_db: mysql
-        login_user: root 
-        login_password: "{{ mariadb_root_password }}"
-      register: mariadb_root_auth_plugin
+    - name: Use community.mysql.mysql_query to check the current root auth method
+      block:
+
+        - name: Check the current auth method
+          community.mysql.mysql_query:
+            query: "SELECT Plugin FROM user WHERE User='root'"
+            login_db: mysql
+            login_user: root 
+            login_password: "{{ mariadb_root_password }}"
+          register: mariadb_root_auth_plugin
+
+        - name: Debug current auth method
+          ansible.builtin.debug:
+            var: mariadb_root_auth_plugin.query_result
+            verbosity: 1
+
+        - name: Set a variable for root authentication method using select
+          set_fact:
+            mariadb_root_auth_current: "{{ mariadb_root_auth_plugin.query_result[0] | map(attribute='plugin') | first }}"
+
       when: mariadb_community
 
-    - name: Debug current auth method
-      ansible.builtin.debug:
-        var: mariadb_root_auth_plugin.query_result
-        verbosity: 1
+    - name: Use command to check the current root auth method
+      block:
 
-    - name: Check the current auth method
-      ansible.builtin.command: mysql -uroot -BNe "SELECT Plugin FROM user WHERE User='root'" mysql
-      check_mode: false
-      changed_when: false
-      register: mariadb_root_auth_plugin
+        - name: Check the current auth method
+          ansible.builtin.command: mysql -uroot -BNe "SELECT Plugin FROM user WHERE User='root'" mysql
+          check_mode: false
+          changed_when: false
+          register: mariadb_root_auth_plugin
+
+        - name: Debug current auth method
+          ansible.builtin.debug:
+            var: mariadb_root_auth_plugin.stdout
+            verbosity: 1
+
+        - name: Set a variable for the current auth method
+          ansible.builtin.set_fact:
+            mariadb_root_auth_current: "{{ mariadb_root_auth_plugin.stdout | trim }}"
+
       when: not mariadb_community
-
-    - name: Debug current auth method
-      ansible.builtin.debug:
-        var: mariadb_root_auth_plugin.stdout
-        verbosity: 1
-
-    - name: Set a variable for the current auth method
-      ansible.builtin.set_fact:
-        mariadb_root_auth_current: "{{ mariadb_root_auth_plugin.stdout | trim }}"
 
     - name: Set the MariaDB root password
       ansible.builtin.include_tasks: mariadb_root_password.yml
@@ -67,7 +79,7 @@
         - ( mariadb_root_auth is defined ) and ( mariadb_root_auth == "password" )
         - ( mariadb_root_auth_current == "unix_socket" )
 
-    - name: Set the MariaDB root use to use socket authentication
+    - name: Set the MariaDB root user to use socket authentication
       ansible.builtin.include_tasks: mariadb_root_socket.yml
       when:
         - ( mariadb_root_auth is defined ) and ( mariadb_root_auth == "socket" )

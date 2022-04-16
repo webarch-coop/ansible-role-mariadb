@@ -4,9 +4,7 @@
 
     - name: Include debugging
       ansible.builtin.include_tasks: mariadb_user_checks_debug.yml
-      # when:
-      #   - enable_task_debugger is defined
-      #   - enable_task_debugger == True
+      when: ( ( enable_task_debugger is defined ) and ( enable_task_debugger ) ) or ( ansible_verbosity >= 2 )
 
     # Max length is 64 characters https://dev.mysql.com/doc/refman/8.0/en/identifier-length.html
     - name: Check the mariadb_username is valid
@@ -40,12 +38,12 @@
     - name: Set the mariadb_database name to match the mariadb_username if it is not defined
       ansible.builtin.set_fact:
         mariadb_database: "{{ mariadb_username }}"
-      when: ( mariadb_database is not defined ) or ( mariadb_database | length <= 0 )
+      when: ( mariadb_database is not defined ) or ( mariadb_database | length == 0 )
 
     - name: Set the mariadb_mycnf path is it is not defined
       block:
 
-        - name: Check if there is a user present
+        - name: Check if there is a user present and use root if not
           block:
 
             - name: "Getent passwd for {{ mariadb_username }}"
@@ -71,7 +69,7 @@
                 mariadb_mycnf: "/root/.{{ mariadb_username }}.my.cnf"
                 mariadb_mycnf_owner: root
 
-        - name: Check if there is a group present
+        - name: Check if there is a group present and use root if not
           block:
 
             - name: "Getent group for {{ mariadb_username }}"
@@ -104,7 +102,7 @@
     - name: Debug mariadb_mycnf_path
       ansible.builtin.debug:
         var: mariadb_mycnf_path
-        verbosity: 1
+        verbosity: 2
       when: mariadb_mycnf_path is defined
 
     - name: "Set a fact if {{ mariadb_mycnf }} exists"
@@ -135,8 +133,7 @@
             loop_var: line
           no_log: true
 
-      when:
-        - ( mariadb_mycnf_present is defined ) and ( mariadb_mycnf_present )
+      when: ( mariadb_mycnf_present is defined ) and ( mariadb_mycnf_present )
 
     - name: Generate a password
       block:
@@ -151,8 +148,7 @@
             mariadb_password: "{{ mariadb_password_gen.stdout | trim | quote }}"
           no_log: true
 
-      when:
-        - ( mariadb_mycnf_present is defined ) and ( not mariadb_mycnf_present )
+      when: ( mariadb_mycnf_present is defined ) and ( not mariadb_mycnf_present )
 
     - name: Fail if any variables are not defined
       ansible.builtin.assert:
@@ -165,9 +161,7 @@
 
     - name: Include debugging
       ansible.builtin.include_tasks: mariadb_user_checks_debug.yml
-      # when:
-      #   - enable_task_debugger is defined
-      #   - enable_task_debugger
+      when: ( ( enable_task_debugger is defined ) and ( enable_task_debugger ) ) or ( ansible_verbosity >= 2 )
 
   tags:
     - mariadb

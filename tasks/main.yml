@@ -21,10 +21,6 @@
         login_unix_socket: /run/mysqld/mysqld.sock
       register: mariadb_root_auth_plugin
 
-    - name: Set a variable for root authentication method using flatten
-      set_fact:
-        mariadb_root_auth_current: "{{ mariadb_root_auth_plugin.query_result[0] | map(attribute='plugin') | flatten }}"
-
     - name: Set a variable for root authentication method using select
       set_fact:
         mariadb_root_auth_current: "{{ mariadb_root_auth_plugin.query_result[0] | map(attribute='plugin') | first }}"

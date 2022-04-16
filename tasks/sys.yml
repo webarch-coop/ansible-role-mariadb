@@ -15,30 +15,38 @@
         clone: true
         version: master
 
-    # Bash might be /bin/bash or /usr/bin/bash
-    - name: Run which bash
-      ansible.builtin.command: which bash
-      check_mode: false
-      changed_when: false
-      register: which_bash
-      failed_when: which_bash.stdout is not regex('\/bash$')
+    - name: Use shell to import the MariaDB sys schema
+      block:
 
-    - name: Set a variable for the path to Bash
-      ansible.builtin.set_fact:
-        bash: "{{ which_bash.stdout }}"
+        # Bash might be /bin/bash or /usr/bin/bash
+        - name: Run which bash
+          ansible.builtin.command: which bash
+          check_mode: false
+          changed_when: false
+          register: which_bash
+          failed_when: which_bash.stdout is not regex('\/bash$')
 
-    # TODO Update the following task to use community.mysql.mysql_db when it is in Debian Ansible
-    - name: Import the sys schema
-      ansible.builtin.shell: |
-        set -e -o pipefail
-        mysql < ./mariadb_sys_install.sql
-      args:
-        executable: "{{ bash }}"
-        chdir: /usr/local/src/mariadb-sys
+        - name: Set a variable for the path to Bash
+          ansible.builtin.set_fact:
+            bash: "{{ which_bash.stdout }}"
+
+        - name: Import the sys schema
+          ansible.builtin.shell: |
+            set -e -o pipefail
+            mysql < ./mariadb_sys_install.sql
+          args:
+            executable: "{{ bash }}"
+            chdir: /usr/local/src/mariadb-sys
+
       when: not mariadb_community
 
-    - name: Import the sys schema
+    - name: Use community.mysql.mysql_db to import the sys schema
       community.mysql.mysql_db:
+        name: all
+        target: /usr/local/src/mariadb-sys/mariadb_sys_install.sql
+        login_user: root
+        login_unix_socket: /run/mysqld/mysqld.sock
+      when: mariadb_community
 
   tags:
     - mariadb

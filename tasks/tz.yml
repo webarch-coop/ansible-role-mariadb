@@ -1,59 +1,96 @@
 ---
-- name: Get the latest date from the tzdata package changelog
-  command: dpkg-parsechangelog -l /usr/share/doc/tzdata/changelog.Debian.gz -S Date
-  check_mode: false
-  changed_when: false
-  register: mariadb_tzdata_deb_date
+- name: Check that the Debian tzdata changelog is present
+  ansible.builtin.stat:
+    path: /usr/share/doc/tzdata/changelog.Debian.gz
+  register: mariadb_tzdata_changelog
   tags:
     - mariadb
 
-- name: Set a fact for the date of the latest version
-  set_fact:
-    mariadb_tzdata_latest: "{{ mariadb_tzdata_deb_date.stdout }}"
-  tags:
-    - mariadb
-
-- name: Check if the /root/.my.tzdata file exists
-  stat:
-    path: /root/.my.tzdata
-  register: mariadb_tzdata_mariadb_file
-  tags:
-    - mariadb
-
-- name: Tasks for when the /root/.my.tzdata file exists
+- name: Update the timezone data
   block:
 
-    - name: Slurp the contents from the /root/.my.tzdata file
-      slurp:
-        src: /root/.my.tzdata
-      register: mariadb_tzdata_mariadb_file_b64encoded
+    - name: Get the latest date from the tzdata package changelog
+      ansible.builtin.command: dpkg-parsechangelog -l /usr/share/doc/tzdata/changelog.Debian.gz -S Date
+      check_mode: false
+      changed_when: false
+      register: mariadb_tzdata_deb_date
 
-    - name: Set a fact for the date in the /root/.my.tzdata file
-      set_fact:
-        mariadb_tzdata_mariadb: "{{ mariadb_tzdata_mariadb_file_b64encoded['content'] | b64decode | trim }}"
+    - name: Set a fact for the date of the latest version
+      ansible.builtin.set_fact:
+        mariadb_tzdata_latest: "{{ mariadb_tzdata_deb_date.stdout }}"
 
-    - name: Debug the value of mariadb_tzdata_mariadb and mariadb_tzdata_deb_date
-      debug:
-        msg:
-          - "mariadb_tzdata_latest: {{ mariadb_tzdata_latest }}"
-          - "mariadb_tzdata_mariadb: {{ mariadb_tzdata_mariadb }}"
-        verbosity: 1
+    - name: Check if the /root/.my.tzdata file exists
+      ansible.builtin.stat:
+        path: /root/.my.tzdata
+      register: mariadb_tzdata_mariadb_file
 
-  when: mariadb_tzdata_mariadb_file.stat.exists
-  tags:
-    - mariadb
+    - name: Tasks for when the /root/.my.tzdata file exists
+      block:
 
-- name: Import the tzdata into the mysql database tables
-  block:
+        - name: Slurp the contents from the /root/.my.tzdata file
+          ansible.builtin.slurp:
+            src: /root/.my.tzdata
+          register: mariadb_tzdata_mariadb_file_b64encoded
 
-    - name: Import the time zone data from /usr/share/zoneinfo
-      shell: mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql mysql
-      notify: Restart mariadb
+        - name: Set a fact for the date in the /root/.my.tzdata file
+          ansible.builtin.set_fact:
+            mariadb_tzdata_mariadb: "{{ mariadb_tzdata_mariadb_file_b64encoded['content'] | b64decode | trim }}"
 
-    - name: Update the /root/.my.tzdata file
-      shell: dpkg-parsechangelog -l /usr/share/doc/tzdata/changelog.Debian.gz -S Date > /root/.my.tzdata
+        - name: Debug the value of mariadb_tzdata_mariadb and mariadb_tzdata_deb_date
+          ansible.builtin.debug:
+            msg:
+              - "mariadb_tzdata_latest: {{ mariadb_tzdata_latest }}"
+              - "mariadb_tzdata_mariadb: {{ mariadb_tzdata_mariadb }}"
+            verbosity: 1
 
-  when: ( not mariadb_tzdata_mariadb_file.stat.exists ) or ( mariadb_tzdata_mariadb_file.stat.exists and mariadb_tzdata_mariadb != mariadb_tzdata_latest )
+      when: mariadb_tzdata_mariadb_file.stat.exists
+
+    - name: Import the tzdata into the mysql database tables using the shell module
+      block:
+
+        # Bash might be /bin/bash or /usr/bin/bash
+        - name: Run which bash
+          ansible.builtin.command: which bash
+          check_mode: false
+          changed_when: false
+          register: which_bash
+          failed_when: which_bash.stdout is not regex('\/bash$')
+
+        - name: Set a variable for the path to Bash
+          ansible.builtin.set_fact:
+            bash: "{{ which_bash.stdout }}"
+
+        - name: Import the time zone data from /usr/share/zoneinfo
+          ansible.builtin.shell: >
+            set -e -o pipefail
+            mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql mysql
+          notify: Restart mariadb
+
+        - name: Update the /root/.my.tzdata file
+          ansible.builtin.shell: >
+            set -e -o pipefail
+            dpkg-parsechangelog -l /usr/share/doc/tzdata/changelog.Debian.gz -S Date > /root/.my.tzdata
+
+      when:
+        - not mariadb_community
+        - ( not mariadb_tzdata_mariadb_file.stat.exists ) or ( mariadb_tzdata_mariadb_file.stat.exists and mariadb_tzdata_mariadb != mariadb_tzdata_latest )
+
+    - name: Import the tzdata into the mysql database tables using the community.mysql.mysql_db module
+      block:
+
+        - name: Use community.mysql.mysql_db to import the sys schema
+          community.mysql.mysql_db:
+            name: all
+            target: /usr/local/src/mariadb-sys/mariadb_sys_install.sql
+            login_user: root
+            login_unix_socket: /run/mysqld/mysqld.sock
+
+      when:
+        - mariadb_community
+        - ( not mariadb_tzdata_mariadb_file.stat.exists ) or ( mariadb_tzdata_mariadb_file.stat.exists and mariadb_tzdata_mariadb != mariadb_tzdata_latest )
+
+
+  when: ( mariadb_tzdata_changelog.stat.exists is defined ) and ( mariadb_tzdata_changelog.stat.exists )
   tags:
     - mariadb
 ...
