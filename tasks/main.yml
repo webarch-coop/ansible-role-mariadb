@@ -35,7 +35,9 @@
 
     - name: Debug result path test
       debug:
-        msg: "{{ mariadb_root_auth_plugin.query_result[0] | map(attribute='plugin') }}"
+        msg:
+          - "{{ mariadb_root_auth_plugin.query_result[0] | map(attribute='plugin') }}"
+          - "{{ mariadb_root_auth_plugin.query_result[0] | map(attribute='plugin') | type_debug }}"
 
     - name: Set a variable for root authentication method using select
       set_fact:
