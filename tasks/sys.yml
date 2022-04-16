@@ -15,6 +15,7 @@
         clone: true
         version: master
 
+    # Bash might be /bin/bash or /usr/bin/bash
     - name: Run which bash
       ansible.builtin.command: which bash
       check_mode: false
@@ -34,6 +35,10 @@
       args:
         executable: "{{ bash }}"
         chdir: /usr/local/src/mariadb-sys
+      when: not mariadb_community
+
+    - name: Import the sys schema
+      community.mysql.mysql_db:
 
   tags:
     - mariadb

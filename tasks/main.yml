@@ -27,7 +27,11 @@
 
     - name: Debug result path
       debug:
-        var: mariadb_root_auth_plugin.query_result[0].plugin
+        var: mariadb_root_auth_plugin.query_result[0]
+
+    - name: Debug result path type
+      debug:
+        msg: "type is {{ mariadb_root_auth_plugin.query_result[0] | type_debug }}"
 
     - name: Set a variable for root authentication method using select
       set_fact:
