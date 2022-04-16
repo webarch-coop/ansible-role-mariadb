@@ -22,44 +22,16 @@
         update_cache: false
       when: ansible_distribution_release is regex('jessie|stretch')
 
-    - name: Gather the package facts
-      ansible.builtin.package_facts:
-        manager: apt
-
-    - name: Debug MariaDB package
-      debug:
-        var: ansible_facts.packages
-
-    - name: Query the MariaDB version and databases using a socket
-      community.mysql.mysql_info:
-        filter:
-          - databases
-          - engines
-          - global_status
-          - settings
-          - users
-          - version
-        return_empty_dbs: true
-        login_user: root
-        login_unix_socket: /run/mysqld/mysqld.sock
-      register: mariadb_info
-
-    - name: Debug info
-      debug:
-        var: mariadb_info
-
-    - name: Debug fail
-      fail:
-
     - name: Stat /root/.my.cnf
       ansible.builtin.stat:
         path: /root/.my.cnf
       register: mariadb_root_mycnf
 
-    - name: Query the MariaDB version and databases using the /root/.my.cnf file
+    - name: Query the MariaDB databases, users and version using the /root/.my.cnf file
       community.mysql.mysql_info:
         filter:
           - databases
+          - users
           - version
         config_file: /root/.my.cnf
         login_user: root
@@ -68,10 +40,11 @@
       register: mariadb_info
       when: mariadb_root_mycnf.stat.exists
 
-    - name: Query the MariaDB version and databases using a socket
+    - name: Query the MariaDB databases, users and version using a socket
       community.mysql.mysql_info:
         filter:
           - databases
+          - users
           - version
         return_empty_dbs: true
         login_user: root
@@ -105,6 +78,8 @@
       ansible.builtin.debug:
         var: mariadb_databases
         verbosity: 2
+
+    - name: Set a variable for the root authentication plugin
 
     - name: MariaDB server defaults in place
       ansible.builtin.template:
