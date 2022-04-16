@@ -33,6 +33,10 @@
       debug:
         msg: "type is {{ mariadb_root_auth_plugin.query_result[0] | type_debug }}"
 
+    - name: Debug result path type test
+      debug:
+        msg: "{{ mariadb_root_auth_plugin.query_result[0] | type_debug | map(attribute='plugin')}"
+
     - name: Set a variable for root authentication method using select
       set_fact:
         mariadb_root_auth_current: "{{ mariadb_root_auth_plugin.query_result | select('equalto', 'plugin') }}"
