@@ -21,45 +21,9 @@
         login_unix_socket: /run/mysqld/mysqld.sock
       register: mariadb_root_auth_plugin
 
-    - name: Debug
-      debug:
-        var: mariadb_root_auth_plugin
-
-    - name: Debug result path
-      debug:
-        var: mariadb_root_auth_plugin.query_result[0]
-
-    - name: Debug result path type
-      debug:
-        msg: "type is {{ mariadb_root_auth_plugin.query_result[0] | type_debug }}"
-
-    - name: Debug result path test
-      debug:
-        msg:
-          - "{{ mariadb_root_auth_plugin.query_result[0] }}"
-          - "{{ mariadb_root_auth_plugin.query_result[0] | map(attribute='plugin') }}"
-          - "{{ mariadb_root_auth_plugin.query_result[0] | map(attribute='plugin') | type_debug }}"
-          - "{{ mariadb_root_auth_plugin.query_result[0] | map(attribute='plugin') | first }}"
-          - "{{ mariadb_root_auth_plugin.query_result | map(attribute='plugin') | first }}"
-
     - name: Set a variable for root authentication method using select
       set_fact:
-        mariadb_root_auth_current: "{{ mariadb_root_auth_plugin.query_result | select('equalto', 'plugin') }}"
-
-    - name: Debug
-      debug:
-        var: mariadb_root_auth_current
-
-    - name: Set a variable for root authentication method
-      set_fact:
-        mariadb_root_auth_current: "{{ result | map(attribute='plugin') }}"
-      loop: "{{ mariadb_root_auth_plugin.query_result }}"
-      loop_control:
-        loop_var: result
-
-    - name: Debug
-      debug:
-        var: mariadb_root_auth_current
+        mariadb_root_auth_current: "{{ mariadb_root_auth_plugin.query_result[0] | map(attribute='plugin') | first }}"
 
     - name: Debug fail
       fail:
