@@ -40,6 +40,9 @@
       debug:
         var: mariadb_info
 
+    - name: Debug fail
+      fail:
+
     - name: Stat /root/.my.cnf
       ansible.builtin.stat:
         path: /root/.my.cnf
