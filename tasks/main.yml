@@ -29,9 +29,9 @@
       debug:
         var: mariadb_root_auth_plugin.rowcount
 
-    - name: Set a variable for root authentication method
+    - name: Set a variable for root authentication method using select
       set_fact:
-        mariadb_root_auth_current: "{{ mariadb_root_auth_plugin.query_result | select('match', 'plugin') }}"
+        mariadb_root_auth_current: "{{ mariadb_root_auth_plugin.query_result | select('equalto', 'plugin') }}"
 
     - name: Debug
       debug:
