@@ -36,6 +36,7 @@
     - name: Debug result path test
       debug:
         msg:
+          - "{{ mariadb_root_auth_plugin.query_result[0].first }}"
           - "{{ mariadb_root_auth_plugin.query_result[0] | map(attribute='plugin') }}"
           - "{{ mariadb_root_auth_plugin.query_result[0] | map(attribute='plugin') | type_debug }}"
 
