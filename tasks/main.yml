@@ -22,6 +22,14 @@
         update_cache: false
       when: ansible_distribution_release is regex('jessie|stretch')
 
+    - name: Gather the package facts
+      ansible.builtin.package_facts:
+        managed: apt
+
+    - name: Debug MariaDB package
+      debug:
+        var: ansible_facts.packages.mariadb
+
     - name: Query the MariaDB version and databases using a socket
       community.mysql.mysql_info:
         filter:
