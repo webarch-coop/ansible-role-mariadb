@@ -35,7 +35,7 @@ mariadb_query_cache_limit: 0
 mariadb_query_cache_size: 0
 
 # Import time zone tables
-mariadb_time_zone_import: false
+mariadb_time_zone_import: true
 
 # If the mariadb_root_auth variable is not set then nothing will be done to the
 # root account login, which, by default, uses a socket for logins and doesn't
