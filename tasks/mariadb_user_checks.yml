@@ -7,7 +7,7 @@
       when: ( ( enable_task_debugger is defined ) and ( enable_task_debugger ) ) or ( ansible_verbosity >= 2 )
 
     # Max length is 64 characters https://dev.mysql.com/doc/refman/8.0/en/identifier-length.html
-    - name: Check the mariadb_username is valid
+    - name: Check the mariadb_username variable is valid
       ansible.builtin.assert:
         that:
           - ( mariadb_username is defined ) and ( mariadb_username | length > 0 )
@@ -17,8 +17,7 @@
     - name: Set the priv to ALL if not defined
       ansible.builtin.set_fact:
         mariadb_priv: "ALL"
-      when:
-        - ( mariadb_priv is not defined ) or ( mariadb_priv | length <= 0 )
+      when: ( mariadb_priv is not defined ) or ( mariadb_priv | length <= 0 )
 
     # https://mariadb.com/kb/en/library/grant/#table-privileges
     - name: Check that the MariaDB database privileges are valid
@@ -27,7 +26,7 @@
           - ( mariadb_priv is defined ) and ( mariadb_priv | length > 0 )
           - ( mariadb_priv is regex("^ALL|ALTER|CREATE|CREATEVIEW|DELETE|DELETEHISTORY|DROP|GRANTOPTION|INDEX|INSERT|REFERENCES|SELECT|SHOWVIEW|TRIGGER|UPDATE$") )
 
-    - name: Check the mariadb_database is valid if defined
+    - name: Check the mariadb_database variable is valid if defined
       ansible.builtin.assert:
         that:
           - ( mariadb_username | length > 0 )
@@ -40,7 +39,7 @@
         mariadb_database: "{{ mariadb_username }}"
       when: ( mariadb_database is not defined ) or ( mariadb_database | length == 0 )
 
-    - name: Set the mariadb_mycnf path is it is not defined
+    - name: Set the mariadb_mycnf path if it is not defined
       block:
 
         - name: Check if there is a user present and use root if not

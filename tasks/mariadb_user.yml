@@ -5,23 +5,23 @@
     - name: Include user variable checks
       ansible.builtin.include_tasks: mariadb_user_checks.yml
 
-    - name: "MariaDB database {{ mariadb_database }} present"
-      ansible.builtin.mysql_db:
+    - name: "MariaDB database {{ mariadb_database }} present using credentials from /root/.my.cnf"
+      community.mysql.mysql_db:
         name: "{{ mariadb_database }}"
         state: present
         login_user: root
-        login_unix_socket: /var/run/mysqld/mysqld.sock
+        config_file: /root/.my.cnf
       register: mariadb_database_creation
-      when: not mariadb_community
+      when: mariadb_root_auth_current == "mysql_native_password"
 
-    - name: "MariaDB database {{ mariadb_database }} present"
+    - name: "MariaDB database {{ mariadb_database }} present using unix_socket"
       community.mysql.mysql_db:
         name: "{{ mariadb_database }}"
         state: present
         login_user: root
         login_unix_socket: /var/run/mysqld/mysqld.sock
       register: mariadb_database_creation
-      when: mariadb_community
+      when: mariadb_root_auth_current == "unix_socket"
 
     - name: "MariaDB .my.cnf for {{ mariadb_username }} present at {{ mariadb_mycnf }}"
       ansible.builtin.template:
@@ -33,19 +33,7 @@
         force: true
       no_log: true
 
-    - name: MariaDB user present
-      ansible.builtin.mysql_user:
-        login_user: root
-        login_unix_socket: /var/run/mysqld/mysqld.sock
-        name: "{{ mariadb_username }}"
-        password: "{{ mariadb_password }}"
-        priv: "{{ mariadb_database }}.*:{{ mariadb_priv }}"
-        state: present
-        update_password: always
-      register: mariadb_user_creation
-      when: not mariadb_community
-
-    - name: MariaDB user present
+    - name: "MariaDB user present {{ mariadb_username }} present using credentials from /root/.my.cnf"
       community.mysql.mysql_user:
         login_user: root
         login_unix_socket: /var/run/mysqld/mysqld.sock
@@ -55,7 +43,19 @@
         state: present
         update_password: always
       register: mariadb_user_creation
-      when: mariadb_community
+      when: mariadb_root_auth_current == "mysql_native_password"
+
+    - name: "MariaDB user present {{ mariadb_username }} present using unix_socket"
+      community.mysql.mysql_user:
+        login_user: root
+        config_file: /root/.my.cnf
+        name: "{{ mariadb_username }}"
+        password: "{{ mariadb_password }}"
+        priv: "{{ mariadb_database }}.*:{{ mariadb_priv }}"
+        state: present
+        update_password: always
+      register: mariadb_user_creation
+      when: mariadb_root_auth_current == "unix_socket"
 
   tags:
     - mariadb

@@ -15,38 +15,46 @@
         clone: true
         version: master
 
-    - name: Use shell to import the MariaDB sys schema
-      block:
+    # - name: Use shell to import the MariaDB sys schema
+    #   block:
 
-        # Bash might be /bin/bash or /usr/bin/bash
-        - name: Run which bash
-          ansible.builtin.command: which bash
-          check_mode: false
-          changed_when: false
-          register: which_bash
-          failed_when: which_bash.stdout is not regex('\/bash$')
+    #     # Bash might be /bin/bash or /usr/bin/bash
+    #     - name: Run which bash
+    #       ansible.builtin.command: which bash
+    #       check_mode: false
+    #       changed_when: false
+    #       register: which_bash
+    #       failed_when: which_bash.stdout is not regex('\/bash$')
 
-        - name: Set a variable for the path to Bash
-          ansible.builtin.set_fact:
-            bash: "{{ which_bash.stdout }}"
+    #     - name: Set a variable for the path to Bash
+    #       ansible.builtin.set_fact:
+    #         bash: "{{ which_bash.stdout }}"
 
-        - name: Import the sys schema
-          ansible.builtin.shell: |
-            set -e -o pipefail
-            mysql < ./mariadb_sys_install.sql
-          args:
-            executable: "{{ bash }}"
-            chdir: /usr/local/src/mariadb-sys
+    #     - name: Import the sys schema
+    #       ansible.builtin.shell: |
+    #         set -e -o pipefail
+    #         mysql < ./mariadb_sys_install.sql
+    #       args:
+    #         executable: "{{ bash }}"
+    #         chdir: /usr/local/src/mariadb-sys
 
-      when: not mariadb_community
+    #   when: not mariadb_community
 
-    - name: Use community.mysql.mysql_db to import the sys schema
+    - name: Use import the sys schema using credentials from /root/.my.cnf
+      community.mysql.mysql_db:
+        name: all
+        target: /usr/local/src/mariadb-sys/mariadb_sys_install.sql
+        login_user: root
+        config_file: /root/.my.cnf
+      when: mariadb_root_auth_current == "mysql_native_password"
+
+    - name: Use import the sys schema using unix_socket
       community.mysql.mysql_db:
         name: all
         target: /usr/local/src/mariadb-sys/mariadb_sys_install.sql
         login_user: root
         login_unix_socket: /run/mysqld/mysqld.sock
-      when: mariadb_community
+      when: mariadb_root_auth_current == "unix_socket"
 
   tags:
     - mariadb

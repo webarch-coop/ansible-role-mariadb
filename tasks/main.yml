@@ -20,7 +20,7 @@
           - python-mysqldb
         state: present
         update_cache: false
-      when: ansible_distribution_release is regex('jessie|stretch')
+      when: ansible_distribution_release is regex('^jessie|stretch$')
 
     - name: Stat /root/.my.cnf
       ansible.builtin.stat:
@@ -33,10 +33,9 @@
           - databases
           - users
           - version
-        config_file: /root/.my.cnf
+        return_empty_dbs: true
         login_user: root
-        login_host: localhost
-        login_port: 3306
+        config_file: /root/.my.cnf
       register: mariadb_info
       when: mariadb_root_mycnf.stat.exists
 
@@ -56,6 +55,15 @@
       ansible.builtin.debug:
         var: mariadb_info
         verbosity: 3
+
+    - name: Set a variable for the root authentication plugin
+      ansible.builtin.set_fact:
+        mariadb_root_auth_current: "{{ mariadb_info.users.localhost.root.plugin }}"
+
+    - name: Debug MariaDB root authentication plugin
+      ansible.builtin.debug:
+        var: mariadb_root_auth_current
+        verbosity: 2
 
     - name: Set a variable for the MariaDB version
       ansible.builtin.set_fact:
@@ -77,15 +85,6 @@
     - name: Debug MariaDB databases
       ansible.builtin.debug:
         var: mariadb_databases
-        verbosity: 2
-
-    - name: Set a variable for the root authentication plugin
-      ansible.builtin.set_fact:
-        mariadb_root_auth_current: "{{ mariadb_info.users.localhost.root.plugin }}"
-
-    - name: Debug MariaDB root authentication plugin
-      ansible.builtin.debug:
-        var: mariadb_root_auth_current
         verbosity: 2
 
     - name: MariaDB server defaults in place
