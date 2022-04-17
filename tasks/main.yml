@@ -27,16 +27,35 @@
         path: /root/.my.cnf
       register: mariadb_root_mycnf
 
-    - name: Query the MariaDB databases, users and version using the /root/.my.cnf file
-      community.mysql.mysql_info:
-        filter:
-          - databases
-          - users
-          - version
-        return_empty_dbs: true
-        login_user: root
-        config_file: /root/.my.cnf
-      register: mariadb_info
+    - name: Read the MariaDB root password from /root/.my.cnf
+      block:
+
+        - name: Load the passwd from /root/.my.cnf
+          ansible.builtin.command: "my_print_defaults --defaults-file='/root/.my.cnf' client"
+          register: mariadb_my_print_defaults_command
+          no_log: true
+
+        - name: Set a fact for the mariadb_root_password
+          ansible.builtin.set_fact:
+            mariadb_root_password: "{{ line | regex_replace('^--password=') | trim }}"
+          when: line is regex('^--password=')
+          loop: "{{ mariadb_my_print_defaults_command.stdout_lines }}"
+          loop_control:
+            loop_var: line
+          no_log: true
+
+        - name: Query the MariaDB databases, users and version using the /root/.my.cnf file
+          community.mysql.mysql_info:
+            filter:
+              - databases
+              - users
+              - version
+            return_empty_dbs: true
+            login_user: root
+            login_password: "{{ mariadb_root_password }}"
+            config_file: /root/.my.cnf
+          register: mariadb_info
+
       when: mariadb_root_mycnf.stat.exists
 
     - name: Query the MariaDB databases, users and version using a socket
