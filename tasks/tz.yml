@@ -99,15 +99,15 @@
             state: absent
           when: mariadb_tzdata_mariadb_file.stat.exists
 
-       - name: "/root/.my.tzdata file containing {{ mariadb_tzdata_latest }} present"
-         lineinfile:
-           path: /root/.my.tzdata
-           line: "{{ mariadb_tzdata_latest }}"
-           present: true
-           create: true
-           mode: 640
-           owner: root
-           group: root
+        - name: "/root/.my.tzdata file containing {{ mariadb_tzdata_latest }} present"
+          lineinfile:
+            path: /root/.my.tzdata
+            line: "{{ mariadb_tzdata_latest }}"
+            present: true
+            create: true
+            mode: 640
+            owner: root
+            group: root
 
       when: ( not mariadb_tzdata_mariadb_file.stat.exists ) or ( mariadb_tzdata_mariadb_file.stat.exists and mariadb_tzdata_mariadb != mariadb_tzdata_latest )
 

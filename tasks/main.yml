@@ -30,7 +30,7 @@
     - name: Read the MariaDB root password from /root/.my.cnf
       block:
 
-        - name: Load the passwd from /root/.my.cnf
+        - name: Read the passwd from /root/.my.cnf
           ansible.builtin.command: "my_print_defaults --defaults-file='/root/.my.cnf' client"
           register: mariadb_my_print_defaults_command
           no_log: true

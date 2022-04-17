@@ -10,7 +10,7 @@
     - name: Stat /root/.my.cnf
       ansible.builtin.stat:
         path: /root/.my.cnf
-      register: root_mycnf_stat
+      register: mariadb_root_mycnf
 
     - name: Read the MariaDB root password from /root/.my.cnf
       block:
@@ -29,7 +29,7 @@
             loop_var: line
           no_log: true
 
-      when: root_mycnf_stat.stat.exists
+      when: mariadb_root_mycnf.stat.exists
 
     # - name: Use community.mysql.mysql_query to check the current root auth method
     #   block:
