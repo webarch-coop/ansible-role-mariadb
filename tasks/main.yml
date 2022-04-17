@@ -51,6 +51,9 @@
               - users
               - version
             return_empty_dbs: true
+            login_host: "localhost"
+            login_port: 3360
+            login_db: mysql
             login_user: root
             login_password: "{{ mariadb_root_password }}"
             # config_file: /root/.my.cnf
