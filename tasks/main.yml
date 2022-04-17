@@ -44,6 +44,10 @@
             loop_var: line
           no_log: true
 
+        - name: Debug MySQL login command
+          debug:
+            msg: "mysql -uroot -p{{ mariadb_root_password }} -hlocalhost mysql"
+
         - name: Query the MariaDB databases, users and version using the /root/.my.cnf file
           community.mysql.mysql_info:
             filter:
