@@ -38,7 +38,7 @@
     #       community.mysql.mysql_query:
     #         query: "SELECT plugin FROM user WHERE User='root'"
     #         login_db: mysql
-    #         login_user: root 
+    #         login_user: root
     #         login_password: "{{ mariadb_root_password }}"
     #       register: mariadb_root_auth_plugin
 

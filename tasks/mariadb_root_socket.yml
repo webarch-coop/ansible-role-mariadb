@@ -19,7 +19,7 @@
     - name: Enable MariaDB root logins with a socket
       ansible.builtin.command: mysql -uroot -p{{ mariadb_root_password }} -e "ALTER USER root@localhost IDENTIFIED VIA unix_socket; FLUSH PRIVILEGES;" mysql
       when:
-        - not mariadb_community 
+        - not mariadb_community
         - ( mariadb_root_password is defined ) and ( mariadb_root_password | length > 0 )
       no_log: true
 
