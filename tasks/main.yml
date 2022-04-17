@@ -53,7 +53,7 @@
             return_empty_dbs: true
             login_user: root
             login_password: "{{ mariadb_root_password }}"
-            config_file: /root/.my.cnf
+            # config_file: /root/.my.cnf
           register: mariadb_info
 
       when: mariadb_root_mycnf.stat.exists
