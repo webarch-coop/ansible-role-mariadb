@@ -80,6 +80,13 @@
         verbosity: 2
 
     - name: Set a variable for the root authentication plugin
+      ansible.builtin.set_fact:
+        mariadb_root_auth_current: "{{ mariadb_info.users.localhost.root.plugin }}"
+
+    - name: Debug MariaDB root authentication plugin
+      ansible.builtin.debug:
+        var: mariadb_root_auth_current
+        verbosity: 2
 
     - name: MariaDB server defaults in place
       ansible.builtin.template:
