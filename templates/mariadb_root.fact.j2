@@ -12,9 +12,9 @@ if [[ -f "${MARIADB}" ]]; then
   PLUGIN=$("${MARIADB}" -h "${MARIADB_HOST}" -P "${MARIADB_PORT}" -BNe "SELECT plugin FROM user WHERE Host='${MARIADB_HOST}' AND User='root'" mysql)
   declare -i NO=$(echo "${PLUGIN}" | wc -l)
 
-  if (( NO eq 1 )); then
+  if (( NO == 1 )); then
     jo state=present plugin="${PLUGIN}"
-  elif (( NO gt 1 )); then
+  elif (( NO > 1 )); then
     jo state=present plugin=$(jo -a $(echo "${PLUGIN}" | tr '\n' ' '))
   else
     echo "Sorry $0 was unable to find the MariaDB root authentication plugin(s)"
