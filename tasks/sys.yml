@@ -30,7 +30,7 @@
           ansible.builtin.set_fact:
             bash: "{{ which_bash.stdout }}"
 
-        - name: Import the sys schema
+        - name: Import the sys schema using the shell module
           ansible.builtin.shell: |
             set -e -o pipefail
             mysql < ./mariadb_sys_install.sql
@@ -38,15 +38,15 @@
             executable: "{{ bash }}"
             chdir: /usr/local/src/mariadb-sys
 
-      when: ansible_local.mariadb_root.plugin == "mysql_native_password"
+      when: mariadb_root_auth_current == "password"
 
-    - name: Use import the sys schema using unix_socket
+    - name: Use import the sys schema using community.mysql.mysql_db and a socket
       community.mysql.mysql_db:
         name: all
         target: /usr/local/src/mariadb-sys/mariadb_sys_install.sql
         login_user: root
         login_unix_socket: /run/mysqld/mysqld.sock
-      when: ansible_local.mariadb_root.plugin is regex('^auth_socket|unix_socket$')
+      when: mariadb_root_auth_current == "socket"
 
   tags:
     - mariadb
