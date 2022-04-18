@@ -64,12 +64,16 @@
           ansible.builtin.shell: >
             set -e -o pipefail
             mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql mysql
+          args:
+            executable: "{{ bash }}"
           notify: Restart mariadb
 
         - name: Update the /root/.my.tzdata file
           ansible.builtin.shell: >
             set -e -o pipefail
             dpkg-parsechangelog -l /usr/share/doc/tzdata/changelog.Debian.gz -S Date > /root/.my.tzdata
+          args:
+            executable: "{{ bash }}"
 
       when:
         - mariadb_root_auth_current == "password"
