@@ -6,7 +6,7 @@ MARIADB="{{ mariadb_path }}"
 
 if [[ -f "${MARIADB}" ]]; then
   PLUGIN=$("${MARIADB}" -BNe "SELECT plugin FROM user WHERE User='root'" mysql)
-  jo state=present plugin="${MARIADB}"
+  jo state=present plugin="${PLUGIN}"
 else
   jo state=absent
 fi
