@@ -53,7 +53,7 @@ See also the [defaults/main.yml](defaults/main.yml) file.
 | `mariadb_username`                     |                                  | Provide a `mariadb_username` to add a MariaDB user account                                                                                                                  |
 | `mariadb_database`                     |                                  | If `mariadb_username` is set and `mariadb_database` is not set then the DB value will default to `mariadb_username`                                                         |
 | `mariadb_password`                     |                                  | This variable is randomly generated and written to `/.my.cnf` or set to the value in `/.my.cnf` if it is present                                                            |
-| `mariadb_priv`                         |                                  | If `mariadb_priv` is not set it defaults to `ALL`                                                                                                                           |
+| `mariadb_priv`                         |                                  | An array of user `PRIVILEGES`, if `mariadb_priv` is not set it defaults to `ALL`                                                                                            |
 | `mariadb_mycnf`                        |                                  | If a Linux user account exists that matches `mariadb_username` this will be set to `/home/{{ mariadb_username }}/.my.cnf` and if not `/root/{{ mariadb_username }}/.my.cnf` |
 
 ## Creating users and databases
@@ -62,17 +62,26 @@ You can call the `mariadb_user.yml` tasks multiple times, for example:
 
 ```yml
 - name: Create database and user for WordPress
-  include_role: mariadb
+  include_role:
+    name: mariadb
     tasks_from: mariadb_user.yml
   vars: 
     mariadb_database: wordpress
     mariadb_username: wordpress
+    mariadb_priv:
+      - ALTER
+      - CREATE
+      - DELETE
+      - INSERT
+      - SELECT
+      - UPDATE
 
 - debug:
     msg: "The MariaDB password for WordPress is: {{ mariadb_password }}"
 
 - name: Create database and user for Matomo
-  include_role: mariadb
+  include_role:
+    name: mariadb
     tasks_from: mariadb_user.yml
   vars:
     mariadb_database: matomo
