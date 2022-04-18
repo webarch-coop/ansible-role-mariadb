@@ -12,7 +12,9 @@ The `community.mysql` collection modules can be installed into `~/.ansible/colle
 ansible-galaxy collection install community.mysql
 ```
 
-This role can be used to switch the root users authentication plugin from `unix_socket` to `mysql_native_password` and back and it also imports the [sys schema](https://github.com/webarch-coop/mariadb-sys), updates the timezone data when needed and sets some systemd defaults.
+This role can be used to [switch the root users authentication plugin from `unix_socket` to `mysql_native_password`](tasks/mariadb_root_password.yml) and [back](tasks/info_socket.yml) and it also imports the [sys schema](https://github.com/webarch-coop/mariadb-sys), [updates the timezone data](tasks/tz.yml) when needed and sets [some systemd defaults](templates/mariadb.conf.j2).
+
+This role adds [a script](templates/mariadb_root.fact.j2) to `/etc/ansible/facts.d` which 
 
 ## Defaults
 
