@@ -44,6 +44,7 @@
             msg: "{{ ansible_local.mariadb_root.plugin }}"
 
         - name: Tasks when the root authentication plugin is a list
+          block:
 
             - name: Check the values of the root authentication plugins
               assert:
@@ -71,6 +72,7 @@
           when: ansible_facts.ansible_local.mariadb_root.plugin | type_debug == "list"
 
         - name: Tasks when the root authentication plugin is a string
+          block:
 
             - name: Check the values of the root authentication plugins
               assert:
