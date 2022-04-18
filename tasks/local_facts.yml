@@ -35,6 +35,26 @@
         msg: "{{ ansible_facts['ansible_local']['mariadb_root'] }}"
         verbosity: 2
 
+    - name: Tasks when Ansible MariaDB root plugin local facts successful
+      block:
+
+        - name: Print Ansible MariaDB root plugin local facts auth result
+          debug:
+            msg: "{{ ansible_facts.ansible_local.mariadb_root.plugin }}"
+
+        - name: Check the value of the root authentication plugin
+          assert:
+            that:
+              - ansible_facts.ansible_local.mariadb_root.plugin is regex('^auth_socket|unix_socket|mysql_native_password$')
+            fail_msg:
+              - This Ansible role only supports these root authentication plugins, auth_socket, unix_socket and mysql_native_password
+
+      when: ansible_facts.ansible_local.mariadb_root.plugin.state == "present"
+
+    - name: Include debugging tasks when Ansible MariaDB root plugin local facts absent
+      include_tasks: local_facts_absent.yml
+      when: ansible_facts.ansible_local.mariadb_root.plugin.state == "absent"
+
   tags:
     - mariadb
 ...

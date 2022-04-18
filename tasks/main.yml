@@ -26,56 +26,9 @@
       include_tasks: local_facts.yml
 
     - name: Query the MariaDB databases, users and version using a socket
-      block:
-
-        - name: Query the MariaDB databases, users and version using a socket
-          community.mysql.mysql_info:
-            filter:
-              - databases
-              - users
-              - version
-            return_empty_dbs: true
-            login_user: root
-            login_unix_socket: /run/mysqld/mysqld.sock
-          register: mariadb_info
-
-        - name: Debug MariaDB info
-          ansible.builtin.debug:
-            var: mariadb_info
-            verbosity: 3
-
-        - name: Set a variable for the root authentication plugin
-          ansible.builtin.set_fact:
-            mariadb_root_auth_current: "{{ mariadb_info.users.localhost.root.plugin }}"
-
-        - name: Debug MariaDB root authentication plugin
-          ansible.builtin.debug:
-            var: mariadb_root_auth_current
-            verbosity: 2
-
-        - name: Set a variable for the MariaDB version
-          ansible.builtin.set_fact:
-            mariadb_version: "{{ mariadb_info.version.major }}.{{ mariadb_info.version.minor }}.{{ mariadb_info.version.release }}"
-
-        - name: Debug MariaDB version
-          ansible.builtin.debug:
-            var: mariadb_version
-            verbosity: 2
-
-        - name: Set a variable for the MariaDB databases
-          ansible.builtin.set_fact:
-            mariadb_databases: "{{ mariadb_databases | default([]) }} + [ '{{ db.key }}' ]"
-          loop: "{{ mariadb_info.databases | dict2items }}"
-          loop_control:
-            loop_var: db
-            label: "{{ db.key }}"
-
-        - name: Debug MariaDB databases
-          ansible.builtin.debug:
-            var: mariadb_databases
-            verbosity: 2
-
-      when: ( ansible_local.mariadb_root.state == "present" ) and ( ansible_local.mariadb_root.plugin == "unix_socket" )
+      when: 
+        - ansible_local.mariadb_root.state == "present"
+        - ansible_local.mariadb_root.plugin is regex('^auth_socket|unix_socket$')
 
     - name: Debug fail
       fail:
