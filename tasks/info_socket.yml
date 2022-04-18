@@ -27,9 +27,11 @@
         var: mariadb_version
         verbosity: 2
 
+    # Skip lost+found as it will be a result of /var/lib/mysql being a seperate partition
     - name: Set a variable for the MariaDB databases
       ansible.builtin.set_fact:
         mariadb_databases: "{{ mariadb_databases | default([]) }} + [ '{{ db.key }}' ]"
+      when: db.key != "lost+found"
       loop: "{{ mariadb_info.databases | dict2items }}"
       loop_control:
         loop_var: db
