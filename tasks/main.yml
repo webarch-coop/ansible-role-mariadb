@@ -48,20 +48,33 @@
           debug:
             msg: "mysql -uroot -p{{ mariadb_root_password }} -hlocalhost mysql"
 
-        - name: Query the MariaDB databases, users and version using the /root/.my.cnf file
-          community.mysql.mysql_info:
-            filter:
-              - databases
-              - users
-              - version
-            return_empty_dbs: true
-            login_host: "localhost"
-            login_port: 3360
-            login_db: mysql
-            login_user: root
-            login_password: "{{ mariadb_root_password }}"
-            # config_file: /root/.my.cnf
-          register: mariadb_info
+        - name: Use community.mysql.mysql_info
+          block:
+
+            - name: Query the MariaDB databases, users and version using the /root/.my.cnf file
+              community.mysql.mysql_info:
+                filter:
+                  - databases
+                  - users
+                  - version
+                return_empty_dbs: true
+                login_host: "localhost"
+                login_port: 3360
+                login_db: mysql
+                login_user: root
+                login_password: "{{ mariadb_root_password }}"
+                # config_file: /root/.my.cnf
+              register: mariadb_info
+
+          rescue:
+
+            - name: Use command to check the root authentication plugin
+              command: mysql -BNe "SELECT plugin FROM user WHERE User='root'" mysql
+              register: mariadb_command_root_plugin
+
+            - name: Debug fail
+              fail:
+                msg: "using mysql on the command line returned {{ mariadb_command_root_plugin }} for the root auth method"
 
       when: mariadb_root_mycnf.stat.exists
 
