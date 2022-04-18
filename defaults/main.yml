@@ -1,14 +1,15 @@
 ---
 # The mariadb variable needs to be true for the tasks in this role to be run
 mariadb: true
-
+mariadb_host: localhost
+mariadb_port: 3360
 # The mariadb_path is used as a test for the local facts
 mariadb_path: /usr/bin/mariadb
 mariadb_socket: /var/run/mysqld/mysqld.sock
 
-# To use community.mysql modules set mariadb_community to true
-# https://docs.ansible.com/ansible/latest/collections/community/mysql/index.html
-mariadb_community: true
+# If mariadb_sys_schema is true then the sys schema is imported from this repo
+# https://github.com/webarch-coop/mariadb-sys
+mariadb_sys_schema: true
 
 # Systemd security settings
 # https://mariadb.com/kb/en/library/systemd/

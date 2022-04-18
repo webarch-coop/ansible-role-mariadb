@@ -25,14 +25,17 @@
     - name: Include local facts tasks
       include_tasks: local_facts.yml
 
-    - name: Query the MariaDB databases, users and version using a socket
-      include_tasks: info.yml
-      when: 
+    - name: Query the MariaDB databases, users and version using a password and the command module
+      include_tasks: info_password.yml
+      when:
+        - ansible_local.mariadb_root.state == "present"
+        - ansible_local.mariadb_root.plugin == "mysql_native_password"
+
+    - name: Query the MariaDB databases, users and version using a socket and the community.mysql.mysql_info module
+      include_tasks: info_socket.yml
+      when:
         - ansible_local.mariadb_root.state == "present"
         - ansible_local.mariadb_root.plugin is regex('^auth_socket|unix_socket$')
-
-    - name: Debug fail
-      fail:
 
     - name: MariaDB server defaults in place
       ansible.builtin.template:
@@ -80,7 +83,7 @@
 
     - name: Include the MariaDB sys schema tasks
       ansible.builtin.include_tasks: sys.yml
-      when: ( "sys" not in mariadb_databases )
+      when: ( mariadb_sys_schema ) and ( "sys" not in mariadb_databases )
 
     - name: Run mysql_upgrade
       ansible.builtin.command: mysql_upgrade

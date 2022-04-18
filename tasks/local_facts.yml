@@ -1,3 +1,4 @@
+---
 - name: Ansible MariaDB local facts
   block:
 
@@ -28,12 +29,12 @@
     - name: Re-read Ansible local facts
       ansible.builtin.setup:
         filter: ansible_local
-      when: mariadb_root_fact.changed 
+      when: mariadb_root_fact.changed
 
     - name: Print Ansible MariaDB root plugin local facts
       debug:
         msg: "{{ ansible_local.mariadb_root }}"
-        verbosity: 2
+        verbosity: 3
 
     - name: Tasks when Ansible MariaDB root plugin local facts successful
       block:

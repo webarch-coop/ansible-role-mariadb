@@ -2,11 +2,26 @@
 # {{ ansible_managed }}
 
 set -euo pipefail
+
 MARIADB="{{ mariadb_path }}"
+MARIADB_HOST="{{ mariadb_host }}"
+MARIADB_PORT="{{ mariadb_port }}"
 
 if [[ -f "${MARIADB}" ]]; then
-  PLUGIN=$("${MARIADB}" -BNe "SELECT plugin FROM user WHERE User='root'" mysql)
-  jo state=present plugin="${PLUGIN}"
+
+  PLUGIN=$("${MARIADB}" -h "${MARIADB_HOST}" -P "${MARIADB_PORT}" -BNe "SELECT plugin FROM user WHERE Host='${MARIADB_HOST}' User='root'" mysql)
+  NO=$(echo "${PLUGIN}" | wc -l)
+
+  if [[ "${NO}" eq "1" ]]; then
+    jo state=present plugin="${PLUGIN}"
+  elif [[ "${NO}" gt "1" ]]; then
+    PLUGINS=$( echo "${PLUGIN}" | xargs)
+    jo state=present -a plugin=$(jo -a "${PLUGINS}")
+  else
+    echo "Sorry $0 was unable to find the MariaDB root authentication plugin(s)"
+    echo 1
+  fi
+
 else
   jo state=absent
 fi
