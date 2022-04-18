@@ -2,6 +2,9 @@
 # The mariadb variable needs to be true for the tasks in this role to be run
 mariadb: true
 
+# The mariadb_path is used as a test for the local facts
+mariadb_path: /usr/bin/mariadb
+
 # To use community.mysql modules set mariadb_community to true
 # https://docs.ansible.com/ansible/latest/collections/community/mysql/index.html
 mariadb_community: true
