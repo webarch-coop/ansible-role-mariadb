@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# {{ ansible_managed }}
+
+set -euo pipefail
+MARIADB="{{ mariadb_path }}"
+
+if [[ -f "${MARIADB}" ]]; then
+  PLUGIN=$("${MARIADB}" -BNe "SELECT plugin FROM user WHERE User='root'" mysql)
+  jo state=present plugin="${MARIADB}"
+else
+  jo state=absent
+fi
+

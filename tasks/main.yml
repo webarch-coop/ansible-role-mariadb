@@ -22,6 +22,9 @@
         update_cache: false
       when: ansible_distribution_release is regex('^jessie|stretch$')
 
+    - name: Include local facts tasks
+      include_tasks: local_facts.yml
+
     - name: Stat /root/.my.cnf
       ansible.builtin.stat:
         path: /root/.my.cnf
