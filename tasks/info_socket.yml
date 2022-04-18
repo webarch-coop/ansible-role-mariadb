@@ -1,5 +1,5 @@
 ---
-- name: Use community.mysql.mysql_info to gather information about the MariaDB server
+- name: Use community.mysql.mysql_info to gather information about the MariaDB server version and databases
   block:
 
     - name: Query the MariaDB databases, users and version using a socket
@@ -18,14 +18,16 @@
         var: mariadb_info
         verbosity: 3
 
-    - name: Set a variable for the root authentication plugin
-      ansible.builtin.set_fact:
-        mariadb_root_auth_current: "{{ mariadb_info.users.localhost.root.plugin }}"
-
-    - name: Debug MariaDB root authentication plugin
-      ansible.builtin.debug:
-        var: mariadb_root_auth_current
-        verbosity: 2
+    # The mariadb_root_auth_current variable is set in the local_facts.yml tasks
+    #
+    # - name: Set a variable for the root authentication plugin
+    #   ansible.builtin.set_fact:
+    #     mariadb_root_auth_current: "{{ mariadb_info.users.localhost.root.plugin }}"
+    #
+    # - name: Debug MariaDB root authentication plugin
+    #   ansible.builtin.debug:
+    #     var: mariadb_root_auth_current
+    #     verbosity: 2
 
     - name: Set a variable for the MariaDB version
       ansible.builtin.set_fact:
