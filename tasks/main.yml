@@ -26,6 +26,7 @@
       include_tasks: local_facts.yml
 
     - name: Query the MariaDB databases, users and version using a socket
+      include_tasks: info.yml
       when: 
         - ansible_local.mariadb_root.state == "present"
         - ansible_local.mariadb_root.plugin is regex('^auth_socket|unix_socket$')
