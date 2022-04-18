@@ -80,34 +80,30 @@
         - ( not mariadb_tzdata_mariadb_file.stat.exists ) or ( mariadb_tzdata_mariadb_file.stat.exists and mariadb_tzdata_mariadb != mariadb_tzdata_latest )
 
     - name: Import the tzdata into the mysql database tables using the community.mysql.mysql_db module
-      block:
-
-        - name: Use import the sys schema using unix_socket
-          community.mysql.mysql_db:
-            name: all
-            target: /usr/local/src/mariadb-sys/mariadb_sys_install.sql
-            login_user: root
-            login_unix_socket: "{{ mariadb_socket }}"
-
-        - name: /root/.my.tzdata file absent
-          ansible.builtin.file:
-            path: /root/.my.tzdata
-            state: absent
-          when: mariadb_tzdata_mariadb_file.stat.exists
-
-        - name: "/root/.my.tzdata file containing {{ mariadb_tzdata_latest }} present"
-          ansible.builtin.lineinfile:
-            path: /root/.my.tzdata
-            line: "{{ mariadb_tzdata_latest }}"
-            state: present
-            create: true
-            mode: 640
-            owner: root
-            group: root
-
+      community.mysql.mysql_db:
+        name: all
+        target: /usr/local/src/mariadb-sys/mariadb_sys_install.sql
+        login_user: root
+        login_unix_socket: "{{ mariadb_socket }}"
       when:
         - mariadb_root_auth_current == "socket"
         - ( not mariadb_tzdata_mariadb_file.stat.exists ) or ( mariadb_tzdata_mariadb_file.stat.exists and mariadb_tzdata_mariadb != mariadb_tzdata_latest )
+
+    - name: /root/.my.tzdata file absent
+      ansible.builtin.file:
+        path: /root/.my.tzdata
+        state: absent
+      when: mariadb_tzdata_mariadb_file.stat.exists
+
+    - name: "/root/.my.tzdata file containing {{ mariadb_tzdata_latest }} present"
+      ansible.builtin.lineinfile:
+        path: /root/.my.tzdata
+        line: "{{ mariadb_tzdata_latest }}"
+        state: present
+        create: true
+        mode: 640
+        owner: root
+        group: root
 
   when: ( mariadb_tzdata_changelog.stat.exists is defined ) and ( mariadb_tzdata_changelog.stat.exists )
   tags:
