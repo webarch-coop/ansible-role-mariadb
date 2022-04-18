@@ -25,13 +25,29 @@
     - name: Include local facts tasks
       include_tasks: local_facts.yml
 
-    - name: Query the MariaDB databases, users and version using a password and the command module
-      include_tasks: info_password.yml
-      when: mariadb_root_auth_current == "password"
+    - name: Tasks when the current root authentication method is a socket
+      block:
 
-    - name: Query the MariaDB databases, users and version using a socket and the community.mysql.mysql_info module
-      include_tasks: info_socket.yml
+        - name: Query the MariaDB databases, users and version using a socket and the community.mysql.mysql_info module
+          include_tasks: info_socket.yml
+
+        - name: Include the MariaDB root password authentication tasks
+          ansible.builtin.include_tasks: mariadb_root_password.yml
+          when: ( mariadb_root_auth is defined ) and ( mariadb_root_auth == "password" )
+
       when: mariadb_root_auth_current == "socket"
+
+    - name: Tasks when the current root authentication method is a password
+      block:
+
+        - name: Query the MariaDB databases, users and version using a password and the command module
+          include_tasks: info_password.yml
+
+        - name: Include the MariaDB root user socket authentication tasks
+          ansible.builtin.include_tasks: mariadb_root_socket.yml
+          when: ( mariadb_root_auth is defined ) and ( mariadb_root_auth == "socket" )
+
+      when: mariadb_root_auth_current == "password"
 
     - name: MariaDB server defaults in place
       ansible.builtin.template:
@@ -94,10 +110,6 @@
     - name: Conditionally include the update-alternatives tasks
       ansible.builtin.include_tasks: update.yml
       when: ( mariadb_etc_my_cnf is defined ) and ( not mariadb_etc_my_cnf.stat.islnk )
-
-    - name: Conditionally include the root password tasks
-      ansible.builtin.include_tasks: mariadb_root.yml
-      when: ( mariadb_root_auth is defined ) and ( mariadb_root_auth is regex("^password|socket$") )
 
     - name: Conditionally import the time zone tables import tasks
       ansible.builtin.include_tasks: tz.yml

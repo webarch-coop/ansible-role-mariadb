@@ -2,6 +2,12 @@
 - name: Set variables and paths
   block:
 
+    - name: Check that socket authentication is being used
+      assert:
+        that:
+          - mariadb_root_auth_current == "socket"
+        fail_msg: "The user tasks in this role have been written to use socket authentication"
+
     - name: Include debugging
       ansible.builtin.include_tasks: mariadb_user_checks_debug.yml
       when: ( ( enable_task_debugger is defined ) and ( enable_task_debugger ) ) or ( ansible_verbosity >= 2 )

@@ -3,50 +3,38 @@
 - name: Set the MariaDB root use to use socket authentication
   block:
 
-    - name: Enable MariaDB root logins with a socket
-      community.mysql.mysql_query:
-        query:
-          - ALTER USER root@localhost IDENTIFIED VIA unix_socket
-          - FLUSH PRIVILEGES
-        login_db: mysql
-        login_user: root
-        login_password: "{{ mariadb_root_password }}"
-      when:
-        - mariadb_community
-        - ( mariadb_root_password is defined ) and ( mariadb_root_password | length > 0 )
-      no_log: true
-
     # - name: Enable MariaDB root logins with a socket
-    #   ansible.builtin.command: mysql -uroot -p{{ mariadb_root_password }} -e "ALTER USER root@localhost IDENTIFIED VIA unix_socket; FLUSH PRIVILEGES;" mysql
+    #   community.mysql.mysql_query:
+    #     query:
+    #       - ALTER USER root@localhost IDENTIFIED VIA unix_socket
+    #       - FLUSH PRIVILEGES
+    #     login_db: mysql
+    #     login_user: root
+    #     login_password: "{{ mariadb_root_password }}"
     #   when:
-    #     - not mariadb_community
+    #     - mariadb_community
     #     - ( mariadb_root_password is defined ) and ( mariadb_root_password | length > 0 )
     #   no_log: true
+
+    - name: Enable MariaDB root logins with a socket using UPDATE
+      ansible.builtin.command: mysql -uroot -e "UPDATE user SET plugin='mysql_native_password' WHERE User='root' AND Host='localhost'" mysql
+      when: mariadb_version is version('10.2.0', '<')
+      no_log: true
+
+    # The ALTER USER statement was introduced in MariaDB 10.2.0
+    # https://mariadb.com/kb/en/alter-user/
+    - name: Enable MariaDB root logins with a socket using ALTER
+      ansible.builtin.command: mysql -uroot -e "ALTER USER root@localhost IDENTIFIED VIA unix_socket; FLUSH PRIVILEGES" mysql
+      when: mariadb_version is version('10.2.0', '>=')
+      no_log: true
 
     - name: Remove /root/.my.cnf
       ansible.builtin.file:
         path: /root/.my.cnf
         state: absent
 
-    - name: Query the MariaDB users using a socket
-      community.mysql.mysql_info:
-        filter:
-          - databases
-          - users
-          - version
-        return_empty_dbs: true
-        login_user: root
-        login_unix_socket: /run/mysqld/mysqld.sock
-      register: mariadb_info
-
-    - name: Set a variable for the root authentication plugin
-      ansible.builtin.set_fact:
-        mariadb_root_auth_current: "{{ mariadb_info.users.localhost.root.plugin }}"
-
-    - name: Debug MariaDB root authentication plugin
-      ansible.builtin.debug:
-        var: mariadb_root_auth_current
-        verbosity: 2
+    - name: Include the local facts tasks to check the socket authentication
+      include_tasks: local_facts.yml
 
   tags:
     - mariadb

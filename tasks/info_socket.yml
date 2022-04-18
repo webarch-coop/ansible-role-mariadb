@@ -18,17 +18,6 @@
         var: mariadb_info
         verbosity: 3
 
-    # The mariadb_root_auth_current variable is set in the local_facts.yml tasks
-    #
-    # - name: Set a variable for the root authentication plugin
-    #   ansible.builtin.set_fact:
-    #     mariadb_root_auth_current: "{{ mariadb_info.users.localhost.root.plugin }}"
-    #
-    # - name: Debug MariaDB root authentication plugin
-    #   ansible.builtin.debug:
-    #     var: mariadb_root_auth_current
-    #     verbosity: 2
-
     - name: Set a variable for the MariaDB version
       ansible.builtin.set_fact:
         mariadb_version: "{{ mariadb_info.version.major }}.{{ mariadb_info.version.minor }}.{{ mariadb_info.version.release }}"
