@@ -16,6 +16,8 @@ This role can be used to [switch the root users authentication plugin from `unix
 
 This role adds [a script](templates/mariadb_root.fact.j2) to `/etc/ansible/facts.d` which 
 
+The primary URL of this repo is [`https://git.coop/webarch/mariadb`](https://git.coop/webarch/mariadb) and this is where the [release notes](https://git.coop/webarch/debug/-/releases) are, it is also [mirrored to GitHub](https://github.com/webarch-coop/ansible-role-debug) and [available via Ansible Galaxy](https://galaxy.ansible.com/chriscroome/debug).
+
 ## Defaults
 
 See also the [defaults/main.yml](defaults/main.yml) file.
