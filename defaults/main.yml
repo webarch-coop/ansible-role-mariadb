@@ -11,6 +11,9 @@ mariadb_socket: /var/run/mysqld/mysqld.sock
 # https://github.com/webarch-coop/mariadb-sys
 mariadb_sys_schema: true
 
+# Import time zone tables
+mariadb_time_zone_import: true
+
 # Systemd security settings
 # https://mariadb.com/kb/en/library/systemd/
 mariadb_systemd_no_new_privileges: true
@@ -38,9 +41,6 @@ mariadb_innodb_buffer_pool_instances: 1
 mariadb_query_cache_type: 0
 mariadb_query_cache_limit: 0
 mariadb_query_cache_size: 0
-
-# Import time zone tables
-mariadb_time_zone_import: true
 
 # If the mariadb_root_auth variable is not set then nothing will be done to the
 # root account login, which, by default, uses a socket for logins and doesn't

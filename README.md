@@ -1,88 +1,66 @@
-# Ansible Debian MariaDB Role 
+# Webarchitects Ansible Debian MariaDB Role 
 
-This repository contains an Ansible role for installing [MariaDB](https://mariadb.org/) on Debian servers, it requires a recent version of the [community.mysql collection](https://docs.ansible.com/ansible/latest/collections/community/mysql/), this can be installed into `~/.ansible/collections/ansible_collections` like this:
+[![pipeline status](https://git.coop/webarch/mariadb/badges/master/pipeline.svg)](https://git.coop/webarch/mariadb/-/commits/master)
+
+This repository contains an Ansible role for installing and configuring [MariaDB](https://mariadb.org/) on Debian servers.
+
+Versions of this role including and prior to [version 1.9.1](https://git.coop/webarch/mariadb/-/tree/1.9.1) require Ansible 2.9 and use the command and shell modules for many tasks, version 2.0.0 onwards uses the [community.mysql collection](https://docs.ansible.com/ansible/latest/collections/community/mysql/). 
+
+The `community.mysql` collection modules can be installed into `~/.ansible/collections/ansible_collections` like this:
 
 ```bash
 ansible-galaxy collection install community.mysql
 ```
 
-See the [defaults/main.yml](defaults/main.yml) for the options that can be set.
+This role can be used to switch the root users authentication plugin from `unix_socket` to `mysql_native_password` and back and it also imports the sysc schem, updates the timezone data when needed and sets some systemd defaults.
 
-To use this role you need to use Ansible Galaxy to install it into another repository under `galaxy/roles/mariadb` by adding a `requirements.yml` file in that repo that contains:
+## Defaults
 
-```yml
----
-- name: mariadb
-  src: https://git.coop/webarch/mariadb.git
-  version: master
-  scm: git
-```
+See also the [defaults/main.yml](defaults/main.yml) file.
 
-And a `ansible.cfg` that contains:
+| Variable name                          | Default value                                      | Comment                                                                                                                       |
+|----------------------------------------|----------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| `mariadb`                              | `true`                                             | Set `mariadb` to false to prevent any tasks in this role being run                                                            |
+| `mariadb_host`                         | `localhost`                                        | Note that this roles hasn't been tested with hosts other than `localhost`                                                     |
+| `mariadb_port`                         | `3306`                                             | The default MariaDB port                                                                                                      |
+| `mariadb_path`                         | `/usr/bin/mariadb`                                 | The existance of the `mariadb_path` is used as a test for generating the `local_facts`                                        |
+| `mariadb_socket`                       | `/var/run/mysqld/mysqld.sock`                      | The path to the MariaDB scoket                                                                                                |
+| `mariadb_sys_schema`                   | `true`                                             | If `mariadb_sys_schema` is true then the sys schema is imported from [this repo](https://github.com/webarch-coop/mariadb-sys) |
+| `mariadb_time_zone_import`             | `true`                                             | If `mariadb_time_zone_import` is true then the  time zone tables when they have been updated                                  |
+| `mariadb_systemd_no_new_privileges`    | `true`                                             | Set systemd `NoNewPrivileges` to true for MariaDB                                                                             |
+| `mariadb_systemd_private_network`      | `true`                                             | Set systemd `PrivateNetwork` to true for MariaDB                                                                              |
+| `mariadb_systemd_private_tmp`          | `true`                                             | Set systemd `PrivateTmp` to true for MariaDB                                                                                  |
+| `mariadb_join_buffer_size`             | `8M`                                               |                                                                                                                               |
+| `mariadb_open_files_limit`             | `122880`                                           |                                                                                                                               |
+| `mariadb_table_open_cache`             | `4000`                                             |                                                                                                                               |
+| `mariadb_tmp_table_size`               | `32M`                                              |                                                                                                                               |
+| `mariadb_max_heap_table_size`          | `"{{ mariadb_tmp_table_size }}"`                   |                                                                                                                               |
+| `mariadb_max_allowed_packet`           | `64M`                                              |                                                                                                                               |
+| `mariadb_key_buffer_size`              | `16M`                                              |                                                                                                                               |
+| `mariadb_max_connections`              | `80`                                               |                                                                                                                               |
+| `max_user_connections`                 | `0`                                                |                                                                                                                               |
+| `mariadb_table_cache`                  | `64`                                               |                                                                                                                               |
+| `mariadb_thread_concurrency`           | `10`                                               |                                                                                                                               |
+| `mariadb_innodb_buffer_pool_size`      | `1G`                                               |                                                                                                                               |
+| `mariadb_innodb_log_file_size`         | `256M`                                             |                                                                                                                               |
+| `mariadb_innodb_buffer_pool_instances` | `1`                                                |                                                                                                                               |
+| `mariadb_query_cache_type`             | `0`                                                |                                                                                                                               |
+| `mariadb_query_cache_limit`            | `0`                                                |                                                                                                                               |
+| `mariadb_query_cache_size`             | `0`                                                |                                                                                                                               |
+| `mariadb_root_auth`                    |                                                    |                                                                                                                               |
+| `mariadb_username`                     |                                                    |                                                                                                                               |
+| `mariadb_priv`                         |                                                    |                                                                                                                               |
+| `mariadb_database`                     |                                                    |                                                                                                                               |
+| `mariadb_password`                     |                                                    |                                                                                                                               |
+| `mariadb_mycnf`                        |                                                    |                                                                                                                               |
 
-```
-[defaults]
-retry_files_enabled = False
-pipelining = True
-inventory = hosts.yml
-roles_path = galaxy/roles
-
-```
-
-And a `.gitignore` containing:
-
-```
-roles/galaxy
-```
-
-To pull this repo in run:
-
-```bash
-ansible-galaxy install -r requirements.yml --force 
-```
-
-The other repo should also contain a `mariadb.yml` file that contains:
-
-```yml
----
-- name: Install MariaDB
-  become: yes
-
-  hosts:
-    - mariadb_servers
-
-  roles:
-    - mariadb
-```
-
-And a `hosts.yml` file that contains lists of servers, for example:
-
-```yml
----
-all:
-  children:
-    mariadb_servers:
-      hosts:
-        host3.example.org:
-        host4.example.org:
-        cloud.example.com:
-        cloud.example.org:
-        cloud.example.net:
-```
-
-Then it can be run as follows:
-
-```bash
-ansible-playbook mariadb.yml 
-```
-
-## Creating multiple users and databases
+## Creating users and databases
 
 You can call the `mariadb_user.yml` tasks multiple times, for example:
 
 ```yml
 - name: Create database and user for WordPress
-  include_role: mariadd
+  include_role: mariadb
     tasks_from: mariadb_user.yml
   vars: 
     mariadb_database: wordpress
@@ -92,7 +70,7 @@ You can call the `mariadb_user.yml` tasks multiple times, for example:
     msg: "The MariaDB password for WordPress is: {{ mariadb_password }}"
 
 - name: Create database and user for Matomo
-  include_role: mariadd
+  include_role: mariadb
     tasks_from: mariadb_user.yml
   vars:
     mariadb_database: matomo
@@ -102,26 +80,4 @@ You can call the `mariadb_user.yml` tasks multiple times, for example:
     msg: "The MariaDB password for Matomo is: {{ mariadb_password }}"
 ```
 
-Note that the `mariadb_password` variable will contain the password for
-the last user created.
-
-## TODO
-
-* Check that the mariadb_username and mariadb_database are lowercase and contain no punctuation or white space 
-* Add additional optional `mariadb_` variables for values in `templates/50-server.cnf.j2`
-* Consider adding the ability to create multiple database users and databases, reading these from YAML dicts, for example:
-```yml
-  vars:
-    mariadb_databases_present:
-      - wordpress_prod
-      - wordpress_stage
-    mariadb_databases_absent:
-      - drupal_prod
-      - drupal_stage
-    mariadb_users_present:
-      - name: wordpress
-        priv:
-          - 'wordpress_prod.*:ALL'
-          - 'wordpress_stage.*:ALL'
-      
-```
+Note that the `mariadb_password` variable will contain the password for the last user created.
