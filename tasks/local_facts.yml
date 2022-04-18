@@ -43,12 +43,55 @@
           debug:
             msg: "{{ ansible_local.mariadb_root.plugin }}"
 
-        - name: Check the value of the root authentication plugin
-          assert:
-            that:
-              - ansible_facts.ansible_local.mariadb_root.plugin is regex('^auth_socket|unix_socket|mysql_native_password$')
-            fail_msg:
-              - This Ansible role only supports these root authentication plugins, auth_socket, unix_socket and mysql_native_password
+        - name: Tasks when the root authentication plugin is a list
+
+            - name: Check the values of the root authentication plugins
+              assert:
+                that: >
+                  ( "auth_socket" in ansible_facts.ansible_local.mariadb_root.plugin ) or
+                  ( "unix_socket" in ansible_facts.ansible_local.mariadb_root.plugin ) or
+                  ( "mysql_native_password" in ansible_facts.ansible_local.mariadb_root.plugin )
+                fail_msg: This Ansible role only supports the root authentication plugins, auth_socket, unix_socket and mysql_native_password
+
+            - name: Set a fact for the root authentication plugin
+              set_fact:
+                mariadb_root_auth_current: "password"
+              when:
+                - ( "auth_socket" not in ansible_facts.ansible_local.mariadb_root.plugin )
+                - ( "unix_socket" not in ansible_facts.ansible_local.mariadb_root.plugin )
+                - ( "mysql_native_password" in ansible_facts.ansible_local.mariadb_root.plugin )
+
+            - name: Set a fact for the root authentication plugin
+              set_fact:
+                mariadb_root_auth_current: "socket"
+              when: >
+                  ( "auth_socket" in ansible_facts.ansible_local.mariadb_root.plugin ) or
+                  ( "unix_socket" in ansible_facts.ansible_local.mariadb_root.plugin )
+
+          when: ansible_facts.ansible_local.mariadb_root.plugin | type_debug == "list"
+
+        - name: Tasks when the root authentication plugin is a string
+
+            - name: Check the values of the root authentication plugins
+              assert:
+                that:
+                  - ansible_facts.ansible_local.mariadb_root.plugin is regex('^auth_socket|unix_socket|mysql_native_password$')
+                fail_msg: This Ansible role only supports the root authentication plugins, auth_socket, unix_socket and mysql_native_password
+
+            - name: Set a fact for the root authentication plugin
+              set_fact:
+                mariadb_root_auth_current: "password"
+              when:
+                - ansible_facts.ansible_local.mariadb_root.plugin == "mysql_native_password"
+
+            - name: Set a fact for the root authentication plugin
+              set_fact:
+                mariadb_root_auth_current: "socket"
+              when: >
+                  ( ansible_facts.ansible_local.mariadb_root.plugin == "auth_socket" ) or
+                  ( ansible_facts.ansible_local.mariadb_root.plugin == "unix_socket" )
+
+          when: ansible_facts.ansible_local.mariadb_root.plugin | type_debug != "list"
 
       when: ansible_facts.ansible_local.mariadb_root.state == "present"
 
