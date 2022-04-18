@@ -40,7 +40,7 @@
 
         - name: Print Ansible MariaDB root plugin local facts auth result
           debug:
-            msg: "{{ ansible_facts.ansible_local.mariadb_root.plugin }}"
+            msg: "{{ ansible_local['mariadb_root']['plugin'] }}"
 
         - name: Check the value of the root authentication plugin
           assert:
