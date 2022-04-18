@@ -10,7 +10,7 @@
           - version
         return_empty_dbs: true
         login_user: root
-        login_unix_socket: /run/mysqld/mysqld.sock
+        login_unix_socket: "{{ mariadb_socket }}"
       register: mariadb_info
 
     - name: Debug MariaDB info
