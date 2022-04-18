@@ -45,65 +45,66 @@
 
       when: mariadb_tzdata_mariadb_file.stat.exists
 
-    - name: Import the tzdata into the mysql database tables using the shell module
+    - name: Import the tzdata
       block:
 
-        # Bash might be /bin/bash or /usr/bin/bash
-        - name: Run which bash
-          ansible.builtin.command: which bash
-          check_mode: false
-          changed_when: false
-          register: which_bash
-          failed_when: which_bash.stdout is not regex('\/bash$')
+        - name: Import the tzdata using the shell module
+          block:
 
-        - name: Set a variable for the path to Bash
-          ansible.builtin.set_fact:
-            bash: "{{ which_bash.stdout }}"
+            # Bash might be /bin/bash or /usr/bin/bash
+            - name: Run which bash
+              ansible.builtin.command: which bash
+              check_mode: false
+              changed_when: false
+              register: which_bash
+              failed_when: which_bash.stdout is not regex('\/bash$')
 
-        - name: Import the time zone data from /usr/share/zoneinfo using the shell module
-          ansible.builtin.shell: >
-            set -e -o pipefail
-            mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql mysql
-          args:
-            executable: "{{ bash }}"
-          notify: Restart mariadb
+            - name: Set a variable for the path to Bash
+              ansible.builtin.set_fact:
+                bash: "{{ which_bash.stdout }}"
 
-        - name: Update the /root/.my.tzdata file
-          ansible.builtin.shell: >
-            set -e -o pipefail
-            dpkg-parsechangelog -l /usr/share/doc/tzdata/changelog.Debian.gz -S Date > /root/.my.tzdata
-          args:
-            executable: "{{ bash }}"
+            - name: Import the time zone data from /usr/share/zoneinfo using the shell module
+              ansible.builtin.shell: >
+                set -e -o pipefail
+                mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql mysql
+              args:
+                executable: "{{ bash }}"
+              notify: Restart mariadb
 
-      when:
-        - mariadb_root_auth_current == "password"
-        - ( not mariadb_tzdata_mariadb_file.stat.exists ) or ( mariadb_tzdata_mariadb_file.stat.exists and mariadb_tzdata_mariadb != mariadb_tzdata_latest )
+            - name: Update the /root/.my.tzdata file
+              ansible.builtin.shell: >
+                set -e -o pipefail
+                dpkg-parsechangelog -l /usr/share/doc/tzdata/changelog.Debian.gz -S Date > /root/.my.tzdata
+              args:
+                executable: "{{ bash }}"
 
-    - name: Import the tzdata into the mysql database tables using the community.mysql.mysql_db module
-      community.mysql.mysql_db:
-        name: all
-        target: /usr/local/src/mariadb-sys/mariadb_sys_install.sql
-        login_user: root
-        login_unix_socket: "{{ mariadb_socket }}"
-      when:
-        - mariadb_root_auth_current == "socket"
-        - ( not mariadb_tzdata_mariadb_file.stat.exists ) or ( mariadb_tzdata_mariadb_file.stat.exists and mariadb_tzdata_mariadb != mariadb_tzdata_latest )
+          when: mariadb_root_auth_current == "password"
 
-    - name: /root/.my.tzdata file absent
-      ansible.builtin.file:
-        path: /root/.my.tzdata
-        state: absent
-      when: mariadb_tzdata_mariadb_file.stat.exists
+        - name: Import the tzdata into the mysql database tables using the community.mysql.mysql_db module
+          community.mysql.mysql_db:
+            name: all
+            target: /usr/local/src/mariadb-sys/mariadb_sys_install.sql
+            login_user: root
+            login_unix_socket: "{{ mariadb_socket }}"
+          when: mariadb_root_auth_current == "socket"
 
-    - name: "/root/.my.tzdata file containing {{ mariadb_tzdata_latest }} present"
-      ansible.builtin.lineinfile:
-        path: /root/.my.tzdata
-        line: "{{ mariadb_tzdata_latest }}"
-        state: present
-        create: true
-        mode: 640
-        owner: root
-        group: root
+        - name: /root/.my.tzdata file absent
+          ansible.builtin.file:
+            path: /root/.my.tzdata
+            state: absent
+          when: mariadb_tzdata_mariadb_file.stat.exists
+
+        - name: "/root/.my.tzdata file containing {{ mariadb_tzdata_latest }} present"
+          ansible.builtin.lineinfile:
+            path: /root/.my.tzdata
+            line: "{{ mariadb_tzdata_latest }}"
+            state: present
+            create: true
+            mode: 640
+            owner: root
+            group: root
+
+      when: ( not mariadb_tzdata_mariadb_file.stat.exists ) or ( mariadb_tzdata_mariadb_file.stat.exists and ( mariadb_tzdata_mariadb != mariadb_tzdata_latest ) )
 
   when: ( mariadb_tzdata_changelog.stat.exists is defined ) and ( mariadb_tzdata_changelog.stat.exists )
   tags:
