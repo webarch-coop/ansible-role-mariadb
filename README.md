@@ -4,7 +4,7 @@
 
 This repository contains an Ansible role for installing and configuring [MariaDB](https://mariadb.org/) on Debian servers.
 
-Versions of this role including and prior to [version 1.9.1](https://git.coop/webarch/mariadb/-/tree/1.9.1) require Ansible 2.9 and use the command and shell modules for many tasks, version 2.0.0 onwards uses the [community.mysql collection](https://docs.ansible.com/ansible/latest/collections/community/mysql/). 
+Versions of this role including and prior to [version 1.9.1](https://git.coop/webarch/mariadb/-/tree/1.9.1) require Ansible 2.9 and use the command and shell modules for many tasks, version 2.0.0 onwards requires Ansible 2.10 and uses the [community.mysql collection](https://docs.ansible.com/ansible/latest/collections/community/mysql/). 
 
 The `community.mysql` collection modules can be installed into `~/.ansible/collections/ansible_collections` like this:
 

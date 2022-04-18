@@ -33,7 +33,11 @@
         path: /root/.my.cnf
         state: absent
 
-    - name: Include the local facts tasks to check the socket authentication
+    - name: Re-read Ansible local facts
+      ansible.builtin.setup:
+        filter: ansible_local
+
+    - name: Include the local facts tasks to set facts based on the local facts
       include_tasks: local_facts.yml
 
   tags:
