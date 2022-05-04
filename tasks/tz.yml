@@ -1,4 +1,12 @@
 ---
+- name: Package dpkg-dev present
+  apt:
+    pkg:
+      - dpkg-dev
+    state: present
+  tags:
+    - mariadb
+
 - name: Check that the Debian tzdata changelog is present
   ansible.builtin.stat:
     path: /usr/share/doc/tzdata/changelog.Debian.gz
