@@ -100,7 +100,7 @@
 
             - name: Import the tzdata into the mysql database tables using the community.mysql.mysql_db module
               community.mysql.mysql_db:
-                name: nysql
+                name: mysql
                 state: import
                 target: /root/timezoneinfo.sql
                 login_user: root
