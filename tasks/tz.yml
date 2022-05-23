@@ -88,13 +88,26 @@
 
           when: mariadb_root_auth_current == "password"
 
-        - name: Import the tzdata into the mysql database tables using the community.mysql.mysql_db module
-          community.mysql.mysql_db:
-            name: all
-            state: import
-            target: /usr/local/src/mariadb-sys/mariadb_sys_install.sql
-            login_user: root
-            login_unix_socket: "{{ mariadb_socket }}"
+        - name: Use community.mysql.mysql_db with socket authentication
+          block:
+
+            - name: Timezone database cump created
+                ansible.builtin.shell: >
+                  set -e -o pipefail
+                  mysql_tzinfo_to_sql /usr/share/zoneinfo > /root/timezoneinfo.sql
+              args:
+                executable: "{{ bash }}"
+              args:
+                executable: "{{ bash }}"
+
+            - name: Import the tzdata into the mysql database tables using the community.mysql.mysql_db module
+              community.mysql.mysql_db:
+                name: nysql
+                state: import
+                target: /root/timezoneinfo.sql
+                login_user: root
+                login_unix_socket: "{{ mariadb_socket }}"
+
           when: mariadb_root_auth_current == "socket"
 
         - name: /root/.my.tzdata file absent
