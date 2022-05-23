@@ -91,12 +91,10 @@
         - name: Use community.mysql.mysql_db with socket authentication
           block:
 
-            - name: Timezone database cump created
-                ansible.builtin.shell: >
-                  set -e -o pipefail
-                  mysql_tzinfo_to_sql /usr/share/zoneinfo > /root/timezoneinfo.sql
-              args:
-                executable: "{{ bash }}"
+            - name: Timezone database dump created
+              ansible.builtin.shell: >
+                set -e -o pipefail
+                mysql_tzinfo_to_sql /usr/share/zoneinfo > /root/timezoneinfo.sql
               args:
                 executable: "{{ bash }}"
 
