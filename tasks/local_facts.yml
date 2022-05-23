@@ -29,7 +29,7 @@
     - name: Re-read Ansible local facts
       ansible.builtin.setup:
         filter: ansible_local
-      when: mariadb_root_fact.changed
+      when: mariadb_root_fact.changed | bool
 
     - name: Print Ansible MariaDB root plugin local facts
       debug:

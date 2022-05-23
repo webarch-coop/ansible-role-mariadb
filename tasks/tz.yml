@@ -51,7 +51,7 @@
               - "mariadb_tzdata_mariadb: {{ mariadb_tzdata_mariadb }}"
             verbosity: 1
 
-      when: mariadb_tzdata_mariadb_file.stat.exists
+      when: mariadb_tzdata_mariadb_file.stat.exists | bool
 
     # Bash might be /bin/bash or /usr/bin/bash
     - name: Run which bash
@@ -112,7 +112,7 @@
           ansible.builtin.file:
             path: /root/.my.tzdata
             state: absent
-          when: mariadb_tzdata_mariadb_file.stat.exists
+          when: mariadb_tzdata_mariadb_file.stat.exists | bool
 
         - name: "/root/.my.tzdata file containing {{ mariadb_tzdata_latest }} present"
           ansible.builtin.lineinfile:
@@ -124,9 +124,9 @@
             owner: root
             group: root
 
-      when: ( not mariadb_tzdata_mariadb_file.stat.exists ) or ( mariadb_tzdata_mariadb_file.stat.exists and ( mariadb_tzdata_mariadb != mariadb_tzdata_latest ) )
+      when: ( not mariadb_tzdata_mariadb_file.stat.exists | bool ) or ( ( mariadb_tzdata_mariadb_file.stat.exists | bool ) and ( mariadb_tzdata_mariadb != mariadb_tzdata_latest ) )
 
-  when: ( mariadb_tzdata_changelog.stat.exists is defined ) and ( mariadb_tzdata_changelog.stat.exists )
+  when: ( mariadb_tzdata_changelog.stat.exists is defined ) and ( mariadb_tzdata_changelog.stat.exists | bool )
   tags:
     - mariadb
 ...

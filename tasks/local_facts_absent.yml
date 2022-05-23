@@ -10,7 +10,7 @@
     - name: Warn that the MariaDB socket doesn't exist
       debug:
         msg: "The MariaDB socket at {{ mariadb_socket }} could not be found, please check the value of the mariadb_socket Ansible variable and the value of the MariaDB socket variable"
-      when: not mariadb_socket_path.stat.exists
+      when: not mariadb_socket_path.stat.exists | bool
 
     - name: Stat /root/.my.cnf
       ansible.builtin.stat:
