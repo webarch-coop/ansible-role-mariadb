@@ -53,23 +53,23 @@
 
       when: mariadb_tzdata_mariadb_file.stat.exists
 
+    # Bash might be /bin/bash or /usr/bin/bash
+    - name: Run which bash
+      ansible.builtin.command: which bash
+      check_mode: false
+      changed_when: false
+      register: which_bash
+      failed_when: which_bash.stdout is not regex('\/bash$')
+
+    - name: Set a variable for the path to Bash
+      ansible.builtin.set_fact:
+        bash: "{{ which_bash.stdout }}"
+
     - name: Import the tzdata
       block:
 
         - name: Import the tzdata using the shell module
           block:
-
-            # Bash might be /bin/bash or /usr/bin/bash
-            - name: Run which bash
-              ansible.builtin.command: which bash
-              check_mode: false
-              changed_when: false
-              register: which_bash
-              failed_when: which_bash.stdout is not regex('\/bash$')
-
-            - name: Set a variable for the path to Bash
-              ansible.builtin.set_fact:
-                bash: "{{ which_bash.stdout }}"
 
             - name: Import the time zone data from /usr/share/zoneinfo using the shell module
               ansible.builtin.shell: >
