@@ -91,6 +91,7 @@
         - name: Import the tzdata into the mysql database tables using the community.mysql.mysql_db module
           community.mysql.mysql_db:
             name: all
+            state: import
             target: /usr/local/src/mariadb-sys/mariadb_sys_install.sql
             login_user: root
             login_unix_socket: "{{ mariadb_socket }}"
