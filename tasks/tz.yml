@@ -44,7 +44,7 @@
           ansible.builtin.set_fact:
             mariadb_tzdata_mariadb: "{{ mariadb_tzdata_mariadb_file_b64encoded['content'] | b64decode | trim }}"
 
-        - name: Debug the value of mariadb_tzdata_mariadb and mariadb_tzdata_deb_date
+        - name: Debug the values of mariadb_tzdata_latest and mariadb_tzdata_mariadb
           ansible.builtin.debug:
             msg:
               - "mariadb_tzdata_latest: {{ mariadb_tzdata_latest }}"
@@ -120,7 +120,7 @@
             line: "{{ mariadb_tzdata_latest }}"
             state: present
             create: true
-            mode: 640
+            mode: 0640
             owner: root
             group: root
 
