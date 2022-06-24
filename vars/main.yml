@@ -1,6 +1,7 @@
 ---
 mariadb_jmesquery:
   adjust_variables: 'AdjustVariables'
+  cve: 'CVE'
   fragmented_tables: 'Tables."Fragmented tables"'
   recommendations: '"Recommendations"'
 ...
