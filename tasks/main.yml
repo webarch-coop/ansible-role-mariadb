@@ -26,10 +26,6 @@
     - name: Include local facts tasks
       include_tasks: local_facts.yml
 
-    - name: Include mysqltuner tasks
-      include_tasks: mysqltuner.yml
-      when: mariadb_mysqltuner | bool
-
     - name: Tasks when the current root authentication method is a socket
       block:
 
@@ -123,6 +119,10 @@
     - name: Conditionally include the user and database creation tasks
       ansible.builtin.include_tasks: mariadb_user.yml
       when: ( mariadb_username is defined ) and ( mariadb_username | length > 0 )
+
+    - name: Include mysqltuner tasks
+      include_tasks: mysqltuner.yml
+      when: mariadb_mysqltuner | bool
 
   when: mariadb | bool
   tags:

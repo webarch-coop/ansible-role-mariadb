@@ -38,7 +38,7 @@
 
     - name: Set a fact for the version of MySQLTuner that is required
       ansible.builtin.set_fact:
-        mariadb_mysqltuner_version_required: "{% if mariadb_mysqltuner_version == 'latest' %}{{ mariadb_mysqltuner_version_latest }}{% else %}{{ mariadb_mysqltuner_version }}"
+        mariadb_mysqltuner_version_required: "{% if mariadb_mysqltuner_version == 'latest' %}{{ mariadb_mysqltuner_version_latest }}{% else %}{{ mariadb_mysqltuner_version }}{% endif %}"
 
     - name: MySQLTuner source code present
       ansible.builtin.git:
