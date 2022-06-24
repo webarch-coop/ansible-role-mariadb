@@ -57,10 +57,18 @@
         owner: root
         group: root
 
+    - name: Directory for MySQLTuner assets in place
+      file:
+        path: /usr/local/share/mysqltuner
+        state: directory
+        mode: 0755
+        owner: root
+        group: root
+
     - name: MySQLTuner basic_passwords.txt file in place
       copy:
         src: /usr/local/src/MySQLTuner-perl/basic_passwords.txt
-        dest: /usr/local/bin/basic_passwords.txt
+        dest: /usr/local/share/mysqltuner/basic_passwords.txt
         remote_src: true
         mode: 0644
         owner: root
@@ -69,7 +77,7 @@
     - name: MySQLTuner vulnerabilities.csv file in place
       copy:
         src: /usr/local/src/MySQLTuner-perl/vulnerabilities.csv
-        dest: /usr/local/bin/vulnerabilities.csv
+        dest: /usr/local/share/mysqltuner/vulnerabilities.csv
         remote_src: true
         mode: 0644
         owner: root
@@ -85,9 +93,9 @@
     - name: Run mysqltuner when it is installed
       block:
 
-        # Full full results run `mysqltuner --json | jq`
+        # Full full results run `mysqltuner --json --cvefile=/usr/local/share/mysqltuner/vulnerabilities.csv | jq`
         - name: Run mysqltuner
-          ansible.builtin.command: mysqltuner --json
+          ansible.builtin.command: mysqltuner --json --cvefile=/usr/local/share/mysqltuner/vulnerabilities.csv
           check_mode: false
           changed_when: false
           register: mariadb_mysqltuner_command
