@@ -8,7 +8,6 @@
           - mariadb-client
           - mariadb-server
           - mycli
-          - mysqltuner
           - pwgen
           - python3-mysqldb
         state: present
@@ -26,6 +25,10 @@
 
     - name: Include local facts tasks
       include_tasks: local_facts.yml
+
+    - name: Include mysqltuner tasks
+      include_tasks: mysqltuner.yml
+      when: mariadb_mysqltuner | bool
 
     - name: Tasks when the current root authentication method is a socket
       block:

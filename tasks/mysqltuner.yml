@@ -1,0 +1,126 @@
+---
+- name: Install and run mysqltuner for MariaDB
+  block:
+
+    - name: Gather hardware facts
+      ansible.builtin.setup:
+        gather_subset:
+          - hardware
+
+    - name: Packages present
+      ansible.builtin.apt:
+        pkg:
+          - libjson-perl
+          - python3-simplejson
+        state: present
+
+    - name: Check the latest version of MySQLTuner
+      ansible.builtin.uri:
+        url: https://github.com/major/MySQLTuner-perl/releases/latest
+        method: HEAD
+        status_code: 302
+        follow_redirects: none
+      check_mode: false
+      changed_when: false
+      register: mariadb_mysqltuner_headers
+
+    - name: Debug MySQLTuner latest headers
+      ansible.builtin.debug:
+        msg:
+          - "Location: {{ mariadb_mysqltuner_headers.location }}"
+          - "Path: {{ mariadb_mysqltuner_headers.location | urlsplit('path') }}"
+          - "Version: {{ mariadb_mysqltuner_headers.location | urlsplit('path') | basename }}"
+        verbosity: 2
+
+    - name: Set a fact for the latest version of MySQLTuner
+      ansible.builtin.set_fact:
+        mariadb_mysqltuner_version_latest: "{{ mariadb_mysqltuner_headers.location | urlsplit('path') | basename }}"
+
+    - name: Set a fact for the version of MySQLTuner that is required
+      ansible.builtin.set_fact:
+        mariadb_mysqltuner_version_required: "{% if mariadb_mysqltuner_version == 'latest' %}{{ mariadb_mysqltuner_version_latest }}{% else %}{{ mariadb_mysqltuner_version }}"
+
+    - name: MySQLTuner source code present
+      ansible.builtin.git:
+        repo: https://github.com/major/MySQLTuner-perl.git
+        dest: /usr/local/src/MySQLTuner-perl
+        version: "{{ mariadb_mysqltuner_version_required }}"
+        depth: 1
+        update: true
+
+    - name: MySQLTuner script in place
+      copy:
+        src: /usr/local/src/MySQLTuner-perl/mysqltuner.pl
+        dest: /usr/local/bin/mysqltuner
+        remote_src: true
+        mode: 0755
+        owner: root
+        group: root
+
+    - name: MySQLTuner basic_passwords.txt file in place
+      copy:
+        src: /usr/local/src/MySQLTuner-perl/basic_passwords.txt
+        dest: /usr/local/bin/basic_passwords.txt
+        remote_src: true
+        mode: 0644
+        owner: root
+        group: root
+
+    - name: MySQLTuner vulnerabilities.csv file in place
+      copy:
+        src: /usr/local/src/MySQLTuner-perl/vulnerabilities.csv
+        dest: /usr/local/bin/vulnerabilities.csv
+        remote_src: true
+        mode: 0644
+        owner: root
+        group: root
+
+    - name: Check that mysqltuner is installed
+      ansible.builtin.command: which mysqltuner
+      check_mode: false
+      changed_when: false
+      register: mariadb_mysqltuner_which
+      failed_when: mariadb_mysqltuner_which.rc is not regex('^0|1$')
+
+    - name: Run mysqltuner when it is installed
+      block:
+
+        # Full full results run `mysqltuner --json | jq`
+        - name: Run mysqltuner
+          ansible.builtin.command: mysqltuner --json
+          check_mode: false
+          changed_when: false
+          register: mariadb_mysqltuner_command
+
+        - name: Set facts
+          ansible.builtin.set_fact:
+            mariadb_mysqltuner_results: "{{ mariadb_mysqltuner_command.stdout | from_json }}"
+            mariadb_mysqltuner_adjust_variables: "{{ mariadb_mysqltuner_command.stdout | from_json | json_query(mariadb_jmesquery.adjust_variables) }}"
+            mariadb_mysqltuner_recommendations: "{{ mariadb_mysqltuner_command.stdout | from_json | json_query(mariadb_jmesquery.recommendations) }}"
+            mariadb_mysqltuner_fragmented_tables: "{{ mariadb_mysqltuner_command.stdout | from_json | json_query(mariadb_jmesquery.fragmented_tables) }}"
+
+        - name: Print mysqltuner full results when running with -v
+          ansible.builtin.debug:
+            var: mariadb_mysqltuner_results
+          when: ( mariadb_mysqltuner_results | length > 0 ) and ( ansible_verbosity >= 1 )
+
+        - name: Print mysqltuner results for Adjust variables
+          ansible.builtin.debug:
+            var: mariadb_mysqltuner_adjust_variables
+          when: ( mariadb_mysqltuner_adjust_variables != [] ) and ( mariadb_mysqltuner_adjust_variables | length > 0 )
+
+        - name: Print mysqltuner results for Fragmented tables
+          ansible.builtin.debug:
+            var: mariadb_mysqltuner_fragmented_tables
+          when: ( mariadb_mysqltuner_fragmented_tables != [] ) and ( mariadb_mysqltuner_fragmented_tables | length > 0 )
+
+        - name: Print mysqltuner results for Recommendations
+          ansible.builtin.debug:
+            var: mariadb_mysqltuner_recommendations
+          when: ( mariadb_mysqltuner_recommendations != [] ) and ( mariadb_mysqltuner_recommendations | length > 0 )
+
+      when: mariadb_mysqltuner_which.rc == 0
+
+  tags:
+    - mariadb
+...

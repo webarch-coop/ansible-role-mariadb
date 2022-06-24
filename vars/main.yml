@@ -1,0 +1,6 @@
+---
+mariadb_jmesquery:
+  adjust_variables: 'AdjustVariables'
+  fragmented_tables: 'Tables."Fragmented tables"'
+  recommendations: '"Recommendations"'
+...
