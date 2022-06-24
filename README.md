@@ -14,7 +14,7 @@ ansible-galaxy collection install community.mysql
 
 This role can be used to [switch the root users authentication plugin from `unix_socket` to `mysql_native_password`](tasks/mariadb_root_password.yml) and [back](tasks/info_socket.yml) and it also runs `mysql_upgrade`, [imports](tasks/sys.yml) the [sys schema](https://github.com/webarch-coop/mariadb-sys), [updates the timezone data](tasks/tz.yml) when needed and sets [some systemd defaults](templates/mariadb.conf.j2).
 
-This role adds [a script](templates/mariadb_root.fact.j2) to `/etc/ansible/facts.d` which 
+This role adds [a script](templates/mariadb_root.fact.j2) to `/etc/ansible/facts.d` which results in the `ansible_local.mariadb_root.plugin` variable being generated with the value(s) of the root authentication plugins, `auth_socket`, `unix_socket` and / or `mysql_native_password`. 
 
 The primary URL of this repo is [`https://git.coop/webarch/mariadb`](https://git.coop/webarch/mariadb) and this is where the [release notes](https://git.coop/webarch/debug/-/releases) are, it is also [mirrored to GitHub](https://github.com/webarch-coop/ansible-role-debug) and [available via Ansible Galaxy](https://galaxy.ansible.com/chriscroome/debug).
 
