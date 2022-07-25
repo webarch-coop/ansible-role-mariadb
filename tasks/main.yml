@@ -13,6 +13,8 @@
         state: present
         update_cache: false
       notify: Restart mariadb
+      tags:
+        - mariadb_install
 
     - name: python-mysqldb present on Debian Jessie and Stretch
       ansible.builtin.apt:
@@ -22,9 +24,13 @@
         update_cache: false
       notify: Restart mariadb
       when: ansible_distribution_release is regex('^jessie|stretch$')
+      tags:
+        - mariadb_install
 
     - name: Include local facts tasks
       include_tasks: local_facts.yml
+      tags:
+        - mariadb_local_facts
 
     - name: Tasks when the current root authentication method is a socket
       block:

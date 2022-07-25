@@ -103,4 +103,5 @@
 
   tags:
     - mariadb
+      mariadb_local_facts
 ...
