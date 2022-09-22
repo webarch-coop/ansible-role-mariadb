@@ -2,6 +2,7 @@
 - name: Include local facts tasks
   include_tasks: local_facts.yml
   tags:
+    - mariadb
     - mariadb_local_facts
 
 - name: Install and configure MariaDB
