@@ -1,4 +1,9 @@
 ---
+- name: Include local facts tasks
+  include_tasks: local_facts.yml
+  tags:
+    - mariadb_local_facts
+
 - name: Install and configure MariaDB
   block:
 
@@ -26,11 +31,6 @@
       when: ansible_distribution_release is regex('^jessie|stretch$')
       tags:
         - mariadb_install
-
-    - name: Include local facts tasks
-      include_tasks: local_facts.yml
-      tags:
-        - mariadb_local_facts
 
     - name: Tasks when the current root authentication method is a socket
       block:
