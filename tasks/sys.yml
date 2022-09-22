@@ -47,7 +47,7 @@
         target: /usr/local/src/mariadb-sys/mariadb_sys_install.sql
         login_user: root
         login_unix_socket: /run/mysqld/mysqld.sock
-      when: mariadb_root_auth_current == "socket"
+      when: mariadb_root_auth_current is regex('socket$')
 
   tags:
     - mariadb

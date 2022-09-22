@@ -5,7 +5,7 @@
     - name: Check that socket authentication is being used
       assert:
         that:
-          - mariadb_root_auth_current == "socket"
+          - mariadb_root_auth_current is regex('socket$')
         fail_msg: "The user tasks in this role have been written to use socket authentication"
 
     - name: Include debugging
@@ -123,7 +123,7 @@
     - name: "Read the password from {{ mariadb_mycnf }}"
       block:
 
-        - name: "mariadb_password loaded from {{ mariadb_mycnf }} since the file exists and the password was not set"
+        - name: "The mariadb_password loaded from {{ mariadb_mycnf }} since the file exists and the password was not set"
           ansible.builtin.command: "my_print_defaults --defaults-file='{{ mariadb_mycnf }}' client"
           changed_when: false
           register: mariadb_my_print_defaults_command

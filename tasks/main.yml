@@ -7,7 +7,7 @@
 - name: Install and configure MariaDB
   block:
 
-    - name: mariadb-server, mariadb-client and other packages present
+    - name: Packages mariadb-server, mariadb-client and others present
       ansible.builtin.apt:
         pkg:
           - mariadb-client
@@ -21,7 +21,7 @@
       tags:
         - mariadb_install
 
-    - name: python-mysqldb present on Debian Jessie and Stretch
+    - name: Debian Jessie and Stretch legacy python-mysqldb present
       ansible.builtin.apt:
         pkg:
           - python-mysqldb
@@ -42,7 +42,8 @@
           ansible.builtin.include_tasks: mariadb_root_password.yml
           when: ( mariadb_root_auth is defined ) and ( mariadb_root_auth == "password" )
 
-      when: mariadb_root_auth_current == "socket"
+      # matches auth_socket and unix_socket
+      when: mariadb_root_auth_current is regex('socket$')
 
     - name: Tasks when the current root authentication method is a password
       block:
@@ -52,7 +53,7 @@
 
         - name: Include the MariaDB root user socket authentication tasks
           ansible.builtin.include_tasks: mariadb_root_socket.yml
-          when: ( mariadb_root_auth is defined ) and ( mariadb_root_auth == "socket" )
+          when: (mariadb_root_auth is defined) and (mariadb_root_auth is regex('socket$'))
 
       when: mariadb_root_auth_current == "password"
 

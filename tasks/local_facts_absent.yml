@@ -32,8 +32,8 @@
 
     - name: Set a fact for the mariadb_root_password
       ansible.builtin.set_fact:
-        mariadb_root_password: "{{ line | regex_replace('^--password=') | trim }}"
-      when: line is regex('^--password=')
+        mariadb_root_password: "{{ line | regex_replace('--password=') | trim }}"
+      when: line is regex('--password=')
       loop: "{{ mariadb_my_print_defaults_command.stdout_lines }}"
       loop_control:
         loop_var: line
@@ -50,7 +50,7 @@
     - name: Test the MariaDB root password
       command: mariadb -u "root" -p "{{ mariadb_root_password }}" -h "localhost" -p "3306" -BNe "status" mysql
       register: mariadb_command_status
-      failed_when: mariadb_command_status.rc not regex(^0|1$)
+      failed_when: mariadb_command_status.rc not regex(0|1)
 
     - name: Fail since the root password in /root/.my.cnf didn't work
       assert:
