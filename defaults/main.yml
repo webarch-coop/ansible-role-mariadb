@@ -14,7 +14,7 @@ mariadb_mysqltuner_version: latest
 
 # If mariadb_sys_schema is true then the sys schema is imported from this repo
 # https://github.com/webarch-coop/mariadb-sys
-mariadb_sys_schema: true
+mariadb_sys_schema: false
 
 # Import time zone tables
 mariadb_time_zone_import: true
