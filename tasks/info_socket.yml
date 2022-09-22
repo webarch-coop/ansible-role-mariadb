@@ -27,37 +27,9 @@
         var: mariadb_version
         verbosity: 2
 
-    - name: Debug test generate a list of dictionaries
+    - name: Generate a list of databases omitting lost+found if present
       ansible.builtin.set_fact:
-        mariadb_databases: "{{ mariadb_info.databases.keys() | list | reject('search', 'information_schema') | list }}"
-
-    - name: Debug MariaDB databases
-      ansible.builtin.debug:
-        var: mariadb_databases
-        verbosity: 2
-
-    # Skip lost+found as it will be a result of /var/lib/mysql being a seperate partition
-    - name: Set a variable for the MariaDB databases for Ansible < 2.13
-      ansible.builtin.set_fact:
-        mariadb_databases: "{{ mariadb_databases | default([]) }} + [ '{{ db.key }}' ]"
-      when:
-        - ansible_version.full is version('2.13.0', '<')
-        - db.key != "lost+found"
-      loop: "{{ mariadb_info.databases | dict2items }}"
-      loop_control:
-        loop_var: db
-        label: "{{ db.key }}"
-
-    - name: Set a variable for the MariaDB databases for Ansible >= 2.13
-      ansible.builtin.set_fact:
-        mariadb_databases: "{{ mariadb_databases | default([]) + [ db.key ] }}"
-      when:
-        - ansible_version.full is version('2.13.0', '>=')
-        - db.key != "lost+found"
-      loop: "{{ mariadb_info.databases | dict2items }}"
-      loop_control:
-        loop_var: db
-        label: "{{ db.key }}"
+        mariadb_databases: "{{ mariadb_info.databases.keys() | list | reject('search', 'lost+found') | list }}"
 
     - name: Debug MariaDB databases
       ansible.builtin.debug:
