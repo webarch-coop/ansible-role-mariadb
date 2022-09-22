@@ -29,7 +29,7 @@
 
     - name: Debug test generate a list of dictionaries
       ansible.builtin.set_fact:
-        mariadb_databases: "{{ mariadb_info.databases.keys() | list }}"
+        mariadb_databases: "{{ mariadb_info.databases.keys() | list | reject('search', 'information_schema') | list }}"
 
     - name: Debug MariaDB databases
       ansible.builtin.debug:
