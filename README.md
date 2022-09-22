@@ -64,7 +64,7 @@ See also the [defaults/main.yml](defaults/main.yml) file.
 
 You can call the `mariadb_user.yml` tasks multiple times, for example:
 
-```yml
+```yaml
 - name: Create database and user for WordPress
   include_role:
     name: mariadb
