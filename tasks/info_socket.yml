@@ -27,6 +27,15 @@
         var: mariadb_version
         verbosity: 2
 
+    - name: Debug test generate a list of dictionaries
+      ansible.builtin.set_fact:
+        mariadb_databases: "{{ mariadb_info.databases.keys() | list }}"
+
+    - name: Debug MariaDB databases
+      ansible.builtin.debug:
+        var: mariadb_databases
+        verbosity: 2
+
     # Skip lost+found as it will be a result of /var/lib/mysql being a seperate partition
     - name: Set a variable for the MariaDB databases for Ansible < 2.13
       ansible.builtin.set_fact:
