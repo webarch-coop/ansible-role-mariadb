@@ -1,6 +1,6 @@
 ---
 - name: Package dpkg-dev present
-  apt:
+  ansible.builtin.apt:
     pkg:
       - dpkg-dev
     state: present

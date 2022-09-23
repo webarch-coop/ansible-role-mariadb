@@ -38,7 +38,7 @@
         filter: ansible_local
 
     - name: Include the local facts tasks to set facts based on the local facts
-      include_tasks: local_facts.yml
+      ansible.builtin.include_tasks: local_facts.yml
 
   tags:
     - mariadb

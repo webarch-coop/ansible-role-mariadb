@@ -3,7 +3,7 @@
   block:
 
     - name: Include local facts tasks
-      include_tasks: local_facts.yml
+      ansible.builtin.include_tasks: local_facts.yml
 
     - name: Include user variable checks
       ansible.builtin.include_tasks: mariadb_user_checks.yml

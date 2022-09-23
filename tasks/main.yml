@@ -1,6 +1,6 @@
 ---
 - name: Include local facts tasks
-  include_tasks: local_facts.yml
+  ansible.builtin.include_tasks: local_facts.yml
   tags:
     - mariadb
     - mariadb_local_facts
@@ -37,7 +37,7 @@
       block:
 
         - name: Query the MariaDB databases, users and version using a socket and the community.mysql.mysql_info module
-          include_tasks: info_socket.yml
+          ansible.builtin.include_tasks: info_socket.yml
 
         - name: Include the MariaDB root password authentication tasks
           ansible.builtin.include_tasks: mariadb_root_password.yml
@@ -50,7 +50,7 @@
       block:
 
         - name: Query the MariaDB databases, users and version using a password and the command module
-          include_tasks: info_password.yml
+          ansible.builtin.include_tasks: info_password.yml
 
         - name: Include the MariaDB root user socket authentication tasks
           ansible.builtin.include_tasks: mariadb_root_socket.yml
@@ -129,7 +129,7 @@
       when: ( mariadb_username is defined ) and ( mariadb_username | length > 0 )
 
     - name: Include mysqltuner tasks
-      include_tasks: mysqltuner.yml
+      ansible.builtin.include_tasks: mysqltuner.yml
       when: mariadb_mysqltuner | bool
 
   when: mariadb | bool

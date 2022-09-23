@@ -1,13 +1,13 @@
 ---
 - name: Reload systemd
-  systemd:
+  ansible.builtin.systemd:
     daemon_reload: true
   listen: Reload systemd
   tags:
     - mariadb
 
 - name: MariaDB restarted
-  systemd:
+  ansible.builtin.systemd:
     name: mysql
     state: restarted
   listen: Restart mariadb

@@ -3,7 +3,7 @@
   block:
 
     - name: Check that socket authentication is being used
-      assert:
+      ansible.builtin.assert:
         that:
           - mariadb_root_auth_current is regex('socket$')
         fail_msg: "The user tasks in this role have been written to use socket authentication"
