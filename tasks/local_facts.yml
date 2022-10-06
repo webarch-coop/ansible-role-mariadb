@@ -3,6 +3,9 @@
   ansible.builtin.command: dpkg -l mariadb-server
   register: mariadb_dpkg
   failed_when: mariadb_dpkg.rc is not regex('^0|1$')
+  tags:
+    - mariadb
+    - mariadb_local_facts
 
 - name: Ansible MariaDB local facts
   block:
