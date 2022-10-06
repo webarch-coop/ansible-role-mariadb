@@ -99,7 +99,9 @@
 
     - name: Include debugging tasks when Ansible MariaDB root plugin local facts absent
       ansible.builtin.include_tasks: local_facts_absent.yml
-      when: ansible_facts.ansible_local.mariadb_root.state == "absent"
+      when:
+        - ansible_facts.ansible_local.mariadb_root is defined
+        - ansible_facts.ansible_local.mariadb_root.state == "absent"
 
   tags:
     - mariadb
