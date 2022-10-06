@@ -49,27 +49,27 @@
             - name: Check the values of the root authentication plugins
               ansible.builtin.assert:
                 that: >
-                  ( "auth_socket" in ansible_facts.ansible_local.mariadb_root.plugin ) or
-                  ( "unix_socket" in ansible_facts.ansible_local.mariadb_root.plugin ) or
-                  ( "mysql_native_password" in ansible_facts.ansible_local.mariadb_root.plugin )
+                  ( "auth_socket" in ansible_local.mariadb_root.plugin ) or
+                  ( "unix_socket" in ansible_local.mariadb_root.plugin ) or
+                  ( "mysql_native_password" in ansible_local.mariadb_root.plugin )
                 fail_msg: This Ansible role only supports the root authentication plugins, auth_socket, unix_socket and mysql_native_password
 
             - name: Set a fact for the root authentication plugin
               ansible.builtin.set_fact:
                 mariadb_root_auth_current: "password"
               when:
-                - ( "auth_socket" not in ansible_facts.ansible_local.mariadb_root.plugin )
-                - ( "unix_socket" not in ansible_facts.ansible_local.mariadb_root.plugin )
-                - ( "mysql_native_password" in ansible_facts.ansible_local.mariadb_root.plugin )
+                - ( "auth_socket" not in ansible_local.mariadb_root.plugin )
+                - ( "unix_socket" not in ansible_local.mariadb_root.plugin )
+                - ( "mysql_native_password" in ansible_local.mariadb_root.plugin )
 
             - name: Set a fact for the root authentication plugin
               ansible.builtin.set_fact:
                 mariadb_root_auth_current: "socket"
               when: >
-                  ( "auth_socket" in ansible_facts.ansible_local.mariadb_root.plugin ) or
-                  ( "unix_socket" in ansible_facts.ansible_local.mariadb_root.plugin )
+                  ( "auth_socket" in ansible_local.mariadb_root.plugin ) or
+                  ( "unix_socket" in ansible_local.mariadb_root.plugin )
 
-          when: ansible_facts.ansible_local.mariadb_root.plugin | type_debug == "list"
+          when: ansible_local.mariadb_root.plugin | type_debug == "list"
 
         - name: Tasks when the root authentication plugin is a string
           block:
@@ -77,31 +77,38 @@
             - name: Check the values of the root authentication plugins
               ansible.builtin.assert:
                 that:
-                  - ansible_facts.ansible_local.mariadb_root.plugin is regex('^auth_socket|unix_socket|mysql_native_password$')
+                  - ansible_local.mariadb_root.plugin is regex('^auth_socket|unix_socket|mysql_native_password$')
                 fail_msg: This Ansible role only supports the root authentication plugins, auth_socket, unix_socket and mysql_native_password
 
             - name: Set a fact for the root authentication plugin
               ansible.builtin.set_fact:
                 mariadb_root_auth_current: "password"
               when:
-                - ansible_facts.ansible_local.mariadb_root.plugin == "mysql_native_password"
+                - ansible_local.mariadb_root.plugin == "mysql_native_password"
 
             - name: Set a fact for the root authentication plugin
               ansible.builtin.set_fact:
                 mariadb_root_auth_current: "socket"
               when: >
-                  ( ansible_facts.ansible_local.mariadb_root.plugin == "auth_socket" ) or
-                  ( ansible_facts.ansible_local.mariadb_root.plugin == "unix_socket" )
+                  ( ansible_local.mariadb_root.plugin == "auth_socket" ) or
+                  ( ansible_local.mariadb_root.plugin == "unix_socket" )
 
-          when: ansible_facts.ansible_local.mariadb_root.plugin | type_debug != "list"
+          when: ansible_local.mariadb_root.plugin | type_debug != "list"
 
-      when: ansible_facts.ansible_local.mariadb_root.state == "present"
+      when: ansible_local.mariadb_root.state == "present"
+
+    - name: Print Ansible MariaDB root plugin local facts state
+      ansible.builtin.debug:
+        var: ansible_local.mariadb_root.state
+        verbosity: 3
+      when:
+        - ansible_local.mariadb_root is defined
 
     - name: Include debugging tasks when Ansible MariaDB root plugin local facts absent
       ansible.builtin.include_tasks: local_facts_absent.yml
       when:
-        - ansible_facts.ansible_local.mariadb_root is defined
-        - ansible_facts.ansible_local.mariadb_root.state == "absent"
+        - ansible_local.mariadb_root is defined
+        - ansible_local.mariadb_root.state == "absent"
 
   tags:
     - mariadb
