@@ -63,7 +63,7 @@
           - "The root password that has been read from /root/.my.cnf doesn't appear to work"
           - "Please ensure that /root/.my.cnf contains the root login details when using mysql_native_password for authentication"
 
-  when: ansible_facts.ansible_local.mariadb_root.plugin.state == "absent"
+  when: ansible_facts.ansible_local.mariadb_root.state == "absent"
   tags:
     - mariadb
 ...
