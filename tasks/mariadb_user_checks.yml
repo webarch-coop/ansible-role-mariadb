@@ -127,7 +127,7 @@
           ansible.builtin.command: "my_print_defaults --defaults-file='{{ mariadb_mycnf }}' client"
           changed_when: false
           register: mariadb_my_print_defaults_command
-          no_log: true
+          no_log: "{% if ansible_verbosity <= 2 %}true{% else %}false{% endif %}"
 
         - name: Set a fact for mariadb_password
           ansible.builtin.set_fact:
@@ -136,7 +136,7 @@
           loop: "{{ mariadb_my_print_defaults_command.stdout_lines }}"
           loop_control:
             loop_var: line
-          no_log: true
+          no_log: "{% if ansible_verbosity <= 2 %}true{% else %}false{% endif %}"
 
       when: ( mariadb_mycnf_present is defined ) and ( mariadb_mycnf_present | bool )
 
@@ -146,12 +146,12 @@
         - name: "Generate a random password for {{ mariadb_username }} as it is not defined or empty"
           ansible.builtin.command: "pwgen -n {{ 24 | random(14) }} 1"
           register: mariadb_password_gen
-          no_log: true
+          no_log: "{% if ansible_verbosity <= 2 %}true{% else %}false{% endif %}"
 
         - name: Set a fact for the mariadb_password
           ansible.builtin.set_fact:
             mariadb_password: "{{ mariadb_password_gen.stdout | trim | quote }}"
-          no_log: true
+          no_log: "{% if ansible_verbosity <= 2 %}true{% else %}false{% endif %}"
 
       when: ( mariadb_mycnf_present is defined ) and ( not mariadb_mycnf_present | bool )
 
