@@ -50,7 +50,7 @@
 
         - name: Include the MariaDB root password authentication tasks
           ansible.builtin.include_tasks: mariadb_root_password.yml
-          when: ( mariadb_root_auth is defined ) and ( mariadb_root_auth == "password" )
+          when: (mariadb_root_auth is defined) and (mariadb_root_auth == "password")
 
       # matches auth_socket and unix_socket
       when: mariadb_root_auth_current is regex('socket$')
@@ -113,12 +113,12 @@
 
     - name: Include the MariaDB sys schema tasks
       ansible.builtin.include_tasks: sys.yml
-      when: ( mariadb_sys_schema | bool ) and ( "sys" not in mariadb_databases )
+      when: (mariadb_sys_schema | bool) and ("sys" not in mariadb_databases)
 
     - name: Run mysql_upgrade
       ansible.builtin.command: mysql_upgrade
       register: mariadb_upgrade
-      changed_when: ( "This installation of MariaDB is already upgraded" not in mariadb_upgrade.stdout )
+      changed_when: ("This installation of MariaDB is already upgraded" not in mariadb_upgrade.stdout)
 
     - name: Stat /etc/mysql/my.cnf
       ansible.builtin.stat:
@@ -127,15 +127,15 @@
 
     - name: Conditionally include the update-alternatives tasks
       ansible.builtin.include_tasks: update.yml
-      when: ( mariadb_etc_my_cnf is defined ) and ( not mariadb_etc_my_cnf.stat.islnk | bool )
+      when: (mariadb_etc_my_cnf is defined) and (not mariadb_etc_my_cnf.stat.islnk | bool)
 
     - name: Conditionally import the time zone tables import tasks
       ansible.builtin.include_tasks: tz.yml
-      when: ( mariadb_time_zone_import is defined ) and ( mariadb_time_zone_import | bool )
+      when: (mariadb_time_zone_import is defined) and (mariadb_time_zone_import | bool)
 
     - name: Conditionally include the user and database creation tasks
       ansible.builtin.include_tasks: mariadb_user.yml
-      when: ( mariadb_username is defined ) and ( mariadb_username | length > 0 )
+      when: (mariadb_username is defined) and (mariadb_username | length > 0)
 
     - name: Include mysqltuner tasks
       ansible.builtin.include_tasks: mysqltuner.yml

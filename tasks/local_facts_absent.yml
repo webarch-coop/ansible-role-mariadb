@@ -45,7 +45,7 @@
     - name: Fail since a password could not be read from /root/.my.cnf
       ansible.builtin.assert:
         that:
-          - ( mariadb_root_password is defined ) and ( mariadb_root_password | length > 0 )
+          - (mariadb_root_password is defined) and (mariadb_root_password | length > 0)
         fail_msg:
           - "A password could not be read from /root/.my.cnf"
           - "Please ensure that /root/.my.cnf contains the root login details when using mysql_native_password for authentication"

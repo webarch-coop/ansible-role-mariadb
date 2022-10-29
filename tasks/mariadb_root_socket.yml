@@ -13,7 +13,7 @@
     #     login_password: "{{ mariadb_root_password }}"
     #   when:
     #     - mariadb_community
-    #     - ( mariadb_root_password is defined ) and ( mariadb_root_password | length > 0 )
+    #     - (mariadb_root_password is defined) and (mariadb_root_password | length > 0)
     #   no_log: true
 
     - name: Enable MariaDB root logins with a socket using UPDATE

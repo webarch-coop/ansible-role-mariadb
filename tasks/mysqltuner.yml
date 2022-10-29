@@ -117,27 +117,27 @@
         - name: Print mysqltuner full results when running with -v
           ansible.builtin.debug:
             var: mariadb_mysqltuner_results
-          when: ( mariadb_mysqltuner_results | length > 0 ) and ( ansible_verbosity >= 1 )
+          when: (mariadb_mysqltuner_results | length > 0) and (ansible_verbosity >= 1)
 
         - name: Print mysqltuner results for Adjust variables
           ansible.builtin.debug:
             var: mariadb_mysqltuner_adjust_variables
-          when: ( mariadb_mysqltuner_adjust_variables != [] ) and ( mariadb_mysqltuner_adjust_variables | length > 0 )
+          when: (mariadb_mysqltuner_adjust_variables != []) and (mariadb_mysqltuner_adjust_variables | length > 0)
 
         - name: Print mysqltuner results for Fragmented tables
           ansible.builtin.debug:
             var: mariadb_mysqltuner_fragmented_tables
-          when: ( mariadb_mysqltuner_fragmented_tables != [] ) and ( mariadb_mysqltuner_fragmented_tables | length > 0 )
+          when: (mariadb_mysqltuner_fragmented_tables != []) and (mariadb_mysqltuner_fragmented_tables | length > 0)
 
         - name: Print mysqltuner results for Recommendations
           ansible.builtin.debug:
             var: mariadb_mysqltuner_recommendations
-          when: ( mariadb_mysqltuner_recommendations != [] ) and ( mariadb_mysqltuner_recommendations | length > 0 )
+          when: (mariadb_mysqltuner_recommendations != []) and (mariadb_mysqltuner_recommendations | length > 0)
 
         - name: Print mysqltuner results for CVE
           ansible.builtin.debug:
             var: mariadb_mysqltuner_cve
-          when: ( mariadb_mysqltuner_cve != [] ) and ( mariadb_mysqltuner_cve | length > 0 )
+          when: (mariadb_mysqltuner_cve != []) and (mariadb_mysqltuner_cve | length > 0)
 
       when: mariadb_mysqltuner_which.rc == 0
 

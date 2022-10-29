@@ -124,9 +124,9 @@
             owner: root
             group: root
 
-      when: ( not mariadb_tzdata_mariadb_file.stat.exists | bool ) or ( ( mariadb_tzdata_mariadb_file.stat.exists | bool ) and ( mariadb_tzdata_mariadb != mariadb_tzdata_latest ) )
+      when: (not mariadb_tzdata_mariadb_file.stat.exists | bool) or ((mariadb_tzdata_mariadb_file.stat.exists | bool) and (mariadb_tzdata_mariadb != mariadb_tzdata_latest))
 
-  when: ( mariadb_tzdata_changelog.stat.exists is defined ) and ( mariadb_tzdata_changelog.stat.exists | bool )
+  when: (mariadb_tzdata_changelog.stat.exists is defined) and (mariadb_tzdata_changelog.stat.exists | bool)
   tags:
     - mariadb
 ...

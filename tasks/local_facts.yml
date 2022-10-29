@@ -57,25 +57,25 @@
             - name: Check the values of the root authentication plugins
               ansible.builtin.assert:
                 that: >
-                  ( "auth_socket" in ansible_local.mariadb_root.plugin ) or
-                  ( "unix_socket" in ansible_local.mariadb_root.plugin ) or
-                  ( "mysql_native_password" in ansible_local.mariadb_root.plugin )
+                  ("auth_socket" in ansible_local.mariadb_root.plugin) or
+                  ("unix_socket" in ansible_local.mariadb_root.plugin) or
+                  ("mysql_native_password" in ansible_local.mariadb_root.plugin)
                 fail_msg: This Ansible role only supports the root authentication plugins, auth_socket, unix_socket and mysql_native_password
 
             - name: Set a fact for the root authentication plugin
               ansible.builtin.set_fact:
                 mariadb_root_auth_current: "password"
               when:
-                - ( "auth_socket" not in ansible_local.mariadb_root.plugin )
-                - ( "unix_socket" not in ansible_local.mariadb_root.plugin )
-                - ( "mysql_native_password" in ansible_local.mariadb_root.plugin )
+                - ("auth_socket" not in ansible_local.mariadb_root.plugin)
+                - ("unix_socket" not in ansible_local.mariadb_root.plugin)
+                - ("mysql_native_password" in ansible_local.mariadb_root.plugin)
 
             - name: Set a fact for the root authentication plugin
               ansible.builtin.set_fact:
                 mariadb_root_auth_current: "socket"
               when: >
-                  ( "auth_socket" in ansible_local.mariadb_root.plugin ) or
-                  ( "unix_socket" in ansible_local.mariadb_root.plugin )
+                  ("auth_socket" in ansible_local.mariadb_root.plugin) or
+                  ("unix_socket" in ansible_local.mariadb_root.plugin)
 
           when: ansible_local.mariadb_root.plugin | type_debug == "list"
 
@@ -98,8 +98,8 @@
               ansible.builtin.set_fact:
                 mariadb_root_auth_current: "socket"
               when: >
-                  ( ansible_local.mariadb_root.plugin == "auth_socket" ) or
-                  ( ansible_local.mariadb_root.plugin == "unix_socket" )
+                  (ansible_local.mariadb_root.plugin == "auth_socket") or
+                  (ansible_local.mariadb_root.plugin == "unix_socket")
 
           when: ansible_local.mariadb_root.plugin | type_debug != "list"
 
