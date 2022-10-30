@@ -60,22 +60,16 @@
         mariadb_group: "{{ mariadb_etc_group_b64encoded ['content'] | b64decode | community.general.jc('group') }}"
         mariadb_passwd: "{{ mariadb_etc_passwd_b64encoded ['content'] | b64decode | community.general.jc('passwd') }}"
 
-    - debug:
-        var: mariadb_group
-
-    - debug:
-        var: mariadb_passwd
-
     - name: Set facts for users and groups
       ansible.builtin.set_fact:
         mariadb_groups: "{{ mariadb_group | community.general.json_query('[].group_name') | list }}"
         mariadb_users: "{{ mariadb_passwd | community.general.json_query('[].username') | list }}"
 
     - debug:
-        var: mariadb_groups
+        var: mariadb_users
 
     - debug:
-        var: mariadb_users
+        var: mariadb_username
 
     - name: Set a fact for .my.cnf path and owner if a user account matching the MariaDB username exists
       ansible.builtin.set_fact:
