@@ -66,12 +66,44 @@
     - debug:
         var: mariadb_passwd
 
+    - name: Set a fact for .my.cnf path and owner if a user account matching the MariaDB username exists
+      ansible.builtin.set_fact:
+        mariadb_mycnf: "{{ mariadb_passwd | community.general.json_query(mariadb_jmespath_passwd_home) }}/.my.cnf"
+        mariadb_mycnf_owner: "{{ mariadb_username }}"
+      vars:
+        mariadb_jmespath_passwd_home: "mariadb_passwd[?username == '{{ mariadb_username }}'].home"
+      when: mariadb_username in mariadb_passwd | community.general.json_query(mariadb_passwd[].username)
+
+    - name: Set a fact for .my.cnf group if a group account matching the MariaDB username exists
+      ansible.builtin.set_fact:
+        mariadb_mycnf_group: "{{ mariadb_username }}"
+      when: mariadb_username in mariadb_group | community.general.json_query(mariadb_goup[].group_name)
+
+    - name: Set facts for .my.cnf when a user account matching the MariaDB username doesn't exist 
+      ansible.builtin.set_fact:
+        mariadb_mycnf: "/root/.{{ mariadb_username }}.my.cnf"
+        mariadb_mycnf_owner: root
+        mariadb_mycnf_group: root
+      when:  mariadb_username not in mariadb_passwd | community.general.json_query(mariadb_passwd[].username)
+
     - fail:
 
     - name: Set a fact for .my.cnf path and owner if a user account matching the MariaDB username exists
       ansible.builtin.set_fact:
         mariadb_mycnf: "{{ getent_passwd[mariadb_username][4] }}/.my.cnf"
         mariadb_mycnf_owner: "{{ mariadb_username }}"
+
+    - name: Set a fact for .my.cnf group if a group matching the MariaDB username exists
+      ansible.builtin.set_fact:
+        mariadb_mycnf: "{{ getent_passwd[mariadb_username][4] }}/.my.cnf"
+        mariadb_mycnf_group: "{{ mariadb_username }}"
+
+    - name: Set mariadb_mycnf_group to root if a group matching the username doesn't exist
+      ansible.builtin.set_fact:
+        mariadb_mycnf: "/root/.{{ mariadb_username }}.my.cnf"
+        mariadb_mycnf_owner: root
+        mariadb_mycnf_group: root
+      when: 
 
     - name: Set the mariadb_mycnf path if it is not defined
       block:
