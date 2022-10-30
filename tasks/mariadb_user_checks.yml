@@ -71,6 +71,14 @@
     - debug:
         var: mariadb_username
 
+    - debug:
+        msg: "{{ mariadb_username }} is in {{ mariadb_users }}"
+      when: mariadb_username is in mariadb_users
+
+    - debug:
+        msg: "{{ mariadb_username }} is in {{ mariadb_groups }}"
+      when: mariadb_username is in mariadb_groups
+
     - name: Set a fact for .my.cnf path and owner if a user account matching the MariaDB username exists
       ansible.builtin.set_fact:
         mariadb_mycnf: "{{ mariadb_passwd | community.general.json_query(mariadb_jmespath_passwd_home) }}/.my.cnf"
