@@ -62,8 +62,8 @@
 
     - name: Set facts for users and groups
       ansible.builtin.set_fact:
-        mariadb_groups: "{{ mariadb_group | community.general.json_query(mariadb_jmespath_groups) | list }}"
-        mariadb_users: "{{ mariadb_passwd | community.general.json_query(mariadb_jmespath_users) | list }}"
+        mariadb_groups: "{{ mariadb_group | community.general.json_query(mariadb_jmespath_groups) }}"
+        mariadb_users: "{{ mariadb_passwd | community.general.json_query(mariadb_jmespath_users) }}"
       vars:
         mariadb_jmespath_groups: "[].group_name"
         mariadb_jmespath_users: "[].username"
