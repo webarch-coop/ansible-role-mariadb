@@ -66,6 +66,17 @@
     - debug:
         var: mariadb_passwd
 
+    - name: Set facts for lists ofusers and groups
+      ansible.builtin.set_fact:
+        mariadb_groups: "{{ mariadb_group | community.general.json_query('[].group_name') | list "
+        mariadb_users: "{{ mariadb_passwd | community.general.json_query('[].username') | list }}"
+
+    - debug:
+        var: mariadb_groups
+
+    - debug:
+        var: mariadb_users
+
     - name: Set a fact for .my.cnf path and owner if a user account matching the MariaDB username exists
       ansible.builtin.set_fact:
         mariadb_mycnf: "{{ mariadb_passwd | community.general.json_query(mariadb_jmespath_passwd_home) }}/.my.cnf"
