@@ -59,17 +59,14 @@
       ansible.builtin.set_fact:
         mariadb_group: "{{ mariadb_etc_group_b64encoded ['content'] | b64decode | community.general.jc('group') }}"
         mariadb_passwd: "{{ mariadb_etc_passwd_b64encoded ['content'] | b64decode | community.general.jc('passwd') }}"
+        mariadb_groups: "{{ mariadb_etc_group_b64encoded ['content'] | b64decode | community.general.json_query('[].group_name') | list }}"
+        mariadb_users: "{{ mariadb_etc_passwd_b64encoded ['content'] | b64decode | community.general.jc('passwd') | community.general.json_query('[].username') | list }}"
 
     - debug:
         var: mariadb_group
 
     - debug:
         var: mariadb_passwd
-
-    - name: Set facts for lists of users and groups
-      ansible.builtin.set_fact:
-        mariadb_groups: "{{ mariadb_group | community.general.json_query('[].group_name') | list }}"
-        mariadb_users: "{{ mariadb_passwd | community.general.json_query('[].username') | list }}"
 
     - debug:
         var: mariadb_groups
