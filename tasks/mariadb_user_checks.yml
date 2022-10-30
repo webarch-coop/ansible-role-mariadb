@@ -57,13 +57,16 @@
 
     - name: Set facts for users and groups
       ansible.builtin.set_fact:
-        mariadb_group: "{{ mariadb_etc_group_b64encoded ['content'] | b64decode | community.general.jc('group') }}"
-        mariadb_passwd: "{{ mariadb_etc_passwd_b64encoded ['content'] | b64decode | community.general.jc('passwd') }}"
+        mariadb_group: "{{ mariadb_etc_group_b64encoded['content'] | b64decode | community.general.jc('group') }}"
+        mariadb_passwd: "{{ mariadb_etc_passwd_b64encoded['content'] | b64decode | community.general.jc('passwd') }}"
 
     - name: Set facts for users and groups
       ansible.builtin.set_fact:
-        mariadb_groups: "{{ mariadb_group | community.general.json_query('[].group_name') | list }}"
-        mariadb_users: "{{ mariadb_passwd | community.general.json_query('[].username') | list }}"
+        mariadb_groups: "{{ mariadb_group | community.general.json_query(mariadb_jmespath_groups) | list }}"
+        mariadb_users: "{{ mariadb_passwd | community.general.json_query(mariadb_jmespath_users) | list }}"
+      vars:
+        mariadb_jmespath_groups: "[].group_name"
+        mariadb_jmespath_users: "[].username"
 
     - name: Set a fact for .my.cnf path and owner if a user account matching the MariaDB username exists
       ansible.builtin.set_fact:
@@ -78,12 +81,12 @@
         mariadb_mycnf_group: "{{ mariadb_username }}"
       when: mariadb_username in mariadb_groups
 
-    - name: Set facts for .my.cnf when a user account matching the MariaDB username doesn't exist 
+    - name: Set facts for .my.cnf when a user account matching the MariaDB username doesn't exist
       ansible.builtin.set_fact:
         mariadb_mycnf: "/root/.{{ mariadb_username }}.my.cnf"
         mariadb_mycnf_owner: root
         mariadb_mycnf_group: root
-      when:  mariadb_username is not in mariadb_users
+      when: mariadb_username is not in mariadb_users
 
     - name: "Stat {{ mariadb_mycnf }}"
       ansible.builtin.stat:
