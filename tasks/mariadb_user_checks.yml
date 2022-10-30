@@ -45,6 +45,34 @@
         mariadb_database: "{{ mariadb_username }}"
       when: (mariadb_database is not defined) or (mariadb_database | length == 0)
 
+    - name: Slurp /etc/group
+      ansible.builtin.slurp:
+        src: /etc/group
+      register: mariadb_etc_group_b64encoded
+
+    - name: Slurp /etc/passwd
+      ansible.builtin.slurp:
+        src: /etc/passwd
+      register: mariadb_etc_passwd_b64encoded
+
+    - name: Set facts for users and groups
+      ansible.builtin.set_fact:
+        mariadb_group: "{{ mariadb_etc_group_b64encoded ['content'] | b64decode | community.general.jc('group') }}"
+        mariadb_passwd: "{{ mariadb_etc_passwd_b64encoded ['content'] | b64decode | community.general.jc('passwd') }}"
+
+    - debug:
+        var: mariadb_group
+
+    - debug:
+        var: mariadb_passwd
+
+    - fail:
+
+    - name: Set a fact for .my.cnf path and owner if a user account matching the MariaDB username exists
+      ansible.builtin.set_fact:
+        mariadb_mycnf: "{{ getent_passwd[mariadb_username][4] }}/.my.cnf"
+        mariadb_mycnf_owner: "{{ mariadb_username }}"
+
     - name: Set the mariadb_mycnf path if it is not defined
       block:
 
