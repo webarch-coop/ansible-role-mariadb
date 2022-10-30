@@ -77,19 +77,19 @@
         mariadb_mycnf_owner: "{{ mariadb_username }}"
       vars:
         mariadb_jmespath_passwd_home: "[?username == '{{ mariadb_username }}'].home"
-      when: mariadb_username in mariadb_users
+      when: mariadb_username is in mariadb_users
 
     - name: Set a fact for .my.cnf group if a group account matching the MariaDB username exists
       ansible.builtin.set_fact:
         mariadb_mycnf_group: "{{ mariadb_username }}"
-      when: mariadb_username in mariadb_groups
+      when: mariadb_username is in mariadb_groups
 
     - name: Set facts for .my.cnf when a user account matching the MariaDB username doesn't exist 
       ansible.builtin.set_fact:
         mariadb_mycnf: "/root/.{{ mariadb_username }}.my.cnf"
         mariadb_mycnf_owner: root
         mariadb_mycnf_group: root
-      when:  mariadb_username not in mariadb_users
+      when:  mariadb_username is not in mariadb_users
 
     - fail:
 
