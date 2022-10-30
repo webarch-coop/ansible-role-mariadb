@@ -71,8 +71,10 @@
         mariadb_mycnf: "{{ mariadb_passwd | community.general.json_query(mariadb_jmespath_passwd_home) }}/.my.cnf"
         mariadb_mycnf_owner: "{{ mariadb_username }}"
       vars:
-        mariadb_jmespath_passwd_home: "mariadb_passwd[?username == '{{ mariadb_username }}'].home"
-      when: mariadb_username in mariadb_passwd | community.general.json_query('mariadb_passwd[].username')
+        mariadb_jmespath_passwd_home: "[?username == '{{ mariadb_username }}'].home"
+      when: mariadb_username in mariadb_passwd | community.general.json_query('[].username')
+      #   mariadb_jmespath_passwd_home: "mariadb_passwd[?username == '{{ mariadb_username }}'].home"
+      # when: mariadb_username in mariadb_passwd | community.general.json_query('mariadb_passwd[].username')
 
     - name: Set a fact for .my.cnf group if a group account matching the MariaDB username exists
       ansible.builtin.set_fact:
