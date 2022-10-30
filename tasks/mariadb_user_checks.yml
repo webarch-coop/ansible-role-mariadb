@@ -66,9 +66,9 @@
     - debug:
         var: mariadb_passwd
 
-    - name: Set facts for lists ofusers and groups
+    - name: Set facts for lists of users and groups
       ansible.builtin.set_fact:
-        mariadb_groups: "{{ mariadb_group | community.general.json_query('[].group_name') | list "
+        mariadb_groups: "{{ mariadb_group | community.general.json_query('[].group_name') | list }}"
         mariadb_users: "{{ mariadb_passwd | community.general.json_query('[].username') | list }}"
 
     - debug:
