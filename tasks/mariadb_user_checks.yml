@@ -65,20 +65,6 @@
         mariadb_groups: "{{ mariadb_group | community.general.json_query('[].group_name') | list }}"
         mariadb_users: "{{ mariadb_passwd | community.general.json_query('[].username') | list }}"
 
-    - debug:
-        var: mariadb_users
-
-    - debug:
-        var: mariadb_username
-
-    - debug:
-        msg: "{{ mariadb_username }} is in {{ mariadb_users }}"
-      when: mariadb_username in mariadb_users
-
-    - debug:
-        msg: "{{ mariadb_username }} is in {{ mariadb_groups }}"
-      when: mariadb_username in mariadb_groups
-
     - name: Set a fact for .my.cnf path and owner if a user account matching the MariaDB username exists
       ansible.builtin.set_fact:
         mariadb_mycnf: "{{ mariadb_passwd | community.general.json_query(mariadb_jmespath_passwd_home) }}/.my.cnf"
@@ -98,79 +84,6 @@
         mariadb_mycnf_owner: root
         mariadb_mycnf_group: root
       when:  mariadb_username is not in mariadb_users
-
-    - fail:
-
-    - name: Set a fact for .my.cnf path and owner if a user account matching the MariaDB username exists
-      ansible.builtin.set_fact:
-        mariadb_mycnf: "{{ getent_passwd[mariadb_username][4] }}/.my.cnf"
-        mariadb_mycnf_owner: "{{ mariadb_username }}"
-
-    - name: Set a fact for .my.cnf group if a group matching the MariaDB username exists
-      ansible.builtin.set_fact:
-        mariadb_mycnf: "{{ getent_passwd[mariadb_username][4] }}/.my.cnf"
-        mariadb_mycnf_group: "{{ mariadb_username }}"
-
-    - name: Set mariadb_mycnf_group to root if a group matching the username doesn't exist
-      ansible.builtin.set_fact:
-        mariadb_mycnf: "/root/.{{ mariadb_username }}.my.cnf"
-        mariadb_mycnf_owner: root
-        mariadb_mycnf_group: root
-      when: 
-
-    - name: Set the mariadb_mycnf path if it is not defined
-      block:
-
-        - name: Check if there is a user present and use root if not
-          block:
-
-            - name: "Getent passwd for {{ mariadb_username }}"
-              ansible.builtin.getent:
-                database: passwd
-                key: "{{ mariadb_username }}"
-                fail_key: true
-
-            - name: "Debug $HOME for {{ mariadb_username }}"
-              ansible.builtin.debug:
-                var: getent_passwd[mariadb_username][4]
-                verbosity: 2
-
-            - name: Set a fact for .my.cnf path and owner if a user account matching the MariaDB username exists
-              ansible.builtin.set_fact:
-                mariadb_mycnf: "{{ getent_passwd[mariadb_username][4] }}/.my.cnf"
-                mariadb_mycnf_owner: "{{ mariadb_username }}"
-
-          rescue:
-
-            - name: "Set mariadb_mycnf to /root/.{{ mariadb_username }}.my.cnf"
-              ansible.builtin.set_fact:
-                mariadb_mycnf: "/root/.{{ mariadb_username }}.my.cnf"
-                mariadb_mycnf_owner: root
-
-        - name: Check if there is a group present and use root if not
-          block:
-
-            - name: "Getent group for {{ mariadb_username }}"
-              ansible.builtin.getent:
-                database: group
-                key: "{{ mariadb_username }}"
-                fail_key: true
-
-            - name: Set a fact for .my.cnf path if a user account matching the MariaDB username exists
-              ansible.builtin.set_fact:
-                mariadb_mycnf: "{{ getent_passwd[mariadb_username][4] }}/.my.cnf"
-                mariadb_mycnf_owner: "{{ mariadb_username }}"
-                mariadb_mycnf_group: "{{ mariadb_username }}"
-
-          rescue:
-
-            - name: Set mariadb_mycnf_group to root if a group matching the username doesn't exist
-              ansible.builtin.set_fact:
-                mariadb_mycnf: "/root/.{{ mariadb_username }}.my.cnf"
-                mariadb_mycnf_owner: root
-                mariadb_mycnf_group: root
-
-      when: (mariadb_mycnf is not defined) or (mariadb_mycnf | length > 0)
 
     - name: "Stat {{ mariadb_mycnf }}"
       ansible.builtin.stat:
