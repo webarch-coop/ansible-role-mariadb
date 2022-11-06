@@ -40,6 +40,9 @@ mariadb_thread_concurrency: 10
 mariadb_innodb_buffer_pool_size: 1G
 mariadb_innodb_log_file_size: 256M
 mariadb_innodb_buffer_pool_instances: 1
+# https://docs.nextcloud.com/server/25/admin_manual/configuration_database/linux_database_configuration.html#database-read-committed-transaction-isolation-level
+# mariadb_transaction_isolation: READ-COMMITTED
+# mariadb_binlog_format: ROW
 
 # Query cache configuration
 # https://mariadb.com/kb/en/query-cache/

@@ -47,6 +47,9 @@ table_open_cache        = {{ mariadb_table_open_cache | default('2000') }}
 tmp_table_size		= {{ mariadb_tmp_table_size | default('32M') }}
 join_buffer_size	= {{ mariadb_join_buffer_size | default('256K') }}
 max_heap_table_size     = {{ mariadb_max_heap_table_size | default('16M') }}
+{% if mariadb_transaction_isolation is defined %}
+transaction_isolation   = {{ mariadb_transaction_isolation }}
+{% endif %}
 
 #
 # * Query Cache Configuration
@@ -86,6 +89,9 @@ expire_logs_days	= 10
 max_binlog_size   = 100M
 #binlog_do_db		= include_database_name
 #binlog_ignore_db	= exclude_database_name
+{% if mariadb_binlog_format is defined %}
+binlog_format = {{ mariadb_binlog_format }}
+{% endif %}
 
 #
 # * InnoDB

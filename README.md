@@ -50,6 +50,8 @@ See also the [defaults/main.yml](defaults/main.yml) file.
 | `mariadb_innodb_buffer_pool_size`      | `1G`                             |                                                                                                                                                                             |
 | `mariadb_innodb_log_file_size`         | `256M`                           |                                                                                                                                                                             |
 | `mariadb_innodb_buffer_pool_instances` | `1`                              |                                                                                                                                                                             |
+| `mariadb_transaction_isolation`        |                                  | Not defined by default, for [Nextcloud](https://docs.nextcloud.com/server/25/admin_manual/configuration_database/linux_database_configuration.html)                         |
+| `mariadb_binlog_format`                |                                  | Not defined by default, for [Nextcloud](https://docs.nextcloud.com/server/25/admin_manual/configuration_database/linux_database_configuration.html)                         |
 | `mariadb_query_cache_type`             | `0`                              |                                                                                                                                                                             |
 | `mariadb_query_cache_limit`            | `0`                              |                                                                                                                                                                             |
 | `mariadb_query_cache_size`             | `0`                              |                                                                                                                                                                             |
@@ -93,6 +95,17 @@ You can call the `mariadb_user.yml` tasks multiple times, for example:
 
 - debug:
     msg: "The MariaDB password for Matomo is: {{ mariadb_password }}"
+
+- name: Create database and user for Nextcloud
+  include_role:
+    name: mariadb
+    tasks_from: mariadb_user.yml
+  vars:
+    mariadb_database: nextcloud
+    mariadb_username: nextcloud
+
+- debug:
+    msg: "The MariaDB password for Nextcloud is: {{ mariadb_password }}"
 ```
 
 Note that the `mariadb_password` variable will contain the password for the last user created.
