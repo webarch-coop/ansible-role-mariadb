@@ -54,6 +54,11 @@
         depth: 1
         update: true
 
+    - name: Stat /usr/local/src/MySQLTuner-perl/mysqltuner.pl
+      ansible.builtin.stat:
+        path: /usr/local/src/MySQLTuner-perl/mysqltuner.pl
+      register: mariadb_mysqltuner_script
+
     - name: MySQLTuner script in place
       ansible.builtin.copy:
         src: /usr/local/src/MySQLTuner-perl/mysqltuner.pl
@@ -62,6 +67,7 @@
         mode: 0755
         owner: root
         group: root
+      when: mariadb_mysqltuner_script.stat.exists | bool
 
     - name: Directory for MySQLTuner assets in place
       ansible.builtin.file:
