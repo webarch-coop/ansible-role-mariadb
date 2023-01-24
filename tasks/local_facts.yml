@@ -1,6 +1,8 @@
 ---
 - name: Check if mariadb-server is present
   ansible.builtin.command: dpkg -l mariadb-server
+  check_mode: false
+  changed_when: false
   register: mariadb_dpkg
   failed_when: mariadb_dpkg.rc is not regex('^0|1$')
   tags:
