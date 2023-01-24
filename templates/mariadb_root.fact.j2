@@ -3,19 +3,20 @@
 
 set -euo pipefail
 
-MARIADB="{{ mariadb_path }}"
-MARIADB_HOST="{{ mariadb_host }}"
-MARIADB_PORT="{{ mariadb_port }}"
+mariadb="{{ mariadb_path }}"
+mariadb_host="{{ mariadb_host }}"
+mariadb_port="{{ mariadb_port }}"
+uid=$(id -u)
 
-if [[ -f "${MARIADB}" ]]; then
+if [[ "${uid}" == 0 && -f "${mariadb}" ]]; then
 
-  PLUGIN=$("${MARIADB}" -h "${MARIADB_HOST}" -P "${MARIADB_PORT}" -BNe "SELECT plugin FROM user WHERE Host='${MARIADB_HOST}' AND User='root'" mysql)
-  declare -i NO=$(echo "${PLUGIN}" | wc -l)
+  plugin=$("${mariadb}" -h "${mariadb_host}" -P "${mariadb_port}" -BNe "SELECT plugin FROM user WHERE Host='${mariadb_host}' AND User='root'" mysql)
+  declare -i NO=$(echo "${plugin}" | wc -l)
 
   if (( NO == 1 )); then
-    jo state=present plugin="${PLUGIN}"
+    jo state=present plugin="${plugin}"
   elif (( NO > 1 )); then
-    jo state=present plugin=$(jo -a $(echo "${PLUGIN}" | tr '\n' ' '))
+    jo state=present plugin=$(jo -a $(echo "${plugin}" | tr '\n' ' '))
   else
     echo "Sorry $0 was unable to find the MariaDB root authentication plugin(s)"
     echo 1
