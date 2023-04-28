@@ -57,8 +57,8 @@
 
     - name: Set facts for users and groups
       ansible.builtin.set_fact:
-        mariadb_group: "{{ mariadb_etc_group_b64encoded['content'] | b64decode | community.general.jc('group') }}"
-        mariadb_passwd: "{{ mariadb_etc_passwd_b64encoded['content'] | b64decode | community.general.jc('passwd') }}"
+        mariadb_group: "{{ mariadb_etc_group_b64encoded['content'] | b64decode | string | community.general.jc('group') }}"
+        mariadb_passwd: "{{ mariadb_etc_passwd_b64encoded['content'] | b64decode | string | community.general.jc('passwd') }}"
 
     - name: Set facts for users and groups
       ansible.builtin.set_fact:
@@ -73,7 +73,7 @@
         mariadb_mycnf: "{{ mariadb_passwd | community.general.json_query(mariadb_jmespath_passwd_home) }}/.my.cnf"
         mariadb_mycnf_owner: "{{ mariadb_username }}"
       vars:
-        mariadb_jmespath_passwd_home: "[?username == '{{ mariadb_username }}'].home"
+        mariadb_jmespath_passwd_home: "[?username=='{{ mariadb_username }}'].home|[0]"
       when: mariadb_username in mariadb_users
 
     - name: Set a fact for .my.cnf group if a group account matching the MariaDB username exists
@@ -135,6 +135,8 @@
 
         - name: "Generate a random password for {{ mariadb_username }} as it is not defined or empty"
           ansible.builtin.command: "pwgen -n {{ 24 | random(14) }} 1"
+          check_mode: false
+          changed_when: false
           register: mariadb_password_gen
           no_log: "{% if ansible_verbosity <= 2 %}true{% else %}false{% endif %}"
 

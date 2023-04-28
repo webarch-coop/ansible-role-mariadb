@@ -36,7 +36,7 @@
         group: root
       register: mariadb_root_fact
 
-    - name: Re-read Ansible local facts
+    - name: Re-read Ansible local facts  # noqa: no-handler
       ansible.builtin.setup:
         filter: ansible_local
       when: mariadb_root_fact.changed | bool

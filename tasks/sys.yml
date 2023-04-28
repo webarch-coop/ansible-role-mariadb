@@ -34,6 +34,7 @@
           ansible.builtin.shell: |
             set -e -o pipefail
             mysql < ./mariadb_sys_install.sql
+          changed_when: true
           args:
             executable: "{{ bash }}"
             chdir: /usr/local/src/mariadb-sys
