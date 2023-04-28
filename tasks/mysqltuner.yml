@@ -10,6 +10,7 @@
     - name: Packages present
       ansible.builtin.apt:
         pkg:
+          - git
           - libjson-perl
           - python3-simplejson
         state: present
