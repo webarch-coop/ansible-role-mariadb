@@ -1,6 +1,60 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects MariaDB Ansible role.
+#
+# The Webarchitects MariaDB Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects MariaDB Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects MariaDB Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 # The mariadb variable needs to be true for the tasks in this role to be run
 mariadb: true
+mariadb_config:
+  - name: MariaDB server
+    path: /etc/mysql/mariadb.conf.d/50-server.cnf
+    state: edited
+    conf:
+      mysqld:
+        binlog_format: ROW
+        innodb_buffer_pool_instances: 1
+        innodb_buffer_pool_size: 1G
+        innodb_log_file_size: 256M
+        join_buffer_size: "8M"
+        key_buffer_size: "16M"
+        max_allowed_packet: "64M"
+        max_connections: "80"
+        max_heap_table_size: "32M"
+        max_user_connections: "0"
+        open_files_limit: "122880"
+        query_cache_limit: "0"
+        query_cache_size: "0"
+        query_cache_type: "0"
+        table_cache: "64"
+        table_open_cache: "4000"
+        thread_concurrency: "10"
+        tmp_table_size: "32M"
+        transaction_isolation: "READ-COMMITTED"
+  - name: MariaDB mysqldump
+    path: /etc/mysql/conf.d/mysqldump.cnf
+    state: present
+    conf:
+      mysqldump:
+        max_allowed_packet: "64M"
+        quick:
+        quote_names:
+mariadb_systemd_units:
+  - name: mariadb
+    state: enabled
+    files:
+      - path: /etc/systemd/system/mariadb.service.d/mariadb.conf
+        conf:
+          Service:
+            NoNewPrivileges: "true"
+            PrivateNetwork: "true"
+            PrivateTmp: "true"
+            LimitNOFILE: "122880"
+
 mariadb_host: localhost
 mariadb_port: 3360
 # The mariadb_path is used as a test for the local facts

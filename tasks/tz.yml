@@ -75,6 +75,7 @@
               ansible.builtin.shell: >
                 set -e -o pipefail
                 mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql mysql
+              changed_when: true
               args:
                 executable: "{{ bash }}"
               notify: Restart mariadb
@@ -95,6 +96,7 @@
               ansible.builtin.shell: >
                 set -e -o pipefail
                 mysql_tzinfo_to_sql /usr/share/zoneinfo > /root/timezoneinfo.sql
+              changed_when: true
               args:
                 executable: "{{ bash }}"
 

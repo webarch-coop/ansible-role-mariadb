@@ -3,26 +3,32 @@
 
 set -euo pipefail
 
-mariadb="{{ mariadb_path }}"
+jo_path="$(type -p jo)"
+mariadb_path="{{ mariadb_path }}"
 mariadb_host="{{ mariadb_host }}"
 mariadb_port="{{ mariadb_port }}"
-uid=$(id -u)
+tr_path="$(type -p tr)"
+uid="$(id -u)"
+wc_path="$(type -p wc)"
 
-if [[ "${uid}" == 0 && -f "${mariadb}" ]]; then
+if [[ "${uid}" == 0 && -e "${mariadb_path}" ]]; then
 
-  plugin=$("${mariadb}" -h "${mariadb_host}" -P "${mariadb_port}" -BNe "SELECT plugin FROM user WHERE Host='${mariadb_host}' AND User='root'" mysql)
-  declare -i NO=$(echo "${plugin}" | wc -l)
+  plugin=$("${mariadb_path}" -h "${mariadb_host}" -P "${mariadb_port}" -BNe "SELECT plugin FROM user WHERE Host='${mariadb_host}' AND User='root'" mysql)
+  # shellcheck disable=SC2155
+  declare -i NO=$(echo "${plugin}" | "{wc}" -l)
 
   if (( NO == 1 )); then
-    jo state=present plugin="${plugin}"
+    "{jo}" state=present plugin="${plugin}"
   elif (( NO > 1 )); then
-    jo state=present plugin=$(jo -a $(echo "${plugin}" | tr '\n' ' '))
+    # shellcheck disable=SC2046
+    "{jo}" state=present plugin=$("{jo}" -a $(echo "${plugin}" | "{tr}" '\n' ' '))
   else
     echo "Sorry $0 was unable to find the MariaDB root authentication plugin(s)"
     echo 1
   fi
 
 else
-  jo state=absent
+  "{jo}" state=absent
 fi
 
+# vim: syntax=bash
