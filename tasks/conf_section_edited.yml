@@ -1,0 +1,33 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects MariaDB Ansible role.
+#
+# The Webarchitects MariaDB Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects MariaDB Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects MariaDB Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+- name: MariaDB configuration file section edited
+  block:
+
+    - name: Debug the existing and proposed MariaDB configuration file variables
+      ansible.builtin.debug:
+        msg:
+          - "Path: {{ mariadb_cnf.path }}"
+          - "Section: {{ mariadb_cnf_section.key }}"
+          - "Existing: {{ mariadb_cnf_variable_pair.key }}: {{ mariadb_cnf_file_existing_vars | community.general.json_query(mariadb_cnf_variable_jpq) }}"
+          - "Proposed: {{ mariadb_cnf_variable_pair.key }}: {{ mariadb_cnf_variable_pair.value }}"
+        verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+      when: mariadb_cnf_variable_pair.value != mariadb_cnf_file_existing_vars | community.general.json_query(mariadb_cnf_variable_jpq)
+      vars:
+        mariadb_cnf_variable_jpq: '"{{ mariadb_cnf_section.key }}"."{{ mariadb_cnf_variable_pair.key }}"'
+      loop: "{{ mariadb_cnf_section.value | ansible.builtin.dict2items }}"
+      loop_control:
+        loop_var: mariadb_cnf_variable_pair
+        label: "{{ mariadb_cnf_variable_pair.key }}"
+
+  tags:
+    - mariadb
+    - mariadb_conf
+...

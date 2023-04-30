@@ -17,6 +17,17 @@
     - mariadb
     - mariadb_verify
 
+- name: Include apt role local fact tasks
+  ansible.builtin.include_role:
+    name: apt
+    tasks_from: local_facts.yml
+  when: >-
+    ( ansible_local.bash.path is not defined ) or
+    ( ansible_local.dpkg.installed is not defined )
+  tags:
+    - mariadb
+    - mariadb_local_facts
+
 - name: Include local facts tasks
   ansible.builtin.include_tasks: local_facts.yml
   tags:
@@ -28,14 +39,13 @@
 
     - name: Packages mariadb-server, mariadb-client and others present
       ansible.builtin.apt:
-        pkg:
-          - mariadb-client
-          - mariadb-server
-          - mycli
-          - pwgen
-          - python3-mysqldb
+        pkg: "{{ mariadb_pkgs }}"
         state: present
         update_cache: false
+      when:
+        - mariadb_pkgs is defined
+        - mariadb_pkgs != []
+        - mariadb_pkgs | difference(ansible_local.dpkg.installed) != []
       register: mariadb_install
       notify: Restart mariadb
       tags:
@@ -85,49 +95,61 @@
 
       when: mariadb_root_auth_current == "password"
 
-    - name: MariaDB server defaults in place
-      ansible.builtin.template:
-        src: templates/50-server.cnf.j2
-        dest: /etc/mysql/mariadb.conf.d/50-server.cnf
-        owner: root
-        group: root
-        mode: 0644
-      notify: Restart mariadb
+    - name: Include the MariaDB configuration file tasks
+      ansible.builtin.include_tasks: conf.yml
+      loop: "{{ mariadb_config }}"
+      loop_control:
+        loop_var: mariadb_cnf
+        label: "{{ mariadb_cnf.name | default(mariadb_cnf.path) }}"
+      when:
+        - mariadb_config is defined
+        - mariadb_config != []
+      tags:
+        - mariadb_conf
 
-    - name: MariaDB client defaults in place
-      ansible.builtin.template:
-        src: templates/50-client.cnf.j2
-        dest: /etc/mysql/mariadb.conf.d/50-client.cnf
-        owner: root
-        group: root
-        mode: 0644
-
-    - name: MariaDB mysqldump defaults in place
-      ansible.builtin.template:
-        src: templates/mysqldump.cnf.j2
-        dest: /etc/mysql/conf.d/mysqldump.cnf
-        owner: root
-        group: root
-        mode: 0644
-
-    - name: MariaDB Systemd directory present
-      ansible.builtin.file:
-        path: /etc/systemd/system/mariadb.service.d
-        state: directory
-        owner: root
-        group: root
-        mode: 0755
-
-    - name: MariaDB Systemd drop-in file in place
-      ansible.builtin.template:
-        src: templates/mariadb.conf.j2
-        dest: /etc/systemd/system/mariadb.service.d/mariadb.conf
-        owner: root
-        group: root
-        mode: 0644
-      notify:
-        - Reload systemd
-        - Restart mariadb
+#    - name: MariaDB server defaults in place
+#      ansible.builtin.template:
+#        src: templates/50-server.cnf.j2
+#        dest: /etc/mysql/mariadb.conf.d/50-server.cnf
+#        owner: root
+#        group: root
+#        mode: 0644
+#      notify: Restart mariadb
+#
+#    - name: MariaDB client defaults in place
+#      ansible.builtin.template:
+#        src: templates/50-client.cnf.j2
+#        dest: /etc/mysql/mariadb.conf.d/50-client.cnf
+#        owner: root
+#        group: root
+#        mode: 0644
+#
+#    - name: MariaDB mysqldump defaults in place
+#      ansible.builtin.template:
+#        src: templates/mysqldump.cnf.j2
+#        dest: /etc/mysql/conf.d/mysqldump.cnf
+#        owner: root
+#        group: root
+#        mode: 0644
+#
+#    - name: MariaDB Systemd directory present
+#      ansible.builtin.file:
+#        path: /etc/systemd/system/mariadb.service.d
+#        state: directory
+#        owner: root
+#        group: root
+#        mode: 0755
+#
+#    - name: MariaDB Systemd drop-in file in place
+#      ansible.builtin.template:
+#        src: templates/mariadb.conf.j2
+#        dest: /etc/systemd/system/mariadb.service.d/mariadb.conf
+#        owner: root
+#        group: root
+#        mode: 0644
+#      notify:
+#        - Reload systemd
+#        - Restart mariadb
 
     - name: Include the MariaDB sys schema tasks
       ansible.builtin.include_tasks: sys.yml

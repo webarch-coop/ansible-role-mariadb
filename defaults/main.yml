@@ -11,7 +11,7 @@
 # The mariadb variable needs to be true for the tasks in this role to be run
 mariadb: true
 mariadb_config:
-  - name: MariaDB server
+  - name: MariaDB server configuration
     path: /etc/mysql/mariadb.conf.d/50-server.cnf
     state: edited
     conf:
@@ -35,7 +35,7 @@ mariadb_config:
         thread_concurrency: "10"
         tmp_table_size: "32M"
         transaction_isolation: "READ-COMMITTED"
-  - name: MariaDB mysqldump
+  - name: MariaDB mysqldump configuration
     path: /etc/mysql/conf.d/mysqldump.cnf
     state: present
     conf:
@@ -43,6 +43,12 @@ mariadb_config:
         max_allowed_packet: "64M"
         quick:
         quote_names:
+mariadb_pkgs:
+  - mariadb-client
+  - mariadb-server
+  - mycli
+  - pwgen
+  - python3-mysqldb
 mariadb_systemd_units:
   - name: mariadb
     state: enabled

@@ -1,0 +1,10 @@
+# {{ ansible_managed }}
+
+{% for mariadb_cnf_section in mariadb_cnf.conf | dict2items %}
+[{{ mariadb_cnf_section.key }}]
+{% for mariadb_cnf_variable_pair in mariadb_cnf_section.value | dict2items %}
+{{ mariadb_cnf_variable_pair.key }}{% if mariadb_cnf_variable_pair.value is defined %} = {{ mariadb_cnf_variable_pair.value }}{% endif %}
+{% endfor %}
+{% endfor %}
+
+# vim: syntax=dosini

@@ -1,0 +1,91 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects MariaDB Ansible role.
+#
+# The Webarchitects MariaDB Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects MariaDB Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects MariaDB Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+- name: MariaDB configuration file
+  block:
+
+    - name: Check if the MariaDB configuration file exists
+      ansible.builtin.stat:
+        path: "{{ mariadb_cnf.path }}"
+      register: mariadb_cnf_file_path
+
+    - name: MariaDB configuration files can only be edited if they exist
+      ansible.builtin.assert:
+        that:
+          - mariadb_cnf_file_path.stat.exists | bool
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+      when: mariadb_cnf.state == "edited"
+
+    - name: MariaDB configuration file absent
+      ansible.builtin.file:
+        path: "{{ mariadb_cnf.path }}"
+        state: absent
+      notify: Restart MariaDB
+      when:
+        - mariadb_cnf.state is defined
+        - mariadb_cnf.state == "absent"
+        - mariadb_cnf_file_path.stat.exists | bool
+
+    - name: MariaDB configuration file present
+      block:
+
+        - name: Debug the proposed MariaDB configuration file
+          ansible.builtin.debug:
+            var: mariadb_cnf.conf
+            verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+
+        - name: Read the existing file when it exists
+          block:
+
+            - name: Slurp the MariaDB configuration file when it exists
+              ansible.builtin.slurp:
+                path: "{{ mariadb_cnf.path }}"
+              register: mariadb_cnf_file_b64encoded
+
+            - name: Set a fact for the existing MariaDB configuration file variables
+              ansible.builtin.set_fact:
+                mariadb_cnf_file_existing_vars: "{{ mariadb_cnf_file_b64encoded['content'] | ansible.builtin.b64decode | community.general.jc('ini') }}"
+
+            - name: Debug the existing MariaDB configuration file variables
+              ansible.builtin.debug:
+                var: mariadb_cnf_file_existing_vars
+                verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+
+            - name: Debug the existing PHP configuration file sections
+              ansible.builtin.debug:
+                var: mariadb_cnf_file_existing_vars.keys()
+                verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+
+          when: mariadb_cnf_file_path.stat.exists | bool
+
+        - name: Include the MariaDB configuration file templated tasks
+          ansible.builtin.include_tasks: conf_templated.yml
+          when: >-
+            ( mariadb_cnf.state == "templated" ) or
+            ( ( mariadb_cnf.state == "present" ) and
+            ( not mariadb_cnf_file_path.stat.exists ) )
+
+        - name: Include the MariaDB configuration edited tasks
+          ansible.builtin.include_tasks: conf_edited.yml
+          when: >-
+            ( ( mariadb_cnf.state == "edited" ) or
+            ( ( mariadb_cnf.state == "present" ) and
+            ( mariadb_cnf_file_path.stat.exists ) ) ) and
+            ( mariadb_cnf.conf != mariadb_cnf_file_existing_vars )
+
+      when: >-
+        ( mariadb_cnf.state is not defined ) or
+        ( ( mariadb_cnf.state is defined ) and
+        ( mariadb_cnf.state != "absent" ) )
+
+  tags:
+    - mariadb
+    - mariadb_conf
+...

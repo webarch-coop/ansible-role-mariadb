@@ -22,35 +22,41 @@ argument_specs:
         type: list
         elements: dict
         required: false
-        description: MariaDB configuration.
+        description: An optional list of MariaDB file paths and their configuration.
         options:
-          files:
-            type: list
-            elements: dict
+          conf:
+            type: dict
             required: false
-            description: A optional list of MariaDB file paths and their configuration.
-            options:
-              conf:
-                type: dict
-                required: false
-                description: A optional YAML dictionary representing the sections, variables and values of a MariaDB configuration file.
-              name:
-                type: str
-                required: false
-                description: A optional name for the MariaDB configuration file.
-              path:
-                type: str
-                required: true
-                description: The path of the MariaDB configuration file.
-              state:
-                type: str
-                required: true
-                description: The state of the MariaDB configuration file.
-                choices:
-                  - absent
-                  - edited
-                  - present
-                  - templated
+            description: An optional YAML dictionary representing the sections, variables and values of a MariaDB configuration file.
+          group:
+            type: str
+            required: false
+            description: An optional group for the MariaDB configuration file.
+          mode:
+            type: str
+            required: false
+            description: An optional file mode for the MariaDB configuration file.
+          name:
+            type: str
+            required: false
+            description: An optional name for the MariaDB configuration file.
+          owner:
+            type: str
+            required: false
+            description: An optional owner for the MariaDB configuration file.
+          path:
+            type: str
+            required: true
+            description: The path of the MariaDB configuration file.
+          state:
+            type: str
+            required: true
+            description: The state of the MariaDB configuration file.
+            choices:
+              - absent
+              - edited
+              - present
+              - templated
       mariadb_host:
         type: str
         required: true
@@ -63,6 +69,11 @@ argument_specs:
         type: str
         required: true
         description: MySQLTuner version.
+      mariadb_pkgs:
+        type: list
+        elements: str
+        required: false
+        description: A list of packages to install.
       mariadb_path:
         type: str
         required: true
