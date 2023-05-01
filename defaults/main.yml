@@ -16,10 +16,10 @@ mariadb_config:
     state: edited
     conf:
       mysqld:
-        binlog_format: ROW
-        innodb_buffer_pool_instances: 1
-        innodb_buffer_pool_size: 1G
-        innodb_log_file_size: 256M
+        binlog_format: "ROW"
+        innodb_buffer_pool_instances: "1"
+        innodb_buffer_pool_size: "256M"
+        innodb_log_file_size: "64M"
         join_buffer_size: "8M"
         key_buffer_size: "16M"
         max_allowed_packet: "64M"
@@ -30,6 +30,7 @@ mariadb_config:
         query_cache_limit: "0"
         query_cache_size: "0"
         query_cache_type: "0"
+        slow_query_log_file: "/var/log/mysql/mariadb-slow.log"
         table_cache: "64"
         table_open_cache: "4000"
         thread_concurrency: "10"

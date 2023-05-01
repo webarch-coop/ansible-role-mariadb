@@ -45,7 +45,7 @@
           ansible.builtin.assert:
             that:
               - mariadb_cnf_section.value | ansible.builtin.flatten | select('regex', '-') == []
-            quiet: "{% if ansible_check_mode or ansible_verbosity >= 2 %}false{% else %}true{% endif %}"
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
             fail_msg: Although dashes or underscores can be used for MariaDB configuration variables this role only suppports the use of underscores.
           loop: "{{ mariadb_cnf.conf | ansible.builtin.dict2items }}"
           loop_control:

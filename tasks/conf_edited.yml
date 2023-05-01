@@ -23,7 +23,14 @@
         mode: "{{ mariadb_cnf.mode | default('0644') }}"
         owner: "{{ mariadb_cnf.owner | default('root') }}"
         group: "{{ mariadb_cnf.owner | default('root') }}"
+      changed_when: false
+      register: mariadb_cnf_file_backup
       when: mariadb_cnf_file_path.stat.exists | bool
+
+    - name: Debug MariaDB configuration file backup
+      ansible.builtin.debug:
+        var: mariadb_cnf_file_backup
+        verbosity: "{% if ansible_check_mode | bool %}2{% else %}3{% endif %}"
 
     - name: Include the MariaDB configuration file section edited tasks
       ansible.builtin.include_tasks: conf_section_edited.yml
@@ -51,6 +58,28 @@
         mode: "{{ mariadb_cnf.mode | default('0644') }}"
         owner: "{{ mariadb_cnf.owner | default('root') }}"
         group: "{{ mariadb_cnf.owner | default('root') }}"
+
+    - name: Stat the MariaDB configuration file
+      ansible.builtin.stat:
+        path: "{{ mariadb_cnf.path }}"
+        get_checksum: true
+        checksum_algorithm: sha1
+      register: mariadb_cnf_file_edited
+
+    - name: Debug MariaDB configuration file
+      ansible.builtin.debug:
+        var: mariadb_cnf_file_edited
+        verbosity: "{% if ansible_check_mode | bool %}2{% else %}3{% endif %}"
+
+    - name: MariaDB configuration file backup absent when it is unchanged
+      ansible.builtin.file:
+        path: "{{ mariadb_cnf_file_path_backup }}"
+        state: absent
+      changed_when: false
+      when:
+        - mariadb_cnf_file_path.stat.exists | bool
+        - mariadb_cnf_file_backup.checksum is defined
+        - mariadb_cnf_file_backup.checksum == mariadb_cnf_file_edited.stat.checksum
 
   tags:
     - mariadb
