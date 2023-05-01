@@ -1,0 +1,56 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects MariaDB Ansible role.
+#
+# The Webarchitects MariaDB Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects MariaDB Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects MariaDB Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+- name: Change dashes to underscores in MariaDB configuration files
+  block:
+
+    - name: Set a fact for the MariaDB configuration file backup path
+      ansible.builtin.set_fact:
+        mariadb_cnf_file_path_backup: "{{ mariadb_cnf.path | ansible.builtin.dirname }}/.{{ mariadb_cnf.path | ansible.builtin.basename }}.{{ ansible_date_time.iso8601_basic_short }}.bak"
+
+    - name: MariaDB configuration file backup present
+      ansible.builtin.copy:
+        src: "{{ mariadb_cnf.path }}"
+        dest: "{{ mariadb_cnf_file_path_backup }}"
+        remote_src: true
+        mode: "{{ mariadb_cnf.mode | default('0644') }}"
+        owner: "{{ mariadb_cnf.owner | default('root') }}"
+        group: "{{ mariadb_cnf.owner | default('root') }}"
+
+    - name: MariaDB backup configuration file dashes updated to underscores
+      ansible.builtin.command: >-
+        sed -i '/^[a-z]/ s/-/_/g' {{ mariadb_cnf.path }}
+
+    - name: Stat the MariaDB backup configuration file
+      ansible.builtin.stat:
+        path: "{{ mariadb_cnf_file_path_backup }}"
+      register: mariadb_cnf_file_path_backup_check
+
+    - name: Diff the edited and backup MariaDB configuration file
+      ansible.builtin.command: >-
+        diff {{ mariadb_cnf.path }} {{ mariadb_cnf_file_path_backup }}
+      register: mariadb_cnf_file_diff
+      failed_when: mariadb_cnf_file_diff.rc is not regex('^0|1$')
+
+    - name: Fail as a MariaDB configuration file has been edited and needs manually checking
+      ansible.builtin.assert:
+        that:
+          - mariadb_cnf_file_diff.rc == 0
+        fail_msg: >-
+          A MariaDB config files has been edited to change underscores into dashes for
+          variables names AND values, this might have caused some unexpected changes,
+          please manually check the results by running
+          `diff --color {{ mariadb_cnf_file_path_backup }} {{ mariadb_cnf.path }}`
+      when: mariadb_cnf_file_diff.rc is defined
+
+  tags:
+    - mariadb
+    - mariadb_conf
+...

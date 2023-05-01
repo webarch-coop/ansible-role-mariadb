@@ -36,10 +36,22 @@
     - name: MariaDB configuration file present
       block:
 
-        - name: Debug the proposed MariaDB configuration file
+        - name: Debug the proposed MariaDB configuration file variables
           ansible.builtin.debug:
             var: mariadb_cnf.conf
             verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+
+        - name: Check that the MariaDB configuration file variables don't contain dashes
+          ansible.builtin.assert:
+            that:
+              - mariadb_cnf_section.value | ansible.builtin.flatten | select('regex', '-') == []
+            quiet: "{% if ansible_check_mode or ansible_verbosity >= 2 %}false{% else %}true{% endif %}"
+            fail_msg: Although dashes or underscores can be used for MariaDB configuration variables this role only suppports the use of underscores.
+          loop: "{{ mariadb_cnf.conf | ansible.builtin.dict2items }}"
+          loop_control:
+            loop_var: mariadb_cnf_section
+            label: "{{ mariadb_cnf_section.key }}"
+          when: mariadb_cnf_section.keys() | length != 0
 
         - name: Read the existing file when it exists
           block:
@@ -58,10 +70,18 @@
                 var: mariadb_cnf_file_existing_vars
                 verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
 
-            - name: Debug the existing PHP configuration file sections
+            - name: Debug the existing MariaDB configuration file sections
               ansible.builtin.debug:
                 var: mariadb_cnf_file_existing_vars.keys()
-                verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+                verbosity: "{% if ansible_check_mode | bool %}2{% else %}3{% endif %}"
+
+            - name: Include the tasks to change dashes to underscores in existing MariaDB configuration file
+              ansible.builtin.include_tasks: conf_underscore.yml
+              when: mariadb_cnf_section.value | ansible.builtin.flatten | select('regex', '-') != []
+              loop: "{{ mariadb_cnf_file_existing_vars | ansible.builtin.dict2items }}"
+              loop_control:
+                loop_var: mariadb_cnf_section
+                label: "{{ mariadb_cnf_section.key }}"
 
           when: mariadb_cnf_file_path.stat.exists | bool
 
