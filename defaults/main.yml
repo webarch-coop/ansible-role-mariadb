@@ -17,7 +17,7 @@ mariadb_config:
     conf:
       client:
         default_character_set: utf8mb4
-        socket: "{{ mariadb_defaults.socket }}"
+        socket: "{{ mariadb_socket }}"
   - name: MariaDB server configuration
     path: /etc/mysql/mariadb.conf.d/50-server.cnf
     state: edited
@@ -56,6 +56,7 @@ mariadb_pkgs:
   - mycli
   - pwgen
   - python3-mysqldb
+mariadb_socket: /run/mysqld/mysqld.sock
 mariadb_systemd_units:
   - name: mariadb
     state: enabled

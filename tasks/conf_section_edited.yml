@@ -32,7 +32,7 @@
     - name: Uncomment commented variables in the MariaDB configuration file that are to be edited
       ansible.builtin.lineinfile:
         path: "{{ mariadb_cnf.path }}"
-        line: "{{ mariadb_cnf_variable_pair.key }}{% if mariadb_cnf_variable_pair.value is defined %}= {{ mariadb_cnf_variable_pair.value }}{% endif %}"
+        line: "{{ mariadb_cnf_variable_pair.key }}{% if mariadb_cnf_variable_pair.value is defined %} = {{ mariadb_cnf_variable_pair.value }}{% endif %}"
         regex: "{{ mariadb_cnf_variable_regex }}"
         state: present
         backrefs: true

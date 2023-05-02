@@ -105,59 +105,18 @@
           loop_control:
             loop_var: systemd_unit
             label: "{{ systemd_unit.name }}"
-          vars:
           when:
             - mariadb_systemd_units is defined
             - mariadb_systemd_units != []
-          tags:
-            - mariadb_systemd
 
+      when:
+        - ansible_local.dpkg.installed is defined
+        - ( "mariadb-server" in ansible_local.dpkg.installed )
       tags:
         - mariadb_conf
 
-    #    - name: MariaDB server defaults in place
-    #      ansible.builtin.template:
-    #        src: templates/50-server.cnf.j2
-    #        dest: /etc/mysql/mariadb.conf.d/50-server.cnf
-    #        owner: root
-    #        group: root
-    #        mode: 0644
-    #      notify: Restart mariadb
-    #
-    #    - name: MariaDB client defaults in place
-    #      ansible.builtin.template:
-    #        src: templates/50-client.cnf.j2
-    #        dest: /etc/mysql/mariadb.conf.d/50-client.cnf
-    #        owner: root
-    #        group: root
-    #        mode: 0644
-    #
-    #    - name: MariaDB mysqldump defaults in place
-    #      ansible.builtin.template:
-    #        src: templates/mysqldump.cnf.j2
-    #        dest: /etc/mysql/conf.d/mysqldump.cnf
-    #        owner: root
-    #        group: root
-    #        mode: 0644
-    #
-    #    - name: MariaDB Systemd directory present
-    #      ansible.builtin.file:
-    #        path: /etc/systemd/system/mariadb.service.d
-    #        state: directory
-    #        owner: root
-    #        group: root
-    #        mode: 0755
-    #
-    #    - name: MariaDB Systemd drop-in file in place
-    #      ansible.builtin.template:
-    #        src: templates/mariadb.conf.j2
-    #        dest: /etc/systemd/system/mariadb.service.d/mariadb.conf
-    #        owner: root
-    #        group: root
-    #        mode: 0644
-    #      notify:
-    #        - Reload systemd
-    #        - Restart mariadb
+    - name: MariaDB database tasks
+      block:
 
         - name: Include the MariaDB sys schema tasks
           ansible.builtin.include_tasks: sys.yml
@@ -192,6 +151,8 @@
       when:
         - ansible_local.dpkg.installed is defined
         - ( "mariadb-server" in ansible_local.dpkg.installed )
+      tags:
+        - mariadb_databases
 
   when: mariadb | bool
   tags:

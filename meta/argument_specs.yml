@@ -70,6 +70,10 @@ argument_specs:
         elements: str
         required: false
         description: A list of packages to install.
+      mariadb_socket:
+        type: str
+        required: true
+        description: Path to the MariaDB socket.
       mariadb_sys_schema:
         type: bool
         required: true

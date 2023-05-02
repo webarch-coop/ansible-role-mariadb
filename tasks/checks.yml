@@ -49,12 +49,16 @@
         var: mariadb_defaults
         verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
 
-    - name: Check that the MariaDB defaults include a socket path
+    - name: Check that the MariaDB defaults socket path matches the specified socket path
       ansible.builtin.assert:
         that:
           - mariadb_defaults.socket is defined
+          - mariadb_defaults.socket == mariadb_socket
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-        fail_msg: This role depends on the Debian default of socket authentication for the root user
+        fail_msg: >-
+          This role depends on the Debian default of socket authentication for the root user using the default
+          socket path of /run/mysqld/mysqld.sock, please ensure that the socket path in the default variables
+          for this role match the socket path specified in /etc/mysql/my.cnf
 
     - name: Query the MariaDB databases, users and version using a socket
       community.mysql.mysql_info:
@@ -64,7 +68,7 @@
           - version
         return_empty_dbs: true
         login_user: root
-        login_unix_socket: "{{ mariadb_defaults.socket }}"
+        login_unix_socket: "{{ mariadb_socket }}"
       register: mariadb_info
 
     - name: Debug MariaDB info
