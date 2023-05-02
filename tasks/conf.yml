@@ -11,19 +11,20 @@
 - name: MariaDB configuration file
   block:
 
-    - name: Check if the MariaDB configuration file exists
+    - name: "Check the existance of the MariaDB configuration file {{ mariadb_cnf.path }}"
       ansible.builtin.stat:
         path: "{{ mariadb_cnf.path }}"
       register: mariadb_cnf_file_path
 
-    - name: MariaDB configuration files can only be edited if they exist
+    - name: "MariaDB configuration file can only be edited it exists {{ mariadb_cnf.path }}"
       ansible.builtin.assert:
         that:
           - mariadb_cnf_file_path.stat.exists | bool
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+        fail_msg: "The file {{ mariadb_cnf.path }} need to exist before it can be edited, to create it set the state to `present` or `templated`."
       when: mariadb_cnf.state == "edited"
 
-    - name: MariaDB configuration file absent
+    - name: "MariaDB configuration file absent {{ mariadb_cnf.path }}"
       ansible.builtin.file:
         path: "{{ mariadb_cnf.path }}"
         state: absent
@@ -36,7 +37,7 @@
     - name: MariaDB configuration file present
       block:
 
-        - name: Debug the proposed MariaDB configuration file variables
+        - name: "Debug the proposed MariaDB configuration variables for the file {{ mariadb_cnf.path }}"
           ansible.builtin.debug:
             var: mariadb_cnf.conf
             verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
@@ -46,7 +47,7 @@
             that:
               - mariadb_cnf_section.value | ansible.builtin.flatten | select('regex', '-') == []
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-            fail_msg: Although dashes or underscores can be used for MariaDB configuration variables this role only suppports the use of underscores.
+            fail_msg: "Although dashes or underscores can be used for MariaDB configuration variables this role only suppports the use of underscores for the {{ mariadb_cnf.path }} file."
           loop: "{{ mariadb_cnf.conf | ansible.builtin.dict2items }}"
           loop_control:
             loop_var: mariadb_cnf_section
