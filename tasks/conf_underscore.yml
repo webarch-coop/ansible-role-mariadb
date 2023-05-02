@@ -24,7 +24,10 @@
         owner: "{{ mariadb_cnf.owner | default('root') }}"
         group: "{{ mariadb_cnf.owner | default('root') }}"
 
-    - name: MariaDB backup configuration file dashes updated to underscores
+    # Ideally this would use lineinfile but the regexs required would be complicated...
+    # so for now it uses sed which also changes dashes in values as well as variables
+    # so manually checking of the result is needed
+    - name: MariaDB backup configuration file dashes updated to underscores  # noqa: command-instead-of-module
       ansible.builtin.command: >-
         sed -i '/^[a-z]/ s/-/_/g' {{ mariadb_cnf.path }}
 
@@ -44,10 +47,12 @@
         that:
           - mariadb_cnf_file_diff.rc == 0
         fail_msg: >-
-          A MariaDB config files has been edited to change underscores into dashes for
-          variables names AND values, this might have caused some unexpected changes,
-          please manually check the results by running
-          `diff --color {{ mariadb_cnf_file_path_backup }} {{ mariadb_cnf.path }}`
+          A MariaDB config files has been edited to change underscores into dashes
+          for variables names AND values, this might have caused some unexpected
+          changes, note that this edit is only applied when variable names with
+          dashes are found so if there are none vaules with dashes won't be
+          touched, please manually check the results by running `diff --color
+          {{ mariadb_cnf_file_path_backup }} {{ mariadb_cnf.path }}`
       when: mariadb_cnf_file_diff.rc is defined
 
   tags:

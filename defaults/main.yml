@@ -45,6 +45,7 @@ mariadb_config:
         quick:
         quote_names:
 mariadb_pkgs:
+  - jo
   - mariadb-client
   - mariadb-server
   - mycli

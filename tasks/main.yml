@@ -8,178 +8,156 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects MariaDB Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Include varify tasks
-  ansible.builtin.include_tasks: verify.yml
-  when:
-    - mariadb_verify is defined
-    - mariadb_verify | bool
-  tags:
-    - mariadb
-    - mariadb_verify
-
-- name: Include apt role local fact tasks
-  ansible.builtin.include_role:
-    name: apt
-    tasks_from: local_facts.yml
-  when: >-
-    ( ansible_local.bash.path is not defined ) or
-    ( ansible_local.dpkg.installed is not defined )
-  tags:
-    - mariadb
-    - mariadb_local_facts
-
-- name: Include local facts tasks
-  ansible.builtin.include_tasks: local_facts.yml
-  tags:
-    - mariadb
-    - mariadb_local_facts
-
-- name: Install and configure MariaDB
+- name: MariaDB
   block:
 
-    - name: Packages mariadb-server, mariadb-client and others present
-      ansible.builtin.apt:
-        pkg: "{{ mariadb_pkgs }}"
-        state: present
-        update_cache: false
+    - name: MariaDB include verify tasks
+      ansible.builtin.include_tasks: verify.yml
       when:
-        - mariadb_pkgs is defined
-        - mariadb_pkgs != []
-        - mariadb_pkgs | difference(ansible_local.dpkg.installed) != []
-      register: mariadb_install
-      notify: Restart mariadb
+        - mariadb_verify is defined
+        - mariadb_verify | bool
       tags:
-        - mariadb_install
+        - mariadb_verify
 
-    - name: Include local facts tasks
-      ansible.builtin.include_tasks: local_facts.yml
-      when: (mariadb_install is defined) and (mariadb_install.changed | bool)
+    - name: MariaDB local facts tasks
+      block:
+
+        - name: Include apt role local fact tasks
+          ansible.builtin.include_role:
+            name: apt
+            tasks_from: local_facts.yml
+          when: >-
+            ( ansible_local.bash.path is not defined ) or
+            ( ansible_local.dpkg.installed is not defined )
+
+        - name: Legacy /etc/ansible/facts.d/mariadb_root.fact file absent
+          ansible.builtin.file:
+            path: /etc/ansible/facts.d/mariadb_root.fact
+            state: absent
+          register: mariadb_root_fact
+
+        - name: Re-read Ansible local facts  # noqa: no-handler
+          ansible.builtin.setup:
+            filter: ansible_local
+          when: mariadb_root_fact.changed | bool
+
       tags:
-        - mariadb
-        - mariadb_install
         - mariadb_local_facts
 
-    - name: Debian Jessie and Stretch legacy python-mysqldb present
-      ansible.builtin.apt:
-        pkg:
-          - python-mysqldb
-        state: present
-        update_cache: false
-      notify: Restart mariadb
-      when: ansible_distribution_release is regex('^jessie|stretch$')
+    - name: Install MariaDB
+      block:
+
+        - name: Packages mariadb-server, mariadb-client and others present
+          ansible.builtin.apt:
+            pkg: "{{ mariadb_pkgs }}"
+            state: present
+            update_cache: false
+          when:
+            - mariadb_pkgs is defined
+            - mariadb_pkgs != []
+            - mariadb_pkgs | difference(ansible_local.dpkg.installed) != []
+          register: mariadb_install
+          notify: Restart mariadb
+
+        - name: Include local facts tasks
+          ansible.builtin.include_tasks: local_facts.yml
+          when: (mariadb_install is defined) and (mariadb_install.changed | bool)
+
       tags:
         - mariadb_install
 
-    - name: Tasks when the current root authentication method is a socket
+    - name: Configure MariaDB
       block:
 
-        - name: Query the MariaDB databases, users and version using a socket and the community.mysql.mysql_info module
-          ansible.builtin.include_tasks: info_socket.yml
+        - name: Include the MariaDB configuration file tasks
+          ansible.builtin.include_tasks: conf.yml
+          loop: "{{ mariadb_config }}"
+          loop_control:
+            loop_var: mariadb_cnf
+            label: "{{ mariadb_cnf.name | default(mariadb_cnf.path) }}"
+          when:
+            - mariadb_config is defined
+            - mariadb_config != []
+          tags:
+            - mariadb_conf
 
-        - name: Include the MariaDB root password authentication tasks
-          ansible.builtin.include_tasks: mariadb_root_password.yml
-          when: (mariadb_root_auth is defined) and (mariadb_root_auth == "password")
+    #    - name: MariaDB server defaults in place
+    #      ansible.builtin.template:
+    #        src: templates/50-server.cnf.j2
+    #        dest: /etc/mysql/mariadb.conf.d/50-server.cnf
+    #        owner: root
+    #        group: root
+    #        mode: 0644
+    #      notify: Restart mariadb
+    #
+    #    - name: MariaDB client defaults in place
+    #      ansible.builtin.template:
+    #        src: templates/50-client.cnf.j2
+    #        dest: /etc/mysql/mariadb.conf.d/50-client.cnf
+    #        owner: root
+    #        group: root
+    #        mode: 0644
+    #
+    #    - name: MariaDB mysqldump defaults in place
+    #      ansible.builtin.template:
+    #        src: templates/mysqldump.cnf.j2
+    #        dest: /etc/mysql/conf.d/mysqldump.cnf
+    #        owner: root
+    #        group: root
+    #        mode: 0644
+    #
+    #    - name: MariaDB Systemd directory present
+    #      ansible.builtin.file:
+    #        path: /etc/systemd/system/mariadb.service.d
+    #        state: directory
+    #        owner: root
+    #        group: root
+    #        mode: 0755
+    #
+    #    - name: MariaDB Systemd drop-in file in place
+    #      ansible.builtin.template:
+    #        src: templates/mariadb.conf.j2
+    #        dest: /etc/systemd/system/mariadb.service.d/mariadb.conf
+    #        owner: root
+    #        group: root
+    #        mode: 0644
+    #      notify:
+    #        - Reload systemd
+    #        - Restart mariadb
 
-      # matches auth_socket and unix_socket
-      when: mariadb_root_auth_current is regex('socket$')
+        - name: Include the MariaDB sys schema tasks
+          ansible.builtin.include_tasks: sys.yml
+          when: (mariadb_sys_schema | bool) and ("sys" not in mariadb_databases)
 
-    - name: Tasks when the current root authentication method is a password
-      block:
+        - name: Run mysql_upgrade
+          ansible.builtin.command: mysql_upgrade
+          register: mariadb_upgrade
+          changed_when: ("This installation of MariaDB is already upgraded" not in mariadb_upgrade.stdout)
 
-        - name: Query the MariaDB databases, users and version using a password and the command module
-          ansible.builtin.include_tasks: info_password.yml
+        - name: Stat /etc/mysql/my.cnf
+          ansible.builtin.stat:
+            path: /etc/mysql/my.cnf
+          register: mariadb_etc_my_cnf
 
-        - name: Include the MariaDB root user socket authentication tasks
-          ansible.builtin.include_tasks: mariadb_root_socket.yml
-          when: (mariadb_root_auth is defined) and (mariadb_root_auth is regex('socket$'))
+        - name: Conditionally include the update-alternatives tasks
+          ansible.builtin.include_tasks: update.yml
+          when: (mariadb_etc_my_cnf is defined) and (not mariadb_etc_my_cnf.stat.islnk | bool)
 
-      when: mariadb_root_auth_current == "password"
+        - name: Conditionally import the time zone tables import tasks
+          ansible.builtin.include_tasks: tz.yml
+          when: (mariadb_time_zone_import is defined) and (mariadb_time_zone_import | bool)
 
-    - name: Include the MariaDB configuration file tasks
-      ansible.builtin.include_tasks: conf.yml
-      loop: "{{ mariadb_config }}"
-      loop_control:
-        loop_var: mariadb_cnf
-        label: "{{ mariadb_cnf.name | default(mariadb_cnf.path) }}"
+        - name: Conditionally include the user and database creation tasks
+          ansible.builtin.include_tasks: mariadb_user.yml
+          when: (mariadb_username is defined) and (mariadb_username | length > 0)
+
+        - name: Include mysqltuner tasks
+          ansible.builtin.include_tasks: mysqltuner.yml
+          when: mariadb_mysqltuner | bool
+
       when:
-        - mariadb_config is defined
-        - mariadb_config != []
-      tags:
-        - mariadb_conf
-
-#    - name: MariaDB server defaults in place
-#      ansible.builtin.template:
-#        src: templates/50-server.cnf.j2
-#        dest: /etc/mysql/mariadb.conf.d/50-server.cnf
-#        owner: root
-#        group: root
-#        mode: 0644
-#      notify: Restart mariadb
-#
-#    - name: MariaDB client defaults in place
-#      ansible.builtin.template:
-#        src: templates/50-client.cnf.j2
-#        dest: /etc/mysql/mariadb.conf.d/50-client.cnf
-#        owner: root
-#        group: root
-#        mode: 0644
-#
-#    - name: MariaDB mysqldump defaults in place
-#      ansible.builtin.template:
-#        src: templates/mysqldump.cnf.j2
-#        dest: /etc/mysql/conf.d/mysqldump.cnf
-#        owner: root
-#        group: root
-#        mode: 0644
-#
-#    - name: MariaDB Systemd directory present
-#      ansible.builtin.file:
-#        path: /etc/systemd/system/mariadb.service.d
-#        state: directory
-#        owner: root
-#        group: root
-#        mode: 0755
-#
-#    - name: MariaDB Systemd drop-in file in place
-#      ansible.builtin.template:
-#        src: templates/mariadb.conf.j2
-#        dest: /etc/systemd/system/mariadb.service.d/mariadb.conf
-#        owner: root
-#        group: root
-#        mode: 0644
-#      notify:
-#        - Reload systemd
-#        - Restart mariadb
-
-    - name: Include the MariaDB sys schema tasks
-      ansible.builtin.include_tasks: sys.yml
-      when: (mariadb_sys_schema | bool) and ("sys" not in mariadb_databases)
-
-    - name: Run mysql_upgrade
-      ansible.builtin.command: mysql_upgrade
-      register: mariadb_upgrade
-      changed_when: ("This installation of MariaDB is already upgraded" not in mariadb_upgrade.stdout)
-
-    - name: Stat /etc/mysql/my.cnf
-      ansible.builtin.stat:
-        path: /etc/mysql/my.cnf
-      register: mariadb_etc_my_cnf
-
-    - name: Conditionally include the update-alternatives tasks
-      ansible.builtin.include_tasks: update.yml
-      when: (mariadb_etc_my_cnf is defined) and (not mariadb_etc_my_cnf.stat.islnk | bool)
-
-    - name: Conditionally import the time zone tables import tasks
-      ansible.builtin.include_tasks: tz.yml
-      when: (mariadb_time_zone_import is defined) and (mariadb_time_zone_import | bool)
-
-    - name: Conditionally include the user and database creation tasks
-      ansible.builtin.include_tasks: mariadb_user.yml
-      when: (mariadb_username is defined) and (mariadb_username | length > 0)
-
-    - name: Include mysqltuner tasks
-      ansible.builtin.include_tasks: mysqltuner.yml
-      when: mariadb_mysqltuner | bool
+        - ansible_local.dpkg.installed is defined
+        - ( "mariadb-server" in ansible_local.dpkg.installed )
 
   when: mariadb | bool
   tags:
