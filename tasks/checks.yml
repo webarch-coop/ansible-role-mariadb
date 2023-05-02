@@ -1,0 +1,100 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects MariaDB Ansible role.
+#
+# The Webarchitects MariaDB Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects MariaDB Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects MariaDB Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+- name: Use my_print_defaults and community.mysql.mysql_info to gather information about the MariaDB server databases, users and version
+  block:
+
+    - name: Run my_print_defaults
+      ansible.builtin.command: my_print_defaults --mysqld
+      check_mode: false
+      changed_when: false
+      register: mariadb_my_print_mysqld_defaults
+
+    - name: Set a fact for the my_print_defaults --mysqld results
+      ansible.builtin.set_fact:
+        mariadb_mysqld_defaults_lines: "{{ mariadb_my_print_mysqld_defaults.stdout_lines | map('regex_replace', '^[-]{2}') }}"
+        mariadb_mysqld_defaults_variables: "{{ mariadb_my_print_mysqld_defaults.stdout_lines | map('regex_replace', '^[-]{2}') | map('regex_replace', '=.*$') | sort }}"
+
+    - name: Check that no variables are duplicated
+      ansible.builtin.assert:
+        that:
+          - mariadb_mysqld != ansible_loop.nextitem
+        quiet: "{% if ansible_verbosity < 3 %}true{% else %}false{% endif %}"
+        fail_msg: "The MariaDB variable {{ mariadb_mysqld }} is duplicated in the settings returned with `my_print_defaults --mysqld`"
+      when:
+        - not ansible_loop.last
+      loop: "{{ mariadb_mysqld_defaults_variables }}"
+      loop_control:
+        extended: true
+        label: "{{ mariadb_mysqld }}"
+        loop_var: mariadb_mysqld
+
+    - name: Set a fact for the my_print_defaults --mysqld results
+      ansible.builtin.set_fact:
+        mariadb_mysqld_defaults: "{% for mariadb_default in mariadb_mysqld_defaults_lines %}{{ mariadb_default + '\n' }}{% endfor %}"
+
+    - name: Set a fact for the my_print_defaults --mysqld results
+      ansible.builtin.set_fact:
+        mariadb_defaults: "{{ mariadb_mysqld_defaults | string | community.general.jc('ini') }}"
+
+    - name: Debug MariaDB defaults
+      ansible.builtin.debug:
+        var: mariadb_defaults
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+
+    - name: Check that the MariaDB defaults include a socket path
+      ansible.builtin.assert:
+        that:
+          - mariadb_defaults.socket is defined
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+        fail_msg: This role depends on the Debian default of socket authentication for the root user
+
+    - name: Query the MariaDB databases, users and version using a socket
+      community.mysql.mysql_info:
+        filter:
+          - databases
+          - users
+          - version
+        return_empty_dbs: true
+        login_user: root
+        login_unix_socket: "{{ mariadb_defaults.socket }}"
+      register: mariadb_info
+
+    - name: Debug MariaDB info
+      ansible.builtin.debug:
+        var: mariadb_info
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+
+    - name: Set a variables for the MariaDB databases, users and version
+      ansible.builtin.set_fact:
+        mariadb_databases: "{{ mariadb_info.databases.keys() | list | reject('search', 'lost+found') | list }}"
+        mariadb_users: "{{ mariadb_info.users.localhost.keys() }}"
+        mariadb_version: "{{ mariadb_info.version.major }}.{{ mariadb_info.version.minor }}.{{ mariadb_info.version.release }}"
+
+    - name: Debug MariaDB databases
+      ansible.builtin.debug:
+        var: mariadb_databases
+        verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+
+    - name: Debug MariaDB users
+      ansible.builtin.debug:
+        var: mariadb_users
+        verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+
+    - name: Debug MariaDB version
+      ansible.builtin.debug:
+        var: mariadb_version
+        verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+
+  tags:
+    - mariadb
+    - mariadb_checks
+    - mariadb_info
+...

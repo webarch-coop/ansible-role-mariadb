@@ -44,27 +44,45 @@
       tags:
         - mariadb_local_facts
 
-    - name: Install MariaDB
+    - name: Install MariaDB packages
       block:
 
-        - name: Packages mariadb-server, mariadb-client and others present
+        - name: "{{ mariadb_task_name }}"
           ansible.builtin.apt:
             pkg: "{{ mariadb_pkgs }}"
             state: present
             update_cache: false
-          when:
-            - mariadb_pkgs is defined
-            - mariadb_pkgs != []
-            - mariadb_pkgs | difference(ansible_local.dpkg.installed) != []
+          vars:
+            mariadb_task_name: >-
+              Packages {% for mariadb_pkg in mariadb_pkgs | difference(ansible_local.dpkg.installed) %}{{ mariadb_pkg -}}
+              {%- if loop.length > 1 and not loop.last %}, {% endif %}{% endfor %} and dependancies installed
           register: mariadb_install
           notify: Restart mariadb
 
-        - name: Include local facts tasks
-          ansible.builtin.include_tasks: local_facts.yml
-          when: (mariadb_install is defined) and (mariadb_install.changed | bool)
+        - name: Include apt role local fact tasks  # noqa: no-handler
+          ansible.builtin.include_role:
+            name: apt
+            tasks_from: local_facts.yml
+          when:
+            - mariadb_install.changed is defined
+            - mariadb_install.changed | bool
 
+      when:
+        - mariadb_pkgs is defined
+        - mariadb_pkgs != []
+        - ansible_local.dpkg.installed is defined
+        - mariadb_pkgs | difference(ansible_local.dpkg.installed) != []
       tags:
         - mariadb_install
+
+    - name: Check variables and gather MariaDB info
+      ansible.builtin.include_tasks: checks.yml
+      when:
+        - ansible_local.dpkg.installed is defined
+        - ( "python3-mysqldb" in ansible_local.dpkg.installed )
+      tags:
+        - mariadb_checks
+        - mariadb_info
 
     - name: Configure MariaDB
       block:
@@ -78,8 +96,24 @@
           when:
             - mariadb_config is defined
             - mariadb_config != []
+
+        - name: Include systemd role
+          ansible.builtin.include_role:
+            name: systemd
+            tasks_from: unit_present.yml
+          loop: "{{ mariadb_systemd_units }}"
+          loop_control:
+            loop_var: systemd_unit
+            label: "{{ systemd_unit.name }}"
+          vars:
+          when:
+            - mariadb_systemd_units is defined
+            - mariadb_systemd_units != []
           tags:
-            - mariadb_conf
+            - mariadb_systemd
+
+      tags:
+        - mariadb_conf
 
     #    - name: MariaDB server defaults in place
     #      ansible.builtin.template:

@@ -11,6 +11,13 @@
 # The mariadb variable needs to be true for the tasks in this role to be run
 mariadb: true
 mariadb_config:
+  - name: MariaDB client configuration
+    path: /etc/mysql/mariadb.conf.d/50-client.cnf
+    state: edited
+    conf:
+      client:
+        default_character_set: utf8mb4
+        socket: "{{ mariadb_defaults.socket }}"
   - name: MariaDB server configuration
     path: /etc/mysql/mariadb.conf.d/50-server.cnf
     state: edited
@@ -42,8 +49,6 @@ mariadb_config:
     conf:
       mysqldump:
         max_allowed_packet: "64M"
-        quick:
-        quote_names:
 mariadb_pkgs:
   - jo
   - mariadb-client
@@ -59,15 +64,9 @@ mariadb_systemd_units:
         conf:
           Service:
             NoNewPrivileges: "true"
-            PrivateNetwork: "true"
+            PrivateNetwork: "false"
             PrivateTmp: "true"
             LimitNOFILE: "122880"
-
-mariadb_host: localhost
-mariadb_port: 3360
-# The mariadb_path is used as a test for the local facts
-mariadb_path: /usr/bin/mariadb
-mariadb_socket: /var/run/mysqld/mysqld.sock
 
 # Install MySQLTuner from GitHub
 # https://github.com/major/MySQLTuner-perl
@@ -81,77 +80,4 @@ mariadb_sys_schema: false
 # Import time zone tables
 mariadb_time_zone_import: true
 
-# Systemd security settings
-# https://mariadb.com/kb/en/library/systemd/
-mariadb_systemd_no_new_privileges: true
-mariadb_systemd_private_network: true
-mariadb_systemd_private_tmp: true
-
-# Performance settings
-mariadb_join_buffer_size: 8M
-mariadb_open_files_limit: 122880
-mariadb_table_open_cache: 4000
-mariadb_tmp_table_size: 32M
-mariadb_max_heap_table_size: "{{ mariadb_tmp_table_size }}"
-mariadb_max_allowed_packet: 64M
-mariadb_key_buffer_size: 16M
-mariadb_max_connections: 80
-max_user_connections: 0
-mariadb_table_cache: 64
-mariadb_thread_concurrency: 10
-mariadb_innodb_buffer_pool_size: 1G
-mariadb_innodb_log_file_size: 256M
-mariadb_innodb_buffer_pool_instances: 1
-# https://docs.nextcloud.com/server/25/admin_manual/configuration_database/linux_database_configuration.html#database-read-committed-transaction-isolation-level
-# mariadb_transaction_isolation: READ-COMMITTED
-# mariadb_binlog_format: ROW
-
-# Query cache configuration
-# https://mariadb.com/kb/en/query-cache/
-mariadb_query_cache_type: 0
-mariadb_query_cache_limit: 0
-mariadb_query_cache_size: 0
-
-# If the mariadb_root_auth variable is not set then nothing will be done to the
-# root account login, which, by default, uses a socket for logins and doesn't
-# have a password set, generally you will want to omit this option -- it is
-# only for cases where non-root users need to login to MariaDB as root that you
-# need to enable this.
-#
-# If the value of mariadb_root_auth is "password" and if /root/.my.cnf exists
-# then the MariaDB root password will be read from the file and set, if the
-# file doesn't exist then a new password will be generated, set and written to
-# that file.
-#
-# To reverse the setting of a root password set this variable to "socket"
-#
-# mariadb_root_auth: password
-
-# If the mariadb_username is not set then no user account or database will be
-# created
-#
-# If the mariadb_username is set but the mariadb_database name is not set then
-# the mariadb_username will be used as the mariadb_database name
-#
-# The mariadb_database will be created, if it didn't already exist
-#
-# If a system user account exists with the same name as the mariadb_username
-# then mariadb_mycnf is set to ~/.my.cnf
-#
-# If there is no system user account name that matches the mariadb_username
-# then mariadb_mycnf is set to /root/.mariadb_username.my.cnf
-#
-# If mariadb_mycnf doesn't exists and mariadb_password is not set then a random
-# password is generated for mariadb_password
-#
-# If mariadb_mycnf does exist then the mariadb_password is loaded from the file
-#
-# The mariadb_password will be written to mariadb_mycnf and the
-# mariadb_username database login updated to match
-#
-# mariadb_username:
-# mariadb_priv: ALL
-# mariadb_database:
-# mariadb_password:
-# mariadb_mycnf:
 ...

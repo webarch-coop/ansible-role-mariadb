@@ -2,9 +2,6 @@
 - name: MariaDB database user, database and login details present
   block:
 
-    - name: Include local facts tasks
-      ansible.builtin.include_tasks: local_facts.yml
-
     - name: Include user variable checks
       ansible.builtin.include_tasks: mariadb_user_checks.yml
 

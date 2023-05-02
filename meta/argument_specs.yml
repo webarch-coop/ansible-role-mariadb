@@ -57,10 +57,6 @@ argument_specs:
               - edited
               - present
               - templated
-      mariadb_host:
-        type: str
-        required: true
-        description: The MariaDB host for the local facts script.
       mariadb_mysqltuner:
         type: int
         required: true
@@ -74,18 +70,6 @@ argument_specs:
         elements: str
         required: false
         description: A list of packages to install.
-      mariadb_path:
-        type: str
-        required: true
-        description: The MariaDB executable path for the local facts script.
-      mariadb_port:
-        type: int
-        required: true
-        description: The MariaDB port for the local facts script.
-      mariadb_socket:
-        type: str
-        required: true
-        description: The path to the MariaDB socket.
       mariadb_sys_schema:
         type: bool
         required: true
