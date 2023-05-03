@@ -1,55 +1,48 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects MariaDB Ansible role.
+#
+# The Webarchitects MariaDB Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects MariaDB Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects MariaDB Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Install the MariaDB sys schema
+- name: Install or remove the MariaDB sys schema
   block:
 
-    - name: MariaDB sys repo directory present
-      ansible.builtin.file:
+    - name: Check if the MariaDB sys repo directory is present
+      ansible.builtin.stat:
         path: /usr/local/src/mariadb-sys
-        state: directory
-        mode: 0755
+      register: mariadb_sys_repo_path
 
-    - name: MariaDB sys schema repo present
-      ansible.builtin.git:
-        repo: https://github.com/webarch-coop/mariadb-sys.git
-        dest: /usr/local/src/mariadb-sys
-        clone: true
-        version: master
-
-    - name: Use shell to import the MariaDB sys schema
+    - name: Install the MariaDB sys schema when it is not already present
       block:
 
-        # Bash might be /bin/bash or /usr/bin/bash
-        - name: Run which bash
-          ansible.builtin.command: which bash
-          check_mode: false
-          changed_when: false
-          register: which_bash
-          failed_when: which_bash.stdout is not regex('\/bash$')
+        - name: MariaDB sys repo directory present
+          ansible.builtin.file:
+            path: /usr/local/src/mariadb-sys
+            state: directory
+            mode: 0755
 
-        - name: Set a variable for the path to Bash
-          ansible.builtin.set_fact:
-            bash: "{{ which_bash.stdout }}"
+        - name: MariaDB sys schema repo present
+          ansible.builtin.git:
+            repo: https://git.coop/webarch/mariadb-sys.git
+            dest: /usr/local/src/mariadb-sys
+            clone: true
+            version: v1.5.3
 
-        - name: Import the sys schema using the shell module
-          ansible.builtin.shell: |
-            set -e -o pipefail
-            mysql < ./mariadb_sys_install.sql
-          changed_when: true
-          args:
-            executable: "{{ bash }}"
-            chdir: /usr/local/src/mariadb-sys
+        - name: Use import the sys schema using community.mysql.mysql_db and a socket
+          community.mysql.mysql_db:
+            name: all
+            state: import
+            target: /usr/local/src/mariadb-sys/sys_10.sql
+            login_user: root
+            login_unix_socket: "{{ mariadb_socket }}"
 
-      when: mariadb_root_auth_current == "password"
-
-    - name: Use import the sys schema using community.mysql.mysql_db and a socket
-      community.mysql.mysql_db:
-        name: all
-        state: import
-        target: /usr/local/src/mariadb-sys/mariadb_sys_install.sql
-        login_user: root
-        login_unix_socket: /run/mysqld/mysqld.sock
-      when: mariadb_root_auth_current is regex('socket$')
+      when: not mariadb_sys_repo_path.stat.exists | bool
 
   tags:
     - mariadb
+    - mariadb_databases
 ...

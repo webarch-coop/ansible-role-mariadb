@@ -120,7 +120,10 @@
 
         - name: Include the MariaDB sys schema tasks
           ansible.builtin.include_tasks: sys.yml
-          when: (mariadb_sys_schema | bool) and ("sys" not in mariadb_databases)
+          when:
+            - mariadb_sys_schema | bool
+            - ( "sys" not in mariadb_databases )
+            - mariadb_version is ansible.builtin.version('10.6.0', 'gt')
 
         - name: Run mysql_upgrade
           ansible.builtin.command: mysql_upgrade

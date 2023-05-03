@@ -34,6 +34,7 @@ mariadb_config:
         max_heap_table_size: "32M"
         max_user_connections: "0"
         open_files_limit: "122880"
+        performance_schema: "on"
         query_cache_limit: "0"
         query_cache_size: "0"
         query_cache_type: "0"
@@ -50,6 +51,8 @@ mariadb_config:
     conf:
       mysqldump:
         max_allowed_packet: "64M"
+mariadb_mysqltuner: true
+mariadb_mysqltuner_version: latest
 mariadb_pkgs:
   - jo
   - mariadb-client
@@ -69,17 +72,6 @@ mariadb_systemd_units:
             PrivateNetwork: "true"
             PrivateTmp: "true"
             LimitNOFILE: "122880"
-
-# Install MySQLTuner from GitHub
-# https://github.com/major/MySQLTuner-perl
-mariadb_mysqltuner: true
-mariadb_mysqltuner_version: latest
-
-# If mariadb_sys_schema is true then the sys schema is imported from this repo
-# https://github.com/webarch-coop/mariadb-sys
 mariadb_sys_schema: false
-
-# Import time zone tables
 mariadb_time_zone_import: true
-
 ...
