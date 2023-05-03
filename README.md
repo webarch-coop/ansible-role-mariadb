@@ -8,11 +8,9 @@ This repository contains an Ansible role for installing and configuring [MariaDB
 
 Version 3.0.0 and greater of this role provide the option to edit or template MariaDB configuration files and use YAML dictionaries for the specification, existing files are read using [the JC ini parser](https://kellyjonbrazil.github.io/jc/docs/parsers/ini) and edited using the [community.general.ini_file module](https://docs.ansible.com/ansible/latest/collections/community/general/ini_file_module.html) or created or clobbered using the [ansible.builtin.template module](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/template_module.html).
 
-The last 2.x version of this role [version 2.4.2](https://git.coop/webarch/mariadb/-/releases/2.4.2) is the last version that contains Ansible tasks to switch between password and socket authentication for the root user, all 3.0.0 versions assume socket authentication is used.
+The last 2.x version of this role [version 2.4.2](https://git.coop/webarch/mariadb/-/releases/2.4.2) is the last version that contains Ansible tasks to switch between password and socket authentication for the root user, all 3.x versions assume socket authentication is used.
 
 Versions of this role including and prior to [version 1.9.1](https://git.coop/webarch/mariadb/-/tree/1.9.1) require Ansible 2.9 and use the command and shell modules for many tasks, version 2.0.0 onwards requires Ansible 2.10 and uses the [community.mysql collection](https://docs.ansible.com/ansible/latest/collections/community/mysql/).
-
-This role can be used to [switch the root users authentication plugin from `unix_socket` to `mysql_native_password`](tasks/mariadb_root_password.yml) and [back](tasks/info_socket.yml) and it also runs `mysql_upgrade`, [imports](tasks/sys.yml) the [sys schema](https://github.com/webarch-coop/mariadb-sys), [updates the timezone data](tasks/tz.yml) when needed and sets [some systemd defaults](templates/mariadb.conf.j2).
 
 ## Role variables
 
@@ -26,7 +24,7 @@ Set the `mariadb` variable to `true` for the tasks in this role to be run, it de
 
 An optional list of dictionaries which each require a `path` and a `state`, the `path` is the MariaDB configuration file path and the `state` specifies the state of the file, `absent` for removal, `edited` for an existing file to be edited using the [community.general.ini_file module](https://docs.ansible.com/ansible/latest/collections/community/general/ini_file_module.html), `present` for the file to be edited if it exists and `templated` if it doesn't, `templated` uses the [ansible.builtin.template module](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/template_module.html) to create or clobber the file.
 
-Optional variables are `conf` for a YAML dictionary representing the file configuration in the same format as provided by the [the JC ini parser](https://kellyjonbrazil.github.io/jc/docs/parsers/ini), `group` for the file group, `mode` for the octal mode of the file, `woner` for the owner of the file and `name` for a description of the file, for example:
+Optional variables are `conf` for a YAML dictionary representing the file configuration in the same format as provided by the [the JC ini parser](https://kellyjonbrazil.github.io/jc/docs/parsers/ini), `group` for the file group, `mode` for the octal mode of the file, `owner` for the owner of the file and `name` for a description of the file, for example:
 
 ```yaml
 mariadb_config:
@@ -63,11 +61,11 @@ mariadb_pkgs:
 
 ### mariadb_socket
 
-The path to the MariaDB socket.
+The path to the MariaDB socket, `mariadb_socket` defaults to `/run/mysqld/mysqld.sock`.
 
 ### mariadb_systemd_units
 
-A list to be use with the [systemd role](https://git.coop/webarch/systemd) as `systemd_units`, by default this role sets `PrivateNetwork` to `true`, set this to `false` if you need to connect to the server using `127.0.0.1` / TCP/IP in addition as `localhost`, which uses the socket.
+A list to be used with the [systemd role](https://git.coop/webarch/systemd) as `systemd_units`, by default this role sets `PrivateNetwork` to `true`, set this to `false` if you need to connect to the server using `127.0.0.1` / TCP/IP in addition as `localhost`, which uses the socket.
 
 The default value for `mariadb_systemd_units`:
 
