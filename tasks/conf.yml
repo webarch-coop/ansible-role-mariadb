@@ -42,7 +42,7 @@
             var: mariadb_cnf.conf
             verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
 
-        - name: Check that the MariaDB configuration file variables don't contain dashes
+        - name: "Check that the MariaDB configuration file variables don't contain dashes for {{ mariadb_cnf.path }}"
           ansible.builtin.assert:
             that:
               - mariadb_cnf_section.value | ansible.builtin.flatten | select('regex', '-') == []
@@ -57,26 +57,26 @@
         - name: Read the existing file when it exists
           block:
 
-            - name: Slurp the MariaDB configuration file when it exists
+            - name: "Slurp the MariaDB configuration file when it exists for {{ mariadb_cnf.path }}"
               ansible.builtin.slurp:
                 path: "{{ mariadb_cnf.path }}"
               register: mariadb_cnf_file_b64encoded
 
-            - name: Set a fact for the existing MariaDB configuration file variables
+            - name: "Set a fact for the existing MariaDB configuration file variables for {{ mariadb_cnf.path }}"
               ansible.builtin.set_fact:
                 mariadb_cnf_file_existing_vars: "{{ mariadb_cnf_file_b64encoded['content'] | ansible.builtin.b64decode | community.general.jc('ini') }}"
 
-            - name: Debug the existing MariaDB configuration file variables
+            - name: "Debug the existing MariaDB configuration file variables for {{ mariadb_cnf.path }}"
               ansible.builtin.debug:
                 var: mariadb_cnf_file_existing_vars
                 verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
 
-            - name: Debug the existing MariaDB configuration file sections
+            - name: "Debug the existing MariaDB configuration file sections for {{ mariadb_cnf.path }}"
               ansible.builtin.debug:
                 var: mariadb_cnf_file_existing_vars.keys()
                 verbosity: "{% if ansible_check_mode | bool %}2{% else %}3{% endif %}"
 
-            - name: Include the tasks to change dashes to underscores in existing MariaDB configuration file
+            - name: "Include the tasks to change dashes to underscores in existing MariaDB configuration file for {{ mariadb_cnf.path }}"
               ansible.builtin.include_tasks: conf_underscore.yml
               when: mariadb_cnf_section.value | ansible.builtin.flatten | select('regex', '-') != []
               loop: "{{ mariadb_cnf_file_existing_vars | ansible.builtin.dict2items }}"
@@ -86,14 +86,14 @@
 
           when: mariadb_cnf_file_path.stat.exists | bool
 
-        - name: Include the MariaDB configuration file templated tasks
+        - name: "Include the MariaDB configuration file templated tasks for {{ mariadb_cnf.path }}"
           ansible.builtin.include_tasks: conf_templated.yml
           when: >-
             ( mariadb_cnf.state == "templated" ) or
             ( ( mariadb_cnf.state == "present" ) and
             ( not mariadb_cnf_file_path.stat.exists ) )
 
-        - name: Include the MariaDB configuration edited tasks
+        - name: "Include the MariaDB configuration edited tasks for {{ mariadb_cnf.path }}"
           ansible.builtin.include_tasks: conf_edited.yml
           when: >-
             ( ( mariadb_cnf.state == "edited" ) or

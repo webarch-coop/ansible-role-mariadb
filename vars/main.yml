@@ -17,4 +17,13 @@ mariadb_jmesquery:
   cve: 'CVE'
   fragmented_tables: 'Tables."Fragmented tables"'
   recommendations: '"Recommendations"'
+
+mariadb_mysqltuner_versions:
+  - distro: bookworm
+    version: 1.9.9
+  - distro: bullseye
+    version: 1.7.17
+  - distro: buster
+    version: 1.7.13
+mariadb_mysqltuner_versions_jpq: "[?distro=='{{ ansible_distribution_release }}'].version|[0]"
 ...

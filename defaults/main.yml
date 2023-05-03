@@ -8,8 +8,7 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects MariaDB Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-# The mariadb variable needs to be true for the tasks in this role to be run
-mariadb: true
+mariadb: false
 mariadb_config:
   - name: MariaDB client configuration
     path: /etc/mysql/mariadb.conf.d/50-client.cnf
@@ -52,8 +51,9 @@ mariadb_config:
       mysqldump:
         max_allowed_packet: "64M"
 mariadb_mysqltuner: true
-mariadb_mysqltuner_version: latest
+mariadb_mysqltuner_version: "1.9.9"
 mariadb_pkgs:
+  - git
   - jo
   - mariadb-client
   - mariadb-server

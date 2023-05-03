@@ -11,25 +11,57 @@
 - name: MariaDB configuration file section edited
   block:
 
-    - name: Set a fact for the variables that are defined in the existing file
+    - name: "Debug the proposed values for section {{ mariadb_cnf_section.key }}"
+      ansible.builtin.debug:
+        var: mariadb_cnf_section.value
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+
+    - name: "Set a fact for the variables that are proposed and defined in the existing file and set value-less keys to an empty array for section {{ mariadb_cnf_section.key }}"
       ansible.builtin.set_fact:
-        mariadb_cnf_file_section_existing_keys: "{{ mariadb_cnf_file_existing_vars | community.general.json_query(mariadb_cnf_file_section_existing_keys_jpq) }}"
+        mariadb_cnf_file_section_existing_keys: "{{ mariadb_cnf_file_existing_vars | community.general.json_query(mariadb_cnf_file_section_existing_keys_jpq) | sort }}"
+        mariadb_cnf_file_section_proposed_keys: "{{ mariadb_cnf_section.value.keys() | sort }}"
+        mariadb_cnf_file_section_proposed_value_less_keys: []
       vars:
         mariadb_cnf_file_section_existing_keys_jpq: "{{ mariadb_cnf_section.key }}|keys(@)"
 
-    - name: Debug the existing and proposed MariaDB configuration file variables
+    - name: "Debug the existing variable keys for section {{ mariadb_cnf_section.key }}"
+      ansible.builtin.debug:
+        var: mariadb_cnf_file_section_existing_keys
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+
+    - name: "Debug the proposed variable keys for section {{ mariadb_cnf_section.key }}"
+      ansible.builtin.debug:
+        var: mariadb_cnf_file_section_proposed_keys
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+
+    - name: "Set a fact for the proposed variables without values for section {{ mariadb_cnf_section.key }}"
+      ansible.builtin.set_fact:
+        mariadb_cnf_file_section_proposed_value_less_keys: "{{ mariadb_cnf_file_section_proposed_value_less_keys + [mariadb_cnf_variable_pair.key] }}"
+      when: mariadb_cnf_variable_pair.value | type_debug == 'NoneType'
+      loop: "{{ mariadb_cnf_section.value | ansible.builtin.dict2items }}"
+      loop_control:
+        loop_var: mariadb_cnf_variable_pair
+        label: "{{ mariadb_cnf_variable_pair.key }}"
+
+    - name: "Debug the proposed variables without values for section {{ mariadb_cnf_section.key }}"
+      ansible.builtin.debug:
+        var: mariadb_cnf_file_section_proposed_value_less_keys
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+
+    - name: "Debug the existing and proposed MariaDB configuration file variables for section {{ mariadb_cnf_section.key }}"
       ansible.builtin.debug:
         msg:
           - "Path: {{ mariadb_cnf.path }}"
           - "Section: {{ mariadb_cnf_section.key }}"
           - "Existing: {% if mariadb_cnf_variable_pair.key in mariadb_cnf_file_section_existing_keys %}{{ mariadb_cnf_variable_pair.key }}: {{ mariadb_cnf_file_existing_vars | community.general.json_query(mariadb_cnf_variable_jpq) }}{% endif %}"
           - "Proposed: {{ mariadb_cnf_variable_pair.key }}{% if mariadb_cnf_variable_pair.value | type_debug != 'NoneType' %}: {{ mariadb_cnf_variable_pair.value }}{% endif %}"
-          - "Paoposed variable value type: {{ mariadb_cnf_variable_pair.value | type_debug  }}"
+          - "Paoposed variable value type: {{ mariadb_cnf_variable_pair.value | type_debug }}"
           - "Regex: ^[#][ ]{0,9}{{ mariadb_cnf_variable_pair.key | regex_replace('_', '[_-]') }}[ ]{0,9}[=]{0,1}"
         verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
       when: >-
         ( mariadb_cnf_variable_pair.key not in mariadb_cnf_file_section_existing_keys ) or
-        ( mariadb_cnf_variable_pair.value != mariadb_cnf_file_existing_vars | community.general.json_query(mariadb_cnf_variable_jpq) )
+        ( ( mariadb_cnf_variable_pair.key not in mariadb_cnf_file_section_proposed_value_less_keys ) and
+        ( mariadb_cnf_variable_pair.value != mariadb_cnf_file_existing_vars | community.general.json_query(mariadb_cnf_variable_jpq) ) )
       vars:
         mariadb_cnf_variable_jpq: '"{{ mariadb_cnf_section.key }}"."{{ mariadb_cnf_variable_pair.key }}"'
       loop: "{{ mariadb_cnf_section.value | ansible.builtin.dict2items }}"
@@ -38,7 +70,7 @@
         label: "{{ mariadb_cnf_variable_pair.key }}"
 
     # This is to ensure that variables are written to the same place as existing commented values
-    - name: Uncomment commented variables in the MariaDB configuration file that are to be edited
+    - name: "Uncomment commented variables in the MariaDB configuration file that are to be edited for section {{ mariadb_cnf_section.key }}"
       ansible.builtin.lineinfile:
         path: "{{ mariadb_cnf.path }}"
         line: "{{ mariadb_cnf_variable_pair.key }}{% if mariadb_cnf_variable_pair.value | type_debug != 'NoneType' %} = {{ mariadb_cnf_variable_pair.value }}{% endif %}"
@@ -50,16 +82,17 @@
         group: "{{ mariadb_cnf.owner | default('root') }}"
       when: >-
         ( mariadb_cnf_variable_pair.key not in mariadb_cnf_file_section_existing_keys ) or
-        ( mariadb_cnf_variable_pair.value != mariadb_cnf_file_existing_vars | community.general.json_query(mariadb_cnf_variable_jpq) )
+        ( ( mariadb_cnf_variable_pair.value | type_debug != "NoneType" ) and
+        ( mariadb_cnf_variable_pair.value != mariadb_cnf_file_existing_vars | community.general.json_query(mariadb_cnf_variable_jpq) ) )
       vars:
         mariadb_cnf_variable_jpq: '"{{ mariadb_cnf_section.key }}"."{{ mariadb_cnf_variable_pair.key }}"'
         mariadb_cnf_variable_regex: "^[#][ ]{0,9}{{ mariadb_cnf_variable_pair.key | regex_replace('_', '[_-]') }}[ ]{0,9}[=]{0,1}"
       loop: "{{ mariadb_cnf_section.value | ansible.builtin.dict2items }}"
       loop_control:
         loop_var: mariadb_cnf_variable_pair
-        label: "{{ mariadb_cnf_variable_pair.key }}"
+        label: "{{ mariadb_cnf_variable_pair.key }}{% if mariadb_cnf_variable_pair.value | type_debug != 'NoneType' %} = {{ mariadb_cnf_variable_pair.value }}{% endif %}"
 
-    - name: MariaDB configuration file edited for keys without values
+    - name: "MariaDB configuration file edited for keys without values for section {{ mariadb_cnf_section.key }}"
       community.general.ini_file:
         path: "{{ mariadb_cnf.path }}"
         section: "{{ mariadb_cnf_section.key }}"
@@ -69,18 +102,17 @@
         mode: "{{ mariadb_cnf.mode | default('0644') }}"
         owner: "{{ mariadb_cnf.owner | default('root') }}"
         group: "{{ mariadb_cnf.owner | default('root') }}"
-      when: >-
-        ( mariadb_cnf_variable_pair.value | type_debug == 'NoneType' ) and
-        ( ( mariadb_cnf_variable_pair.key not in mariadb_cnf_file_section_existing_keys ) or
-        ( mariadb_cnf_variable_pair.value != mariadb_cnf_file_existing_vars | community.general.json_query(mariadb_cnf_variable_jpq) ) )
+      when:
+        - mariadb_cnf_variable_pair.key in mariadb_cnf_file_section_proposed_value_less_keys
+        - mariadb_cnf_variable_pair.key not in mariadb_cnf_file_section_existing_keys
       vars:
         mariadb_cnf_variable_jpq: '"{{ mariadb_cnf_section.key }}"."{{ mariadb_cnf_variable_pair.key }}"'
       loop: "{{ mariadb_cnf_section.value | ansible.builtin.dict2items }}"
       loop_control:
         loop_var: mariadb_cnf_variable_pair
-        label: "{{ mariadb_cnf_variable_pair.key }} = {{ mariadb_cnf_variable_pair.value }}"
+        label: "{{ mariadb_cnf_variable_pair.key }}"
 
-    - name: MariaDB configuration file edited for keys with values
+    - name: "MariaDB configuration file edited for keys with values for section {{ mariadb_cnf_section.key }}"
       community.general.ini_file:
         path: "{{ mariadb_cnf.path }}"
         section: "{{ mariadb_cnf_section.key }}"
@@ -91,7 +123,7 @@
         owner: "{{ mariadb_cnf.owner | default('root') }}"
         group: "{{ mariadb_cnf.owner | default('root') }}"
       when: >-
-        ( mariadb_cnf_variable_pair.value | type_debug != 'NoneType' ) and
+        ( mariadb_cnf_variable_pair.key not in mariadb_cnf_file_section_proposed_value_less_keys ) and
         ( ( mariadb_cnf_variable_pair.key not in mariadb_cnf_file_section_existing_keys ) or
         ( mariadb_cnf_variable_pair.value != mariadb_cnf_file_existing_vars | community.general.json_query(mariadb_cnf_variable_jpq) ) )
       vars:

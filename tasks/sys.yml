@@ -36,6 +36,7 @@
           community.mysql.mysql_db:
             name: all
             state: import
+            chdir: /usr/local/src/mariadb-sys
             target: /usr/local/src/mariadb-sys/sys_10.sql
             login_user: root
             login_unix_socket: "{{ mariadb_socket }}"
@@ -44,5 +45,5 @@
 
   tags:
     - mariadb
-    - mariadb_databases
+    - mariadb_conf
 ...

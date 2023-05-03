@@ -11,11 +11,11 @@
 - name: MariaDB configuration file edited
   block:
 
-    - name: Set a fact for the MariaDB configuration file backup path
+    - name: "Set a fact for the MariaDB configuration file backup path for {{ mariadb_cnf.path }}"
       ansible.builtin.set_fact:
         mariadb_cnf_file_path_backup: "{{ mariadb_cnf.path | ansible.builtin.dirname }}/.{{ mariadb_cnf.path | ansible.builtin.basename }}.{{ ansible_date_time.iso8601_basic_short }}.bak"
 
-    - name: MariaDB configuration file backup present
+    - name: "MariaDB configuration file backup present {{ mariadb_cnf_file_path_backup }}"
       ansible.builtin.copy:
         src: "{{ mariadb_cnf.path }}"
         dest: "{{ mariadb_cnf_file_path_backup }}"
@@ -27,19 +27,20 @@
       register: mariadb_cnf_file_backup
       when: mariadb_cnf_file_path.stat.exists | bool
 
-    - name: Debug MariaDB configuration file backup
+    - name: "Debug MariaDB configuration file backup for {{ mariadb_cnf.path }}"
       ansible.builtin.debug:
         var: mariadb_cnf_file_backup
         verbosity: "{% if ansible_check_mode | bool %}2{% else %}3{% endif %}"
 
-    - name: Include the MariaDB configuration file section edited tasks
+    - name: "Include the MariaDB configuration file section edited tasks for {{ mariadb_cnf.path }}"
       ansible.builtin.include_tasks: conf_section_edited.yml
       loop: "{{ mariadb_cnf.conf | dict2items }}"
       loop_control:
         loop_var: mariadb_cnf_section
+        label: "{{ mariadb_cnf_section.key }}"
       when: mariadb_cnf_section.keys() | length != 0
 
-    - name: Ansible managed comment present at the top of the MariaDB configuration file
+    - name: "Ansible managed comment present at the top of the MariaDB configuration file {{ mariadb_cnf.path }}"
       ansible.builtin.lineinfile:
         path: "{{ mariadb_cnf.path }}"
         line: "# Ansible managed"
@@ -49,7 +50,7 @@
         owner: "{{ mariadb_cnf.owner | default('root') }}"
         group: "{{ mariadb_cnf.owner | default('root') }}"
 
-    - name: Vim syntaxhighlighting modeline present at the end of the MariaDB configuration file
+    - name: "Vim syntaxhighlighting modeline present at the end of the MariaDB configuration file {{ mariadb_cnf.path }}"
       ansible.builtin.lineinfile:
         path: "{{ mariadb_cnf.path }}"
         line: "# vim: syntax=dosini"
@@ -59,7 +60,7 @@
         owner: "{{ mariadb_cnf.owner | default('root') }}"
         group: "{{ mariadb_cnf.owner | default('root') }}"
 
-    - name: Stat the MariaDB configuration file
+    - name: "Stat the MariaDB configuration file {{ mariadb_cnf.path }}"
       ansible.builtin.stat:
         path: "{{ mariadb_cnf.path }}"
         get_checksum: true
@@ -71,7 +72,7 @@
         var: mariadb_cnf_file_edited
         verbosity: "{% if ansible_check_mode | bool %}2{% else %}3{% endif %}"
 
-    - name: MariaDB configuration file backup absent when it is unchanged
+    - name: "MariaDB configuration file backup absent when it is unchanged {{ mariadb_cnf_file_path_backup }}"
       ansible.builtin.file:
         path: "{{ mariadb_cnf_file_path_backup }}"
         state: absent

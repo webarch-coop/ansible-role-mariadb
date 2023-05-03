@@ -79,6 +79,7 @@
       ansible.builtin.include_tasks: checks.yml
       when:
         - ansible_local.dpkg.installed is defined
+        - ( "mariadb-server" in ansible_local.dpkg.installed )
         - ( "python3-mysqldb" in ansible_local.dpkg.installed )
       tags:
         - mariadb_checks
@@ -86,6 +87,22 @@
 
     - name: Configure MariaDB
       block:
+
+        - name: Stat /etc/mysql/my.cnf
+          ansible.builtin.stat:
+            path: /etc/mysql/my.cnf
+          register: mariadb_etc_my_cnf
+
+        - name: Conditionally include the update-alternatives tasks
+          ansible.builtin.include_tasks: update.yml
+          when:
+            - mariadb_etc_my_cnf.stat is defined
+            - not mariadb_etc_my_cnf.stat.islnk | bool
+
+        - name: Run mysql_upgrade
+          ansible.builtin.command: mysql_upgrade
+          register: mariadb_upgrade
+          changed_when: ( "This installation of MariaDB is already upgraded" not in mariadb_upgrade.stdout )
 
         - name: Include the MariaDB configuration file tasks
           ansible.builtin.include_tasks: conf.yml
@@ -97,7 +114,7 @@
             - mariadb_config is defined
             - mariadb_config != []
 
-        - name: Include systemd role
+        - name: Include the systemd role
           ansible.builtin.include_role:
             name: systemd
             tasks_from: unit_present.yml
@@ -109,53 +126,39 @@
             - mariadb_systemd_units is defined
             - mariadb_systemd_units != []
 
+        - name: Conditionally include the MariaDB sys schema tasks
+          ansible.builtin.include_tasks: sys.yml
+          when:
+            - mariadb_sys_schema | bool
+            - ( "sys" not in mariadb_databases )
+            - mariadb_version is ansible.builtin.version('10.6.0', 'lt')
+
+        - name: Conditionally include the the time zone tables import tasks
+          ansible.builtin.include_tasks: tz.yml
+          when:
+            - mariadb_time_zone_import is defined
+            - mariadb_time_zone_import | bool
+
+        - name: Conditionally include the user and database creation tasks
+          ansible.builtin.include_tasks: mariadb_user.yml
+          when:
+            - mariadb_username is defined
+            - mariadb_username | length > 0
+
+        - name: Conditionally include MySQLTuner tasks
+          ansible.builtin.include_tasks: mysqltuner.yml
+          when:
+            - mariadb_mysqltuner is defined
+            - mariadb_mysqltuner | bool
+          tags:
+            - mariadb_mysqltuner
+            - mysqltuner
+
       when:
         - ansible_local.dpkg.installed is defined
         - ( "mariadb-server" in ansible_local.dpkg.installed )
       tags:
         - mariadb_conf
-
-    - name: MariaDB database tasks
-      block:
-
-        - name: Include the MariaDB sys schema tasks
-          ansible.builtin.include_tasks: sys.yml
-          when:
-            - mariadb_sys_schema | bool
-            - ( "sys" not in mariadb_databases )
-            - mariadb_version is ansible.builtin.version('10.6.0', 'gt')
-
-        - name: Run mysql_upgrade
-          ansible.builtin.command: mysql_upgrade
-          register: mariadb_upgrade
-          changed_when: ("This installation of MariaDB is already upgraded" not in mariadb_upgrade.stdout)
-
-        - name: Stat /etc/mysql/my.cnf
-          ansible.builtin.stat:
-            path: /etc/mysql/my.cnf
-          register: mariadb_etc_my_cnf
-
-        - name: Conditionally include the update-alternatives tasks
-          ansible.builtin.include_tasks: update.yml
-          when: (mariadb_etc_my_cnf is defined) and (not mariadb_etc_my_cnf.stat.islnk | bool)
-
-        - name: Conditionally import the time zone tables import tasks
-          ansible.builtin.include_tasks: tz.yml
-          when: (mariadb_time_zone_import is defined) and (mariadb_time_zone_import | bool)
-
-        - name: Conditionally include the user and database creation tasks
-          ansible.builtin.include_tasks: mariadb_user.yml
-          when: (mariadb_username is defined) and (mariadb_username | length > 0)
-
-        - name: Include mysqltuner tasks
-          ansible.builtin.include_tasks: mysqltuner.yml
-          when: mariadb_mysqltuner | bool
-
-      when:
-        - ansible_local.dpkg.installed is defined
-        - ( "mariadb-server" in ansible_local.dpkg.installed )
-      tags:
-        - mariadb_databases
 
   when: mariadb | bool
   tags:
