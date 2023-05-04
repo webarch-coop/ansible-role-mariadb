@@ -14,37 +14,27 @@
     - name: Debug the mariadb_username variable
       ansible.builtin.debug:
         var: mariadb_username
-      when:
-        - mariadb_username is defined
-        - mariadb_username | length > 0
+      when: mariadb_username is defined
 
     - name: Debug the mariadb_database variable
       ansible.builtin.debug:
         var: mariadb_database
-      when:
-        - mariadb_database is defined
-        - mariadb_database | length > 0
+      when: mariadb_database is defined
 
     - name: Debug the mariadb_mycnf variable
       ansible.builtin.debug:
         var: mariadb_mycnf
-      when:
-        - mariadb_mycnf is defined
-        - mariadb_mycnf | length > 0
+      when: mariadb_mycnf is defined
 
     - name: Debug the mariadb_mycnf_owner variable
       ansible.builtin.debug:
         var: mariadb_mycnf_owner
-      when:
-        - mariadb_mycnf_owner is defined
-        - mariadb_mycnf_owner | length > 0
+      when: mariadb_mycnf_owner is defined
 
     - name: Debug the mariadb_mycnf_group variable
       ansible.builtin.debug:
         var: mariadb_mycnf_group
-      when:
-        - mariadb_mycnf_group is defined
-        - mariadb_mycnf_group | length > 0
+      when: mariadb_mycnf_group is defined
 
   tags:
     - mariadb
