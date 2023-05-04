@@ -140,7 +140,7 @@
             - mariadb_time_zone_import | bool
 
         - name: Conditionally include the user and database creation tasks
-          ansible.builtin.include_tasks: mariadb_user.yml
+          ansible.builtin.include_tasks: user.yml
           when:
             - mariadb_username is defined
             - mariadb_username | length > 0

@@ -93,13 +93,13 @@ A boolean, which defaults to `true`. which results in `mysql_tzinfo_to_sql` bein
 
 ## Creating users and databases
 
-You can call the `mariadb_user.yml` tasks multiple times, for example:
+You can call the `user.yml` tasks multiple times, for example:
 
 ```yaml
 - name: Create database and user for WordPress
   include_role:
     name: mariadb
-    tasks_from: mariadb_user.yml
+    tasks_from: user.yml
   vars:
     mariadb_database: wordpress
     mariadb_username: wordpress
@@ -117,7 +117,7 @@ You can call the `mariadb_user.yml` tasks multiple times, for example:
 - name: Create database and user for Matomo
   include_role:
     name: mariadb
-    tasks_from: mariadb_user.yml
+    tasks_from: user.yml
   vars:
     mariadb_database: matomo
     mariadb_username: matomo
@@ -128,7 +128,7 @@ You can call the `mariadb_user.yml` tasks multiple times, for example:
 - name: Create database and user for Nextcloud
   include_role:
     name: mariadb
-    tasks_from: mariadb_user.yml
+    tasks_from: user.yml
   vars:
     mariadb_database: nextcloud
     mariadb_username: nextcloud

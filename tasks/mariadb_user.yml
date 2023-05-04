@@ -1,0 +1,24 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects MariaDB Ansible role.
+#
+# The Webarchitects MariaDB Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects MariaDB Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects MariaDB Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+# This file exists for other roles that include mariadb_user.yml
+- name: Warn that the files has moved from mariadb_user.yml to user.yml
+  ansible.builtin.debug:
+    msg: "Please update the role calling this file to use tasks_from user.yml not mariadb_user.yml"
+  tags:
+    - mariadb
+    - mariadb_user
+
+- name: Include the user tasks
+  ansible.builtin.include_tasks: user.yml
+  tags:
+    - mariadb
+    - mariadb_user
+...
