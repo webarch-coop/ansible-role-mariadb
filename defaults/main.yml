@@ -75,12 +75,27 @@ mariadb_systemd_units:
 mariadb_sys_schema: false
 mariadb_time_zone_import: true
 
-
-mariadb_database:
-mariadb_mycnf:
-mariadb_mycnf_group:
-mariadb_mycnf_owner:
+# mariadb_database:
+# mariadb_mycnf:
+# mariadb_mycnf_group:
+# mariadb_mycnf_owner:
 mariadb_priv:
-  - ALL
-mariadb_username:
+  - ALTER
+  - ALTER ROUTINE
+  - CREATE
+  - CREATE ROUTINE
+  - CREATE TEMPORARY TABLES
+  - CREATE VIEW
+  - DELETE
+  - DROP
+  - EXECUTE
+  - INDEX
+  - INSERT
+  - LOCK TABLES
+  - REFERENCES
+  - SELECT
+  - SHOW VIEW
+  - TRIGGER
+  - UPDATE
+# mariadb_username:
 ...

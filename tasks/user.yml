@@ -18,7 +18,7 @@
         login_unix_socket: "{{ mariadb_socket }}"
         name: "{{ mariadb_username }}"
         password: "{{ mariadb_password }}"
-        priv: "{{ mariadb_database }}.*:{{ mariadb_priv }}"
+        priv: "{{ mariadb_database }}.*:{% for mariadb_p in mariadb_priv %}{{ mariadb_p }}{% if not loop.last %},{% endif %}{% endfor %}"
         state: present
         update_password: always
       no_log: "{% if ansible_verbosity <= 2 %}true{% else %}false{% endif %}"
