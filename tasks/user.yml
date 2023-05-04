@@ -21,7 +21,7 @@
         priv: "{{ mariadb_database }}.*:{{ mariadb_priv }}"
         state: present
         update_password: always
-      no_log: true
+      no_log: "{% if ansible_verbosity <= 2 %}true{% else %}false{% endif %}"
 
     - name: "MariaDB .my.cnf present at {{ mariadb_mycnf }}"
       ansible.builtin.template:
@@ -31,7 +31,7 @@
         group: "{{ mariadb_mycnf_group }}"
         mode: 0640
         force: true
-      no_log: true
+      no_log: "{% if ansible_verbosity <= 2 %}true{% else %}false{% endif %}"
 
   tags:
     - mariadb
