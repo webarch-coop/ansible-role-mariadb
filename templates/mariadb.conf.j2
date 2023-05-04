@@ -1,7 +1,0 @@
-# {{ ansible_managed }}
-[Service]
-NoNewPrivileges={{ mariadb_systemd_no_new_privileges | lower }}
-PrivateNetwork={{ mariadb_systemd_private_network | lower }}
-PrivateTmp={{ mariadb_systemd_private_tmp | lower }}
-LimitNOFILE={{ mariadb_open_files_limit }}
-# vim: set ft=systemd:

@@ -1,49 +1,47 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects MariaDB Ansible role.
+#
+# The Webarchitects MariaDB Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects MariaDB Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects MariaDB Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Set variables and paths
+- name: Set MariaDB variables and paths
   block:
 
-    - name: Check that socket authentication is being used
-      ansible.builtin.assert:
-        that:
-          - mariadb_root_auth_current is regex('socket$')
-        fail_msg: "The user tasks in this role have been written to use socket authentication"
-
     - name: Include debugging
-      ansible.builtin.include_tasks: mariadb_user_checks_debug.yml
-      when: ((enable_task_debugger is defined) and (enable_task_debugger | bool)) or (ansible_verbosity >= 2)
+      ansible.builtin.include_tasks: user_checks_debug.yml
+      when: >-
+        ( ( enable_task_debugger is defined ) and
+        ( enable_task_debugger | bool ) ) or
+        ( ansible_verbosity >= 2 )
 
-    # Max length is 64 characters https://dev.mysql.com/doc/refman/8.0/en/identifier-length.html
     - name: Check the mariadb_username variable is valid
       ansible.builtin.assert:
         that:
-          - (mariadb_username is defined) and (mariadb_username | length > 0)
-          - (mariadb_username is regex("^[a-z0-9_]*$"))
-          - (mariadb_username is regex("^.{2,25}$"))
-
-    - name: Set the priv to ALL if not defined
-      ansible.builtin.set_fact:
-        mariadb_priv: "ALL"
-      when: (mariadb_priv is not defined) or (mariadb_priv | length <= 0)
-
-    # https://mariadb.com/kb/en/library/grant/#table-privileges
-    - name: Check that the MariaDB database privileges are valid
-      ansible.builtin.assert:
-        that:
-          - (mariadb_priv is defined) and (mariadb_priv | length > 0)
-          - (mariadb_priv is regex("^ALL|ALTER|CREATE|CREATEVIEW|DELETE|DELETEHISTORY|DROP|GRANTOPTION|INDEX|INSERT|REFERENCES|SELECT|SHOWVIEW|TRIGGER|UPDATE$"))
+          - mariadb_username is defined
+          - mariadb_username is regex("^[a-z0-9_]{1,64}$")
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: Check the mariadb_database variable is valid if defined
       ansible.builtin.assert:
         that:
-          - (mariadb_username | length > 0)
-          - (mariadb_database is regex("^[a-z0-9_]*$"))
-          - (mariadb_database is regex("^.{2,25}$"))
-      when: (mariadb_database is defined)
+          - mariadb_database is regex("^[a-z0-9_]{1,64}$")
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+      when: mariadb_database is defined
+
+    - name: Include verify variable tasks for MariaDB
+      ansible.builtin.include_tasks: verify.yml
+      when:
+        - mariadb_verify is defined
+        - mariadb_verify | bool
 
     - name: Set the mariadb_database name to match the mariadb_username if it is not defined
       ansible.builtin.set_fact:
         mariadb_database: "{{ mariadb_username }}"
-      when: (mariadb_database is not defined) or (mariadb_database | length == 0)
+      when: mariadb_database is not defined
 
     - name: Slurp /etc/group
       ansible.builtin.slurp:
@@ -62,18 +60,15 @@
 
     - name: Set facts for users and groups
       ansible.builtin.set_fact:
-        mariadb_groups: "{{ mariadb_group | community.general.json_query(mariadb_jmespath_groups) }}"
-        mariadb_users: "{{ mariadb_passwd | community.general.json_query(mariadb_jmespath_users) }}"
-      vars:
-        mariadb_jmespath_groups: "[].group_name"
-        mariadb_jmespath_users: "[].username"
+        mariadb_groups: "{{ mariadb_group | community.general.json_query(mariadb_jpq.groups) }}"
+        mariadb_users: "{{ mariadb_passwd | community.general.json_query(mariadb_jpq.users) }}"
 
     - name: Set a fact for .my.cnf path and owner if a user account matching the MariaDB username exists
       ansible.builtin.set_fact:
-        mariadb_mycnf: "{{ mariadb_passwd | community.general.json_query(mariadb_jmespath_passwd_home) }}/.my.cnf"
+        mariadb_mycnf: "{{ mariadb_passwd | community.general.json_query(mariadb_jpq_passwd_home) }}/.my.cnf"
         mariadb_mycnf_owner: "{{ mariadb_username }}"
       vars:
-        mariadb_jmespath_passwd_home: "[?username=='{{ mariadb_username }}'].home|[0]"
+        mariadb_jpq_passwd_home: "[?username=='{{ mariadb_username }}'].home|[0]"
       when: mariadb_username in mariadb_users
 
     - name: Set a fact for .my.cnf group if a group account matching the MariaDB username exists
@@ -96,18 +91,23 @@
     - name: Debug mariadb_mycnf_path
       ansible.builtin.debug:
         var: mariadb_mycnf_path
-        verbosity: 2
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
       when: mariadb_mycnf_path is defined
 
     - name: "Set a fact if {{ mariadb_mycnf }} exists"
       ansible.builtin.set_fact:
         mariadb_mycnf_present: true
-      when: (mariadb_mycnf_path is defined) and (mariadb_mycnf_path.stat.exists | bool)
+      when:
+        - mariadb_mycnf_path.stat.exists is defined
+        - mariadb_mycnf_path.stat.exists | bool
 
     - name: "Set a fact if {{ mariadb_mycnf }} doesn't exist"
       ansible.builtin.set_fact:
         mariadb_mycnf_present: false
-      when: (mariadb_mycnf_path is not defined) or ((mariadb_mycnf_path is defined) and (not mariadb_mycnf_path.stat.exists | bool))
+      when: >-
+        ( mariadb_mycnf_path is not defined ) or
+        ( ( mariadb_mycnf_path is defined ) and
+        ( not mariadb_mycnf_path.stat.exists | bool ) )
 
     - name: "Read the password from {{ mariadb_mycnf }}"
       block:
@@ -128,13 +128,15 @@
             loop_var: line
           no_log: "{% if ansible_verbosity <= 2 %}true{% else %}false{% endif %}"
 
-      when: (mariadb_mycnf_present is defined) and (mariadb_mycnf_present | bool)
+      when:
+        - mariadb_mycnf_present is defined
+        - mariadb_mycnf_present | bool
 
     - name: Generate a password
       block:
 
         - name: "Generate a random password for {{ mariadb_username }} as it is not defined or empty"
-          ansible.builtin.command: "pwgen -n {{ 24 | random(14) }} 1"
+          ansible.builtin.command: "pwgen -n {{ 36 | random(24) }} 1"
           check_mode: false
           changed_when: false
           register: mariadb_password_gen
@@ -145,7 +147,9 @@
             mariadb_password: "{{ mariadb_password_gen.stdout | trim | quote }}"
           no_log: "{% if ansible_verbosity <= 2 %}true{% else %}false{% endif %}"
 
-      when: (mariadb_mycnf_present is defined) and (not mariadb_mycnf_present | bool)
+      when:
+        - mariadb_mycnf_present is defined
+        - not mariadb_mycnf_present | bool
 
     - name: Fail if any variables are not defined
       ansible.builtin.assert:
@@ -155,10 +159,14 @@
           - mariadb_database is defined
           - mariadb_mycnf is defined
           - mariadb_priv is defined
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     - name: Include debugging
-      ansible.builtin.include_tasks: mariadb_user_checks_debug.yml
-      when: ((enable_task_debugger is defined) and (enable_task_debugger | bool)) or (ansible_verbosity >= 2)
+      ansible.builtin.include_tasks: user_checks_debug.yml
+      when: >-
+        ( ( enable_task_debugger is defined ) and
+        ( enable_task_debugger | bool ) ) or
+        ( ansible_verbosity >= 2 )
 
   tags:
     - mariadb

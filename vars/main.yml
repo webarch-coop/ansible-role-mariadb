@@ -12,11 +12,15 @@
 mariadbvarnames: "{{ q('varnames', '^mariadb_') | sort }}"
 mariadbhostvars: "{{ dict(mariadbvarnames | list | zip(q('vars', *mariadbvarnames))) }}"
 
-mariadb_jmesquery:
-  adjust_variables: 'AdjustVariables'
+# JMESPath queries
+mariadb_jpq:
+  adjvars: 'AdjustVariables'
   cve: 'CVE'
-  fragmented_tables: 'Tables."Fragmented tables"'
-  recommendations: '"Recommendations"'
+  fragtabs: 'Tables."Fragmented tables"'
+  groups: "[].group_name"
+  tunerver: "[?distro=='{{ ansible_distribution_release }}'].version|[0]"
+  recs: '"Recommendations"'
+  users: "[].username"
 
 mariadb_mysqltuner_versions:
   - distro: bookworm
@@ -25,5 +29,4 @@ mariadb_mysqltuner_versions:
     version: 1.7.17
   - distro: buster
     version: 1.7.13
-mariadb_mysqltuner_versions_jpq: "[?distro=='{{ ansible_distribution_release }}'].version|[0]"
 ...

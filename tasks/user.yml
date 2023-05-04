@@ -3,16 +3,16 @@
   block:
 
     - name: Include user variable checks
-      ansible.builtin.include_tasks: mariadb_user_checks.yml
+      ansible.builtin.include_tasks: user_checks.yml
 
-    - name: "MariaDB database {{ mariadb_database }} present"
+    - name: "MariaDB database present {{ mariadb_database }}"
       community.mysql.mysql_db:
         login_user: root
         login_unix_socket: "{{ mariadb_socket }}"
         name: "{{ mariadb_database }}"
         state: present
 
-    - name: "MariaDB user present {{ mariadb_username }} present using unix_socket"
+    - name: "MariaDB user present {{ mariadb_username }}"
       community.mysql.mysql_user:
         login_user: root
         login_unix_socket: "{{ mariadb_socket }}"
@@ -23,7 +23,7 @@
         update_password: always
       no_log: true
 
-    - name: "MariaDB .my.cnf for {{ mariadb_username }} present at {{ mariadb_mycnf }}"
+    - name: "MariaDB .my.cnf present at {{ mariadb_mycnf }}"
       ansible.builtin.template:
         src: templates/my.cnf.j2
         dest: "{{ mariadb_mycnf }}"

@@ -36,7 +36,7 @@
     - name: Set a fact for the version of MySQLTuner that is required and the Debian version
       ansible.builtin.set_fact:
         mariadb_mysqltuner_version_required: "{% if mariadb_mysqltuner_version == 'latest' %}{{ mariadb_mysqltuner_version_latest }}{% else %}{{ mariadb_mysqltuner_version }}{% endif %}"
-        mariadb_mysqltuner_version_debian: "{{ mariadb_mysqltuner_versions | community.general.json_query(mariadb_mysqltuner_versions_jpq) }}"
+        mariadb_mysqltuner_version_debian: "{{ mariadb_mysqltuner_versions | community.general.json_query(mariadb_jpq.tunerver) }}"
 
     - name: Use a Debian version of MySQLTuner
       block:
@@ -186,11 +186,11 @@
 
         - name: Set facts
           ansible.builtin.set_fact:
-            mariadb_mysqltuner_results: "{{ mariadb_mysqltuner_command.stdout | from_json }}"
-            mariadb_mysqltuner_adjust_variables: "{{ mariadb_mysqltuner_command.stdout | from_json | json_query(mariadb_jmesquery.adjust_variables) }}"
-            mariadb_mysqltuner_recommendations: "{{ mariadb_mysqltuner_command.stdout | from_json | json_query(mariadb_jmesquery.recommendations) }}"
-            mariadb_mysqltuner_fragmented_tables: "{{ mariadb_mysqltuner_command.stdout | from_json | json_query(mariadb_jmesquery.fragmented_tables) }}"
-            mariadb_mysqltuner_cve: "{{ mariadb_mysqltuner_command.stdout | from_json | json_query(mariadb_jmesquery.cve) }}"
+            mariadb_mysqltuner_results: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json }}"
+            mariadb_mysqltuner_adjust_variables: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.adjvars) }}"
+            mariadb_mysqltuner_recommendations: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.recs) }}"
+            mariadb_mysqltuner_fragmented_tables: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.fragtabs) }}"
+            mariadb_mysqltuner_cve: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.cve) }}"
 
         - name: Print mysqltuner full results when running with -v
           ansible.builtin.debug:

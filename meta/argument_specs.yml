@@ -57,6 +57,22 @@ argument_specs:
               - edited
               - present
               - templated
+      mariadb_database:
+        type: str
+        required: false
+        description: MariaDB database name.
+      mariadb_mycnf:
+        type: str
+        reqired: false
+        description: MariaDB my.cnf file path.
+      mariadb_mycnf_group:
+        type: str
+        reqired: false
+        description: MariaDB my.cnf file group.
+      mariadb_mycnf_owner:
+        type: str
+        reqired: false
+        description: MariaDB my.cnf file owner.
       mariadb_mysqltuner:
         type: int
         required: true
@@ -70,6 +86,35 @@ argument_specs:
         elements: str
         required: false
         description: A list of packages to install.
+      mariadb_priv:
+        type: list
+        elements: str
+        required: false
+        description: MariaDB database privileges.
+        choices:
+          - ALL
+          - ALTER
+          - ALTER ROUTINE
+          - CREATE
+          - CREATE ROUTINE
+          - CREATE TEMPORARY TABLES
+          - CREATE VIEW
+          - DELETE
+          - DELETE HISTORY
+          - DROP
+          - EVENT
+          - EXECUTE
+          - GRANT
+          - GRANT OPTION
+          - LOCK TABLES
+          - INDEX
+          - INSERT
+          - PROXY
+          - REFERENCES
+          - SELECT
+          - SHOW VIEW
+          - TRIGGER
+          - UPDATE
       mariadb_socket:
         type: str
         required: true
@@ -135,4 +180,62 @@ argument_specs:
         type: bool
         required: true
         description: Import the time zone tables.
+      mariadb_username:
+        type: str
+        required: false
+        description: MariaDB user name.
+  user:
+    author: Chris Croome
+    description: Ansible role for installing and configuring MariaDB on Debian
+    short_description: The user entry point for the MariaDB role.
+    options:
+      mariadb_database:
+        type: str
+        required: false
+        description: MariaDB database name.
+      mariadb_mycnf:
+        type: str
+        reqired: false
+        description: MariaDB my.cnf file path.
+      mariadb_mycnf_group:
+        type: str
+        reqired: false
+        description: MariaDB my.cnf file group.
+      mariadb_mycnf_owner:
+        type: str
+        reqired: false
+        description: MariaDB my.cnf file owner.
+      mariadb_priv:
+        type: list
+        elements: str
+        required: false
+        description: MariaDB database privileges.
+        choices:
+          - ALL
+          - ALTER
+          - ALTER ROUTINE
+          - CREATE
+          - CREATE ROUTINE
+          - CREATE TEMPORARY TABLES
+          - CREATE VIEW
+          - DELETE
+          - DELETE HISTORY
+          - DROP
+          - EVENT
+          - EXECUTE
+          - GRANT
+          - GRANT OPTION
+          - LOCK TABLES
+          - INDEX
+          - INSERT
+          - PROXY
+          - REFERENCES
+          - SELECT
+          - SHOW VIEW
+          - TRIGGER
+          - UPDATE
+      mariadb_username:
+        type: str
+        required: true
+        description: MariaDB user name.
 ...

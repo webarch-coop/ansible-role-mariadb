@@ -74,4 +74,13 @@ mariadb_systemd_units:
             LimitNOFILE: "122880"
 mariadb_sys_schema: false
 mariadb_time_zone_import: true
+
+
+mariadb_database:
+mariadb_mycnf:
+mariadb_mycnf_group:
+mariadb_mycnf_owner:
+mariadb_priv:
+  - ALL
+mariadb_username:
 ...
