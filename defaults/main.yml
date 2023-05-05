@@ -33,7 +33,6 @@ mariadb_config:
         max_heap_table_size: "32M"
         max_user_connections: "0"
         open_files_limit: "122880"
-        performance_schema: "on"
         query_cache_limit: "0"
         query_cache_size: "0"
         query_cache_type: "0"
