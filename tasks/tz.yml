@@ -94,7 +94,7 @@
                     state: absent
                   when: mariadb_tzdata_mariadb_file.stat.exists | bool
 
-                - name: "/root/.my.tzdata file containing {{ mariadb_tzdata_latest }} present"
+                - name: "/root/.my.tzdata file present containing {{ mariadb_tzdata_latest }}"
                   ansible.builtin.lineinfile:
                     path: /root/.my.tzdata
                     line: "{{ mariadb_tzdata_latest }}"

@@ -67,19 +67,19 @@ argument_specs:
         description: MariaDB user host.
       mariadb_mycnf:
         type: str
-        reqired: false
+        required: false
         description: MariaDB ~/.my.cnf file path.
       mariadb_mycnf_group:
         type: str
-        reqired: false
+        required: false
         description: MariaDB ~/.my.cnf file group.
       mariadb_mycnf_mode:
         type: str
-        reqired: false
+        required: false
         description: MariaDB ~/.my.cnf file mode.
       mariadb_mycnf_owner:
         type: str
-        reqired: false
+        required: false
         description: MariaDB my.cnf file owner.
       mariadb_mysqltuner:
         type: int
@@ -133,15 +133,15 @@ argument_specs:
         description: Install the MariaDB sys schema.
       mariadb_systemd_units:
         type: list
+        elements: dict
         required: false
         description: A list of systemd units and contents.
-        elements: dict
         options:
           files:
             type: list
+            elements: dict
             required: false
             description: A list of systemd unit files and their content.
-            elements: dict
             options:
               comment:
                 type: str
@@ -170,6 +170,7 @@ argument_specs:
             description: The name of the systemd service.
           pkgs:
             type: list
+            elements: str
             required: false
             description: A list of packages that should be present.
           state:
@@ -207,19 +208,19 @@ argument_specs:
         description: MariaDB user host.
       mariadb_mycnf:
         type: str
-        reqired: false
+        required: false
         description: MariaDB my.cnf file path.
       mariadb_mycnf_group:
         type: str
-        reqired: false
+        required: false
         description: MariaDB my.cnf file group.
       mariadb_mycnf_mode:
         type: str
-        reqired: false
+        required: false
         description: MariaDB ~/.my.cnf file mode.
       mariadb_mycnf_owner:
         type: str
-        reqired: false
+        required: false
         description: MariaDB my.cnf file owner.
       mariadb_priv:
         type: list

@@ -1,3 +1,12 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects MariaDB Ansible role.
+#
+# The Webarchitects MariaDB Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects MariaDB Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects MariaDB Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 - name: MariaDB database user, database and login details present
   block:
@@ -25,7 +34,7 @@
       no_log: "{% if ansible_verbosity <= 2 %}true{% else %}false{% endif %}"
 
     - name: "MariaDB .my.cnf present at {{ mariadb_mycnf }}"
-      include_tasks: conf.yml
+      ansible.builtin.include_tasks: conf.yml
       no_log: "{% if ansible_verbosity <= 2 %}true{% else %}false{% endif %}"
       vars:
         mariadb_config:

@@ -125,16 +125,19 @@ You can call the `user.yml` tasks multiple times, for example:
 - debug:
     msg: "The MariaDB password for Matomo is: {{ mariadb_password }}"
 
-- name: Create database and user for Nextcloud
+- name: Create database and user for ONLYOFFICE
   include_role:
     name: mariadb
     tasks_from: user.yml
   vars:
     mariadb_database: nextcloud
     mariadb_username: nextcloud
+    mariadb_host: "127.0.0.1"
+    mariadb_priv:
+      - ALL
 
 - debug:
-    msg: "The MariaDB password for Nextcloud is: {{ mariadb_password }}"
+    msg: "The MariaDB password for ONLYOFFICE is: {{ mariadb_password }}"
 ```
 
 Note that the `mariadb_password` variable will contain the password for the last user created.

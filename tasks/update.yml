@@ -10,6 +10,7 @@
 ---
 - name: Upgrade from Debian Jessie MySQL configuration
   ansible.builtin.command: update-alternatives --remove my.cnf /etc/mysql/my.cnf.migrated
+  changed_when: true
   notify: Restart mariadb
   tags:
     - mariadb

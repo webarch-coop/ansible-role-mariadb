@@ -94,14 +94,14 @@
         verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
       when: mariadb_mycnf_path is defined
 
-    - name: "Set a fact if {{ mariadb_mycnf }} exists"
+    - name: "Set a fact if a file exists at {{ mariadb_mycnf }}"
       ansible.builtin.set_fact:
         mariadb_mycnf_present: true
       when:
         - mariadb_mycnf_path.stat.exists is defined
         - mariadb_mycnf_path.stat.exists | bool
 
-    - name: "Set a fact if {{ mariadb_mycnf }} doesn't exist"
+    - name: "Set a fact if a file doesn't exist at {{ mariadb_mycnf }}"
       ansible.builtin.set_fact:
         mariadb_mycnf_present: false
       when: >-
@@ -112,7 +112,7 @@
     - name: "Read the password from {{ mariadb_mycnf }}"
       block:
 
-        - name: "The mariadb_password loaded from {{ mariadb_mycnf }} since the file exists and the password was not set"
+        - name: "The mariadb_password has been loaded since the file exists and the password was not set from {{ mariadb_mycnf }}"
           ansible.builtin.command: "my_print_defaults --defaults-file='{{ mariadb_mycnf }}' client"
           check_mode: false
           changed_when: false
@@ -135,7 +135,7 @@
     - name: Generate a password
       block:
 
-        - name: "Generate a random password for {{ mariadb_username }} as it is not defined or empty"
+        - name: "Generate a random password as it is not defined or empty for {{ mariadb_username }}"
           ansible.builtin.command: "pwgen -n {{ 36 | random(24) }} 1"
           check_mode: false
           changed_when: false

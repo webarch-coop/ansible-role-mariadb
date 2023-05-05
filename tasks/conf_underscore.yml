@@ -30,6 +30,7 @@
     - name: MariaDB backup configuration file dashes updated to underscores  # noqa: command-instead-of-module
       ansible.builtin.command: >-
         sed -i '/^[a-z]/ s/-/_/g' {{ mariadb_cnf.path }}
+      changed_when: true
 
     - name: Stat the MariaDB backup configuration file
       ansible.builtin.stat:
@@ -39,6 +40,8 @@
     - name: Diff the edited and backup MariaDB configuration file
       ansible.builtin.command: >-
         diff {{ mariadb_cnf.path }} {{ mariadb_cnf_file_path_backup }}
+      check_mode: false
+      changed_when: false
       register: mariadb_cnf_file_diff
       failed_when: mariadb_cnf_file_diff.rc is not regex('^0|1$')
 
