@@ -78,6 +78,7 @@ mariadb_time_zone_import: true
 # mariadb_mycnf:
 # mariadb_mycnf_group:
 # mariadb_mycnf_owner:
+mariadb_mycnf_mode: "0600"
 mariadb_priv:
   - ALTER
   - ALTER ROUTINE

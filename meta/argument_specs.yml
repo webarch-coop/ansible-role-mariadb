@@ -68,11 +68,15 @@ argument_specs:
       mariadb_mycnf:
         type: str
         reqired: false
-        description: MariaDB my.cnf file path.
+        description: MariaDB ~/.my.cnf file path.
       mariadb_mycnf_group:
         type: str
         reqired: false
-        description: MariaDB my.cnf file group.
+        description: MariaDB ~/.my.cnf file group.
+      mariadb_mycnf_mode:
+        type: str
+        reqired: false
+        description: MariaDB ~/.my.cnf file mode.
       mariadb_mycnf_owner:
         type: str
         reqired: false
@@ -209,6 +213,10 @@ argument_specs:
         type: str
         reqired: false
         description: MariaDB my.cnf file group.
+      mariadb_mycnf_mode:
+        type: str
+        reqired: false
+        description: MariaDB ~/.my.cnf file mode.
       mariadb_mycnf_owner:
         type: str
         reqired: false

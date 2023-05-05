@@ -25,14 +25,20 @@
       no_log: "{% if ansible_verbosity <= 2 %}true{% else %}false{% endif %}"
 
     - name: "MariaDB .my.cnf present at {{ mariadb_mycnf }}"
-      ansible.builtin.template:
-        src: templates/my.cnf.j2
-        dest: "{{ mariadb_mycnf }}"
-        owner: "{{ mariadb_mycnf_owner }}"
-        group: "{{ mariadb_mycnf_group }}"
-        mode: 0640
-        force: true
+      include_tasks: conf.yml
       no_log: "{% if ansible_verbosity <= 2 %}true{% else %}false{% endif %}"
+      vars:
+        mariadb_config:
+          - name: MariaDB user ~/.my.cnf configuration
+            path: "{{ mariadb_mycnf }}"
+            owner: "{{ mariadb_mycnf_owner }}"
+            group: "{{ mariadb_mycnf_group }}"
+            mode: "0400"
+            state: present
+            conf:
+              client:
+                user: "{{ mariadb_username }}"
+                password: "{{ mariadb_password }}"
 
   tags:
     - mariadb
