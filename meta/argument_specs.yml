@@ -61,6 +61,10 @@ argument_specs:
         type: str
         required: false
         description: MariaDB database name.
+      mariadb_host:
+        type: str
+        required: false
+        description: MariaDB user host.
       mariadb_mycnf:
         type: str
         reqired: false
@@ -193,6 +197,10 @@ argument_specs:
         type: str
         required: false
         description: MariaDB database name.
+      mariadb_host:
+        type: str
+        required: false
+        description: MariaDB user host.
       mariadb_mycnf:
         type: str
         reqired: false

@@ -19,6 +19,7 @@
         name: "{{ mariadb_username }}"
         password: "{{ mariadb_password }}"
         priv: "{{ mariadb_database }}.*:{% for mariadb_p in mariadb_priv %}{{ mariadb_p }}{% if not loop.last %},{% endif %}{% endfor %}"
+        host: "{{ mariadb_host | default('localhost') }}"
         state: present
         update_password: always
       no_log: "{% if ansible_verbosity <= 2 %}true{% else %}false{% endif %}"
