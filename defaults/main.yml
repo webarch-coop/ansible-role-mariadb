@@ -51,7 +51,8 @@ mariadb_config:
         max_allowed_packet: "64M"
 mariadb_mysqltuner: true
 mariadb_mysqltuner_version: "1.9.9"
-mariadb_pkgs:
+mariadb_pkgs_absent: []
+mariadb_pkgs_present:
   - git
   - jo
   - mariadb-client

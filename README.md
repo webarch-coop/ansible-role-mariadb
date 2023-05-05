@@ -44,12 +44,20 @@ A boolean, `mariadb_mysqltuner` defaults to `true` and results in [MySQLTuner](h
 
 A version number for MySQLTuner, `mariadb_mysqltuner_version` defaults to `1.9.9` the version provided by [Debian Bookworm](https://packages.debian.org/bookworm/mysqltuner). If `mariadb_mysqltuner_version` is set to `latest` then the [versions available from GitHub](https://github.com/major/MySQLTuner-perl/releases) are checked and the latest release is installed.
 
-### mariadb_pkgs
+### mariadb_pkgs_absent
 
 A list of Debian packages to install, the default value for `mariadb_pkgs`:
 
 ```yaml
-mariadb_pkgs:
+mariadb_pkgs_absent: []
+```
+
+### mariadb_pkgs_present
+
+A list of Debian packages to install, the default value for `mariadb_pkgs`:
+
+```yaml
+mariadb_pkgs_present:
   - git
   - jo
   - mariadb-client

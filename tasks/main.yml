@@ -44,8 +44,20 @@
       tags:
         - mariadb_local_facts
 
-    - name: Install MariaDB packages
+    - name: Install and remove MariaDB packages
       block:
+
+        - name: "{{ mariadb_task_name }}"
+          ansible.builtin.apt:
+            pkg: "{{ mariadb_pkgs_present }}"
+            state: present
+            update_cache: false
+          vars:
+            mariadb_task_name: >-
+              Packages {% for mariadb_pkg in mariadb_pkgs_present | ansible.builtin.difference(ansible_local.dpkg.installed) %}{{ mariadb_pkg -}}
+              {%- if loop.length > 1 and not loop.last %}, {% endif %}{% endfor %} and dependancies installed
+          register: mariadb_install
+          notify: Restart mariadb
 
         - name: "{{ mariadb_task_name }}"
           ansible.builtin.apt:
@@ -54,24 +66,30 @@
             update_cache: false
           vars:
             mariadb_task_name: >-
-              Packages {% for mariadb_pkg in mariadb_pkgs | difference(ansible_local.dpkg.installed) %}{{ mariadb_pkg -}}
-              {%- if loop.length > 1 and not loop.last %}, {% endif %}{% endfor %} and dependancies installed
-          register: mariadb_install
+              Packages {% for mariadb_pkg in mariadb_pkgs_absent | ansible.builtin.intersect(ansible_local.dpkg.installed) %}{{ mariadb_pkg -}}
+              {%- if loop.length > 1 and not loop.last %}, {% endif %}{% endfor %} removed
+          register: mariadb_remove
           notify: Restart mariadb
 
         - name: Include apt role local fact tasks  # noqa: no-handler
           ansible.builtin.include_role:
             name: apt
             tasks_from: local_facts.yml
-          when:
-            - mariadb_install.changed is defined
-            - mariadb_install.changed | bool
+          when: >-
+            ( ( mariadb_install.changed is defined ) and
+            ( mariadb_install.changed | bool ) ) or
+            ( ( mariadb_remove.changed is defined ) or
+            ( mariadb_remove.changed | bool ) )
 
-      when:
-        - mariadb_pkgs is defined
-        - mariadb_pkgs != []
-        - ansible_local.dpkg.installed is defined
-        - mariadb_pkgs | difference(ansible_local.dpkg.installed) != []
+      when: >
+        ( ( mariadb_pkgs_present is defined ) and
+        ( mariadb_pkgs_present != [] ) and
+        ( ansible_local.dpkg.installed is defined ) and
+        ( mariadb_pkgs_present | ansible.builtin.difference(ansible_local.dpkg.installed) != [] ) ) or
+        ( ( mariadb_pkgs_absent is defined ) and
+        ( mariadb_pkgs_absent != [] ) and
+        ( ansible_local.dpkg.installed is defined ) and
+        ( mariadb_pkgs_absent | ansible.builtin.intersect(ansible_local.dpkg.installed) != [] ) ) or
       tags:
         - mariadb_install
 

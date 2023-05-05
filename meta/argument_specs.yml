@@ -89,11 +89,16 @@ argument_specs:
         type: str
         required: true
         description: MySQLTuner version.
-      mariadb_pkgs:
+      mariadb_pkgs_absent:
         type: list
         elements: str
         required: false
-        description: A list of packages to install.
+        description: A list of packages to remove if present.
+      mariadb_pkgs_present:
+        type: list
+        elements: str
+        required: false
+        description: A list of packages to install if absent.
       mariadb_priv:
         type: list
         elements: str
