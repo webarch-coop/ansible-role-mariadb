@@ -47,29 +47,31 @@
     - name: Install and remove MariaDB packages
       block:
 
-        - name: "{{ mariadb_task_name }}"
+        - name: MariaDB packages present
           ansible.builtin.apt:
-            pkg: "{{ mariadb_pkgs_present }}"
+            pkg: "{{ mariadb_pkgs_present | ansible.builtin.difference(ansible_local.dpkg.installed) }}"
             state: present
             update_cache: false
-          vars:
-            mariadb_task_name: >-
-              Packages {% for mariadb_pkg in mariadb_pkgs_present | ansible.builtin.difference(ansible_local.dpkg.installed) %}{{ mariadb_pkg -}}
-              {%- if loop.length > 1 and not loop.last %}, {% endif %}{% endfor %} and dependancies installed
           register: mariadb_install
           notify: Restart mariadb
+          when:
+            - mariadb_pkgs_present is defined
+            - mariadb_pkgs_present != []
+            - ansible_local.dpkg.installed is defined
+            - mariadb_pkgs_present | ansible.builtin.difference(ansible_local.dpkg.installed) != []
 
-        - name: "{{ mariadb_task_name }}"
+        - name: MariaDB packages absent
           ansible.builtin.apt:
-            pkg: "{{ mariadb_pkgs }}"
+            pkg: "{{ mariadb_pkgs_absent | ansible.builtin.intersect(ansible_local.dpkg.installed) }}"
             state: present
             update_cache: false
-          vars:
-            mariadb_task_name: >-
-              Packages {% for mariadb_pkg in mariadb_pkgs_absent | ansible.builtin.intersect(ansible_local.dpkg.installed) %}{{ mariadb_pkg -}}
-              {%- if loop.length > 1 and not loop.last %}, {% endif %}{% endfor %} removed
           register: mariadb_remove
           notify: Restart mariadb
+          when:
+            - mariadb_pkgs_absent is defined
+            - mariadb_pkgs_absent != []
+            - ansible_local.dpkg.installed is defined
+            - mariadb_pkgs_absent | ansible.builtin.intersect(ansible_local.dpkg.installed) != []
 
         - name: Include apt role local fact tasks  # noqa: no-handler
           ansible.builtin.include_role:
@@ -81,15 +83,6 @@
             ( ( mariadb_remove.changed is defined ) or
             ( mariadb_remove.changed | bool ) )
 
-      when: >
-        ( ( mariadb_pkgs_present is defined ) and
-        ( mariadb_pkgs_present != [] ) and
-        ( ansible_local.dpkg.installed is defined ) and
-        ( mariadb_pkgs_present | ansible.builtin.difference(ansible_local.dpkg.installed) != [] ) ) or
-        ( ( mariadb_pkgs_absent is defined ) and
-        ( mariadb_pkgs_absent != [] ) and
-        ( ansible_local.dpkg.installed is defined ) and
-        ( mariadb_pkgs_absent | ansible.builtin.intersect(ansible_local.dpkg.installed) != [] ) ) or
       tags:
         - mariadb_install
 
