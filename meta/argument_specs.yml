@@ -260,4 +260,8 @@ argument_specs:
         type: str
         required: true
         description: MariaDB user name.
+      mariadb_verify:
+        type: bool
+        required: false
+        description: Verify the variables starting with mariadb_.
 ...
