@@ -32,7 +32,7 @@
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
       when: mariadb_database is defined
 
-    - name: Chris that the mariadb_privs are valid if defined
+    - name: Check that the mariadb_privs are an array
       ansible.builtin.assert:
         that:
           - mariadb_privs | type_debug == "list"
