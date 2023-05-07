@@ -555,14 +555,32 @@ argument_specs:
         type: dict
         required: false
         description: Internal dictionary of the results of my_print_defaults --mysqld converted into JSON usng the JC ini filter.
+      mariadb_etc_group_b64encoded:
+        type: dict
+        required: false
+        description: Internal results of slurping /etc/group.
       mariadb_etc_my_cnf:
         type: dict
         required: false
         description: Internal results of stating a MariaDB configuration file.
+      mariadb_etc_passwd_b64encoded:
+        type: dict
+        required: false
+        description: Internal results of slurping /etc/passwd.
       mariadb_git_present:
         type: dict
         required: false
         description: Internal results from installing git and related packages for MySQLTuner install.
+      mariadb_group:
+        type: list
+        elements: dict
+        required: false
+        description: Internal group from /etc/group.
+      mariadb_groups:
+        type: list
+        elements: str
+        required: false
+        description: Internal list of groups.
       mariadb_host:
         type: str
         required: false
@@ -609,6 +627,14 @@ argument_specs:
         type: str
         required: false
         description: MariaDB my.cnf file owner.
+      mariadb_mycnf_path:
+        type: dict
+        required: false
+        description: Internal result form stating .my.cnf file.
+      mariadb_mycnf_present:
+        type: bool
+        required: false
+        description: Internal variable for the state of the .my.cnf file.
       mariadb_mysqltuner:
         type: int
         required: true
@@ -685,6 +711,10 @@ argument_specs:
         type: dict
         required: false
         description: Internal variable for the results of which mysqltuner.
+      mariadb_my_print_defaults_command:
+        type: dict
+        required: false
+        description: Internal variable for the results of my_print_defaults.
       mariadb_my_print_mysqld_defaults:
         type: dict
         required: false
@@ -693,6 +723,14 @@ argument_specs:
         type: str
         required: false
         description: Internal variable for the MySQL users password.
+      mariadb_password:
+        type: str
+        required: false
+        description: Internal variable for the MariaDB password.
+      mariadb_password_gen:
+        type: dict
+        required: false
+        description: Internal result from running the pwgen command.
       mariadb_pkgs_absent:
         type: list
         elements: str
@@ -823,9 +861,9 @@ argument_specs:
         required: false
         description: Internal variable for the date of the latest version of the tzdata package changelog.
       mariadb_tzdata_mariadb:
-        type: dict
+        type: str
         required: false
-        description: Internal result for the content of the /root/.my.tzdata file.
+        description: Internal variable for the content of the /root/.my.tzdata file.
       mariadb_tzdata_mariadb_file:
         type: dict
         required: false
@@ -863,3 +901,4 @@ argument_specs:
         type: str
         required: false
         description: Internal MariaDB version string.
+...
