@@ -99,4 +99,6 @@ mariadb_priv:
   - TRIGGER
   - UPDATE
 # mariadb_username:
+
+mariadb_verify: true
 ...
