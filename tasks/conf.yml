@@ -11,6 +11,12 @@
 - name: MariaDB configuration file
   block:
 
+    - name: Debug mariadb_cnf
+      ansible.builtin.debug:
+        var: mariadb_cnf
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+      when: mariadb_cnf is defined
+
     - name: "Check the existance of the MariaDB configuration file {{ mariadb_cnf.path }}"
       ansible.builtin.stat:
         path: "{{ mariadb_cnf.path }}"
