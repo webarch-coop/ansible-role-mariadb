@@ -79,7 +79,7 @@
     - name: Set a variables for the MariaDB databases, users and version
       ansible.builtin.set_fact:
         mariadb_databases: "{{ mariadb_info.databases.keys() | list | reject('search', 'lost+found') | list }}"
-        mariadb_users: "{{ mariadb_info.users.localhost.keys() }}"
+        mariadb_usernames: "{{ mariadb_info.users.localhost.keys() }}"
         mariadb_version: "{{ mariadb_info.version.major }}.{{ mariadb_info.version.minor }}.{{ mariadb_info.version.release }}"
 
     - name: Debug MariaDB databases
@@ -87,9 +87,9 @@
         var: mariadb_databases
         verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
 
-    - name: Debug MariaDB users
+    - name: Debug MariaDB usernames
       ansible.builtin.debug:
-        var: mariadb_users
+        var: mariadb_usernamess
         verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
 
     - name: Debug MariaDB version
