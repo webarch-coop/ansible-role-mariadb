@@ -377,9 +377,9 @@ argument_specs:
         required: false
         description: Internal variable for the date of the latest version of the tzdata package changelog.
       mariadb_tzdata_mariadb:
-        type: dict
+        type: str
         required: false
-        description: Internal result for the content of the /root/.my.tzdata file.
+        description: Internal variable for the content of the /root/.my.tzdata file.
       mariadb_tzdata_mariadb_file:
         type: dict
         required: false
