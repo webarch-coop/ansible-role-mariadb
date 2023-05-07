@@ -40,17 +40,17 @@
       ansible.builtin.include_tasks: conf.yml
       no_log: "{% if ansible_verbosity <= 2 %}true{% else %}false{% endif %}"
       vars:
-        mariadb_config:
-          - name: MariaDB user ~/.my.cnf configuration
-            path: "{{ mariadb_mycnf }}"
-            owner: "{{ mariadb_mycnf_owner }}"
-            group: "{{ mariadb_mycnf_group }}"
-            mode: "0400"
-            state: present
-            conf:
-              client:
-                user: "{{ mariadb_username }}"
-                password: "{{ mariadb_password }}"
+        mariadb_cnf:
+          name: MariaDB user ~/.my.cnf configuration
+          path: "{{ mariadb_mycnf }}"
+          owner: "{{ mariadb_mycnf_owner }}"
+          group: "{{ mariadb_mycnf_group }}"
+          mode: "0400"
+          state: present
+          conf:
+            client:
+              user: "{{ mariadb_username }}"
+              password: "{{ mariadb_password }}"
 
   tags:
     - mariadb
