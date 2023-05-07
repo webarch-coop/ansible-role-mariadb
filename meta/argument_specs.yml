@@ -65,6 +65,10 @@ argument_specs:
         type: str
         required: false
         description: MariaDB user host.
+      mariadb_jpq:
+        type: dict
+        required: true
+        description: Internal dictionary of JMESPATH variables.
       mariadb_mycnf:
         type: str
         required: false
@@ -89,6 +93,19 @@ argument_specs:
         type: str
         required: true
         description: MySQLTuner version.
+      mariadb_mysqltuner_versions:
+        type: list
+        elements: str
+        description: Internal list of MySQLTuner versions provided by different versions of Debian.
+        options:
+          distro:
+            type: str
+            required: true
+            description: Internal name of the Debian distro that provides MySQLTuner.
+          version:
+            type: str
+            required: true
+            description: Internal version of MySQLTuner provided by the Debian distro.
       mariadb_pkgs_absent:
         type: list
         elements: str
