@@ -215,6 +215,10 @@ argument_specs:
         type: str
         required: false
         description: MariaDB user name.
+      mariadb_verify:
+        type: bool
+        required: false
+        description: Verify the variables starting with mariadb_.
   user:
     author: Chris Croome
     description: Ansible role for installing and configuring MariaDB on Debian
