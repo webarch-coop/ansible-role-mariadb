@@ -8,16 +8,10 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects MariaDB Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-# This file exists for other roles that include mariadb_user.yml
-- name: Warn that the files has moved from mariadb_user.yml to user.yml
-  ansible.builtin.debug:
+# This file exists for old roles that include mariadb_user.yml
+- name: Include user.yml not mariadb_user.yml
+  ansible.builtin.fail:
     msg: "Please update the role calling this file to use tasks_from user.yml not mariadb_user.yml"
-  tags:
-    - mariadb
-    - mariadb_user
-
-- name: Include the user tasks
-  ansible.builtin.include_tasks: user.yml
   tags:
     - mariadb
     - mariadb_user
