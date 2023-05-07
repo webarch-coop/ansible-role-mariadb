@@ -400,6 +400,11 @@ argument_specs:
         type: str
         required: false
         description: MariaDB user name.
+      mariadb_usernames:
+        type: list
+        elements: str
+        required: false
+        description: Internal array of MariaDB existing usernames.
       mariadb_users:
         type: list
         required: false
@@ -803,6 +808,11 @@ argument_specs:
         type: str
         required: true
         description: MariaDB user name.
+      mariadb_usernames:
+        type: list
+        elements: str
+        required: false
+        description: Internal array of MariaDB existing usernames.
       mariadb_users:
         type: list
         required: false
