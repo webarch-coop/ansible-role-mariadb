@@ -81,6 +81,7 @@
         mariadb_databases: "{{ mariadb_info.databases.keys() | list | reject('search', 'lost+found') | list }}"
         mariadb_usernames: "{{ mariadb_info.users.localhost.keys() }}"
         mariadb_version: "{{ mariadb_info.version.major }}.{{ mariadb_info.version.minor }}.{{ mariadb_info.version.release }}"
+        mariadb_version_major_minor: "{{ mariadb_info.version.major }}.{{ mariadb_info.version.minor }}"
 
     - name: Debug MariaDB databases
       ansible.builtin.debug:
@@ -89,7 +90,7 @@
 
     - name: Debug MariaDB usernames
       ansible.builtin.debug:
-        var: mariadb_usernamess
+        var: mariadb_usernames
         verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
 
     - name: Debug MariaDB version
