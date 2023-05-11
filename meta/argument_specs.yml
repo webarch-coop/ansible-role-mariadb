@@ -454,7 +454,11 @@ argument_specs:
       mariadb_version:
         type: str
         required: false
-        description: Internal MariaDB version string.
+        description: Internal MariaDB full version string.
+      mariadb_version_major_minor:
+        type: str
+        required: false
+        description: Internal MariaDB two part version string.
   user:
     author: Chris Croome
     description: Ansible role for installing and configuring MariaDB on Debian
@@ -901,4 +905,8 @@ argument_specs:
         type: str
         required: false
         description: Internal MariaDB version string.
+      mariadb_version_major_minor:
+        type: str
+        required: false
+        description: Internal MariaDB two part version string.
 ...
