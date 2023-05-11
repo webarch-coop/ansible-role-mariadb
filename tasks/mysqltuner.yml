@@ -103,7 +103,8 @@
           register: mariadb_git_present
           when: >-
             ( ansible_local.dpkg.installed is not defined ) or
-            ( "git" not in ansible_local.dpkg.installed )
+            ( "git" not in ansible_local.dpkg.installed ) or
+            ( "libjson-perl" not in ansible_local.dpkg.installed )
 
         - name: Re-read Ansible local facts  # noqa: no-handler
           ansible.builtin.setup:
