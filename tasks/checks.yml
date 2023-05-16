@@ -11,6 +11,29 @@
 - name: Use my_print_defaults and community.mysql.mysql_info to gather information about the MariaDB server databases, users and version
   block:
 
+    # When in a docker container mariadb_init.stdout == "sh"
+    - name: Check if system has been booted with systemd as init system
+      ansible.builtin.command: ps -p 1 -o comm=
+      changed_when: false
+      check_mode: false
+      register: mariadb_ps
+      failed_when: mariadb_ps.rc is not regex('^0|47$')
+
+    - name: Set a fact for the init system
+      ansible.builtin.set_fact:
+        mariadb_init: "{{ mariadb_ps.stdout }}"
+      when: mariadb_ps.rc == 0
+
+    - name: When the exit code is 47 assume is is because this is a chroot
+      ansible.builtin.set_fact:
+        mariadb_init: chroot
+      when: mariadb_ps.rc == 47
+
+    - name: Debug the ini system
+      ansible.builtin.debug:
+        var: mariadb_init
+        verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+
     - name: Run my_print_defaults
       ansible.builtin.command: my_print_defaults --mysqld
       check_mode: false

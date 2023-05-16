@@ -53,7 +53,6 @@
             state: present
             update_cache: false
           register: mariadb_install
-          notify: Restart mariadb
           when:
             - mariadb_pkgs_present is defined
             - mariadb_pkgs_present != []
@@ -66,7 +65,6 @@
             state: present
             update_cache: false
           register: mariadb_remove
-          notify: Restart mariadb
           when:
             - mariadb_pkgs_absent is defined
             - mariadb_pkgs_absent != []
