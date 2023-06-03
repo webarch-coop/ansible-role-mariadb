@@ -143,6 +143,10 @@ argument_specs:
         type: dict
         required: false
         description: Internal results from the community.mysql.mysql_info module.
+      mariadb_init:
+        type: str
+        required: false
+        description: Internal results from checking the init system.
       mariadb_install:
         type: dict
         required: false
@@ -324,6 +328,10 @@ argument_specs:
           - SHOW VIEW
           - TRIGGER
           - UPDATE
+      mariadb_ps:
+        type: str
+        required: false
+        description: Internal variable for the results from runing ps.
       mariadb_remove:
         type: dict
         required: false
