@@ -8,6 +8,13 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects MariaDB Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
+- name: Skip the tasks in this role
+  ansible.builtin.debug:
+    msg: "The MariaDB role tasks are not being run since the mariadb variable is false."
+  when: not mariadb | bool
+  tags:
+    - mariadb
+
 - name: MariaDB
   block:
 
