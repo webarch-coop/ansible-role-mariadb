@@ -27,7 +27,7 @@
     # Ideally this would use lineinfile but the regexs required would be complicated...
     # so for now it uses sed which also changes dashes in values as well as variables
     # so manually checking of the result is needed
-    - name: MariaDB backup configuration file dashes updated to underscores  # noqa: command-instead-of-module
+    - name: MariaDB configuration file dashes updated to underscores  # noqa: command-instead-of-module
       ansible.builtin.command: >-
         sed -i '/^[a-z]/ s/-/_/g' {{ mariadb_cnf.path }}
       changed_when: true
@@ -43,6 +43,7 @@
       check_mode: false
       changed_when: false
       register: mariadb_cnf_file_diff
+      when: mariadb_cnf_file_path_backup_check.stat.exists | bool
       failed_when: mariadb_cnf_file_diff.rc is not regex('^0|1$')
 
     - name: Fail as a MariaDB configuration file has been edited and needs manually checking
