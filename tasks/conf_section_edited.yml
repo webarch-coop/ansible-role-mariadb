@@ -91,6 +91,7 @@
       loop_control:
         loop_var: mariadb_cnf_variable_pair
         label: "{{ mariadb_cnf_variable_pair.key }}{% if mariadb_cnf_variable_pair.value | type_debug != 'NoneType' %} = {{ mariadb_cnf_variable_pair.value }}{% endif %}"
+      notify: Restart mariadb
 
     - name: "MariaDB configuration file edited for keys without values for section {{ mariadb_cnf_section.key }}"
       community.general.ini_file:
@@ -111,6 +112,7 @@
       loop_control:
         loop_var: mariadb_cnf_variable_pair
         label: "{{ mariadb_cnf_variable_pair.key }}"
+      notify: Restart mariadb
 
     - name: "MariaDB configuration file edited for keys with values for section {{ mariadb_cnf_section.key }}"
       community.general.ini_file:
@@ -132,6 +134,7 @@
       loop_control:
         loop_var: mariadb_cnf_variable_pair
         label: "{{ mariadb_cnf_variable_pair.key }} = {{ mariadb_cnf_variable_pair.value }}"
+      notify: Restart mariadb
 
   tags:
     - mariadb

@@ -33,7 +33,7 @@
         owner: "{{ mariadb_cnf.owner | default('root') }}"
         group: "{{ mariadb_cnf.group | default('root') }}"
       register: mariadb_cnf_file_templated
-      notify: MariaDB restarted
+      notify: Restart mariadb
 
     - name: MariaDB configuration file backup absent when originial file is unchanged
       ansible.builtin.file:
