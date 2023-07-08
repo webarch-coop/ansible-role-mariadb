@@ -138,7 +138,6 @@
           loop_control:
             loop_var: systemd_unit
             label: "{{ systemd_unit.name }}"
-          notify: Reload systemd
           when:
             - mariadb_systemd_units is defined
             - mariadb_systemd_units != []
