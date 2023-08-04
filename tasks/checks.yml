@@ -101,7 +101,7 @@
 
     - name: Set a variables for the MariaDB databases, users and version
       ansible.builtin.set_fact:
-        mariadb_databases: "{{ mariadb_info.databases.keys() | list | reject('search', 'lost+found') | list }}"
+        mariadb_databases: "{{ mariadb_info.databases.keys() | list | reject('search', '.*lost+found$') | list }}"
         mariadb_usernames: "{{ mariadb_info.users.localhost.keys() }}"
         mariadb_version: "{{ mariadb_info.version.major }}.{{ mariadb_info.version.minor }}.{{ mariadb_info.version.release }}"
         mariadb_version_major_minor: "{{ mariadb_info.version.major }}.{{ mariadb_info.version.minor }}"
