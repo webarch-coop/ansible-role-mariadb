@@ -59,7 +59,7 @@
           {{ mariadb_cnf_file_path_backup }} {{ mariadb_cnf.path }}`
       when:
         - mariadb_cnf_file_diff.rc is defined
-        - mariadb_underscore_autoupdate | bool
+        - not mariadb_underscore_autoupdate | bool
 
   tags:
     - mariadb
