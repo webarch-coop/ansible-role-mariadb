@@ -8,18 +8,16 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects MariaDB Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-dependency:
-  name: galaxy
-platforms:
-  - name: instance
-provisioner:
-  name: ansible
-    # host_vars:
-    #   instance:
-    #     ansible_user: ansible
-verifier:
-  name: ansible
-    # host_vars:
-    #   instance:
-    #     ansible_user: ansible
+- name: Run cleanup as root
+  # become: true
+  connection: local
+  gather_facts: true
+  hosts:
+    - localhost
+  tasks:
+
+    - name: Stop MariaDB
+      ansible.builtin.systemd:
+        name: mariadb
+        state: stopped
 ...

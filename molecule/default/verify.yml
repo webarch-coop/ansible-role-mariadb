@@ -1,0 +1,53 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects MariaDB Ansible role.
+#
+# The Webarchitects MariaDB Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects MariaDB Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects MariaDB Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+- name: Verify as root
+  # become: true
+  connection: local
+  gather_facts: true
+  hosts:
+    - localhost
+  tasks:
+
+    - name: Query the MariaDB databases, users and version using a socket
+      community.mysql.mysql_info:
+        filter:
+          - databases
+          - users
+          - version
+        return_empty_dbs: true
+        login_user: root
+        login_unix_socket: /run/mysqld/mysqld.sock
+      register: molecule_mariadb_info
+
+    - name: Debug MariaDB info
+      ansible.builtin.debug:
+        var: molecule_mariadb_info
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+
+    - name: Set a variables for the MariaDB databases, users and version
+      ansible.builtin.set_fact:
+        mariadb_databases: "{{ molecule_mariadb_info.databases.keys() | reject('regex', '.*lost[+]found$') | list }}"
+        mariadb_usernames: "{{ molecule_mariadb_info.users.localhost.keys() }}"
+        mariadb_version: "{{ molecule_mariadb_info.version.major }}.{{ molecule_mariadb_info.version.minor }}.{{ molecule_mariadb_info.version.release }}"
+        mariadb_version_major_minor: "{{ molecule_mariadb_info.version.major }}.{{ molecule_mariadb_info.version.minor }}"
+
+    - name: Debug MariaDB databases
+      ansible.builtin.debug:
+        var: molecule_mariadb_databases
+
+    - name: Debug MariaDB usernames
+      ansible.builtin.debug:
+        var: molecule_mariadb_usernames
+
+    - name: Debug MariaDB version
+      ansible.builtin.debug:
+        var: molecule_mariadb_version
+...
