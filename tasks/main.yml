@@ -78,10 +78,9 @@
             - ansible_local.dpkg.installed is defined
             - mariadb_pkgs_absent | ansible.builtin.intersect(ansible_local.dpkg.installed) != []
 
-        - name: Include apt role local fact tasks  # noqa: no-handler
-          ansible.builtin.include_role:
-            name: apt
-            tasks_from: local_facts.yml
+        - name: Re-read local facts after instaling MariaDB
+          ansible.builtin.setup:
+            filter: ansible_local
           when: >-
             ( ( mariadb_install.changed is defined ) and
             ( mariadb_install.changed | bool ) ) or

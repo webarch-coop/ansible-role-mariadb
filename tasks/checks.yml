@@ -51,7 +51,9 @@
           - mariadb_mysqld != ansible_loop.nextitem
         quiet: "{% if ansible_verbosity < 3 %}true{% else %}false{% endif %}"
         fail_msg: "The MariaDB variable {{ mariadb_mysqld }} is duplicated in the settings returned with `my_print_defaults --mysqld`"
-      when: not ansible_loop.last
+      when:
+        - not ansible_loop.last
+        - mariadb_mysqld != "plugin_load_add"
       loop: "{{ mariadb_mysqld_defaults_variables }}"
       loop_control:
         extended: true
