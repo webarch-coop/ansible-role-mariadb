@@ -1,0 +1,72 @@
+# Copyright 2018-2023 Chris Croome
+#
+# This file is part of the Webarchitects MariaDB Ansible role.
+#
+# The Webarchitects MariaDB Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects MariaDB Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects MariaDB Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+- name: MariaDB install
+  block:
+
+    - name: MariaDB packages present
+      ansible.builtin.apt:
+        pkg: "{{ mariadb_pkgs_present | ansible.builtin.difference(ansible_local.dpkg.installed) }}"
+        state: present
+        update_cache: false
+      register: mariadb_install
+      when:
+        - mariadb_pkgs_present is defined
+        - mariadb_pkgs_present != []
+        - ansible_local.dpkg.installed is defined
+        - mariadb_pkgs_present | ansible.builtin.difference(ansible_local.dpkg.installed) != []
+
+    - name: MariaDB packages absent
+      ansible.builtin.apt:
+        pkg: "{{ mariadb_pkgs_absent | ansible.builtin.intersect(ansible_local.dpkg.installed) }}"
+        state: present
+        update_cache: false
+      register: mariadb_remove
+      when:
+        - mariadb_pkgs_absent is defined
+        - mariadb_pkgs_absent != []
+        - ansible_local.dpkg.installed is defined
+        - mariadb_pkgs_absent | ansible.builtin.intersect(ansible_local.dpkg.installed) != []
+
+    - name: Re-read local facts after instaling MariaDB
+      ansible.builtin.setup:
+        filter: ansible_local
+      when: >-
+        ( ( mariadb_install.changed is defined ) and
+        ( mariadb_install.changed | bool ) ) or
+        ( ( mariadb_remove.changed is defined ) or
+        ( mariadb_remove.changed | bool ) )
+
+    - name: Stat /lib/systemd/system/mariadb.service
+      ansible.builtin.stat:
+        path: /lib/systemd/system/mariadb.service
+      register: mariadb_system_service
+
+    - name: MariaDB enabled
+      ansible.builtin.service:
+        name: mariadb
+        state: started
+      register: mariadb_service
+      when: mariadb_system_service.stat.exists | bool
+
+    - name: Debug mariadb_service
+      ansible.builtin.debug:
+        var: mariadb_service
+        verbosity: 2
+
+    - name: Flush handlers  # noqa: no-handler
+      ansible.builtin.meta: flush_handlers
+      when:
+        - mariadb_install.changed | bool
+        - mariadb_system_service.stat.exists | bool
+
+  tags:
+    - mariadb
+...

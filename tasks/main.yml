@@ -52,41 +52,7 @@
         - mariadb_local_facts
 
     - name: Install and remove MariaDB packages
-      block:
-
-        - name: MariaDB packages present
-          ansible.builtin.apt:
-            pkg: "{{ mariadb_pkgs_present | ansible.builtin.difference(ansible_local.dpkg.installed) }}"
-            state: present
-            update_cache: false
-          register: mariadb_install
-          when:
-            - mariadb_pkgs_present is defined
-            - mariadb_pkgs_present != []
-            - ansible_local.dpkg.installed is defined
-            - mariadb_pkgs_present | ansible.builtin.difference(ansible_local.dpkg.installed) != []
-
-        - name: MariaDB packages absent
-          ansible.builtin.apt:
-            pkg: "{{ mariadb_pkgs_absent | ansible.builtin.intersect(ansible_local.dpkg.installed) }}"
-            state: present
-            update_cache: false
-          register: mariadb_remove
-          when:
-            - mariadb_pkgs_absent is defined
-            - mariadb_pkgs_absent != []
-            - ansible_local.dpkg.installed is defined
-            - mariadb_pkgs_absent | ansible.builtin.intersect(ansible_local.dpkg.installed) != []
-
-        - name: Re-read local facts after instaling MariaDB
-          ansible.builtin.setup:
-            filter: ansible_local
-          when: >-
-            ( ( mariadb_install.changed is defined ) and
-            ( mariadb_install.changed | bool ) ) or
-            ( ( mariadb_remove.changed is defined ) or
-            ( mariadb_remove.changed | bool ) )
-
+      ansible.builtin.include_tasks: install.yml
       tags:
         - mariadb_install
 

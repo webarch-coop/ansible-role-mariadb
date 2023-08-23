@@ -14,6 +14,8 @@
   # gather_facts: true
   hosts:
     - localhost
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
   tasks:
 
     - name: Query the MariaDB databases, users and version using a socket
