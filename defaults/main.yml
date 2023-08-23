@@ -100,5 +100,6 @@ mariadb_priv:
   - UPDATE
 # mariadb_username:
 
+mariadb_underscore_autoupdate: false
 mariadb_verify: true
 ...

@@ -57,7 +57,9 @@
           dashes are found so if there are none vaules with dashes won't be
           touched, please manually check the results by running `diff --color
           {{ mariadb_cnf_file_path_backup }} {{ mariadb_cnf.path }}`
-      when: mariadb_cnf_file_diff.rc is defined
+      when:
+        - mariadb_cnf_file_diff.rc is defined
+        - mariadb_underscore_autoupdate | bool
 
   tags:
     - mariadb

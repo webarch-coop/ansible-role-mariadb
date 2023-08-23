@@ -37,4 +37,5 @@
         mariadb: true
         mariadb_database: ansible
         mariadb_username: ansible
+        mariadb_underscore_autoupdate: true
 ...
