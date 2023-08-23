@@ -16,6 +16,7 @@
         pkg: "{{ mariadb_pkgs_present | ansible.builtin.difference(ansible_local.dpkg.installed) }}"
         state: present
         update_cache: false
+      notify: Restart mariadb
       register: mariadb_install
       when:
         - mariadb_pkgs_present is defined
