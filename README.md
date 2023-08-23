@@ -97,6 +97,10 @@ A boolean which defaults to `false`, [MariaDB 10.6.0 and greater](https://mariad
 
 A boolean, which defaults to `true`. which results in `mysql_tzinfo_to_sql` being used to convert `/usr/share/zoneinfo` into SQL which is then imported into the `mysql` database.
 
+### mariadb_underscore_autoupdate
+
+A boolean, which defaults to `false`, set it to `true` to skip the role failing for manual checks, after changing dashes to underscores in MariaDB configuration files.
+
 ## Creating users and databases
 
 You can call the `user.yml` tasks multiple times, for example:

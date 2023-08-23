@@ -438,6 +438,10 @@ argument_specs:
         type: dict
         required: false
         description: Internal result from stating the /root/timezoneinfo.sql file.
+      mariadb_underscore_autoupdate:
+        type: bool
+        required: true
+        description: Automatically update MariaDB configuration to change dashes to underscores without failing for manual check.
       mariadb_upgrade:
         type: dict
         required: false
