@@ -32,6 +32,7 @@
       ansible.builtin.include_role:
         name: mariadb
       vars:  # noqa var-naming[no-role-prefix]
+        ansible_python_interpreter: /usr/bin/python3
         mariadb: true
         mariadb_database: ansible
         mariadb_username: ansible
