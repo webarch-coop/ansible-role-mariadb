@@ -26,6 +26,10 @@ argument_specs:
         type: dict
         required: false
         description: Internal results of copying a MariaDB configuration file.
+      mariadb_cnf_file_diff:
+        type: dict
+        required: false
+        description: Internal results of diffing a MariaDB configuration file.
       mariadb_cnf_file_edited:
         type: dict
         required: false
@@ -42,6 +46,10 @@ argument_specs:
         type: str
         required: false
         description: Internal path for MariaDB configuration file backup.
+      mariadb_cnf_file_path_backup_check:
+        type: dict
+        required: false
+        description: Internal results of converting checking a MariaDB configuration file backup.
       mariadb_cnf_file_section_existing_keys:
         type: list
         elements: str
@@ -340,6 +348,10 @@ argument_specs:
         type: dict
         required: false
         description: Internal result from the removal of the legacy mariadb_root.fact file.
+      mariadb_service:
+        type: dict
+        required: false
+        description: Internal result from setting the MariaDB systemd service state to started.
       mariadb_socket:
         type: str
         required: true
@@ -352,6 +364,10 @@ argument_specs:
         type: bool
         required: true
         description: Install the MariaDB sys schema.
+      mariadb_system_service:
+        type: dict
+        required: false
+        description: Internal result from stating the MariaDB systemd service file.
       mariadb_systemd_units:
         type: list
         elements: dict
