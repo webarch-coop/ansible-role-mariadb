@@ -186,49 +186,56 @@
           failed_when: >-
             ( "JSON Module is needed" in mariadb_mysqltuner_command.stdout ) or
             ( mariadb_mysqltuner_command.rc != 0 )
+          tags:
+            - molecule-idempotence-notest
 
-        - name: Set facts
-          ansible.builtin.set_fact:
-            mariadb_mysqltuner_results: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json }}"
-            mariadb_mysqltuner_adjust_variables: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.adjvars) }}"
-            mariadb_mysqltuner_recommendations: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.recs) }}"
-            mariadb_mysqltuner_fragmented_tables: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.fragtabs) }}"
-            mariadb_mysqltuner_cve: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.cve) }}"
+        - name: Set fact for mysqltuner results
+          block:
 
-        - name: Print mysqltuner full results when running with -v
-          ansible.builtin.debug:
-            var: mariadb_mysqltuner_results
-          when:
-            - mariadb_mysqltuner_results | length > 0
-            - ansible_verbosity >= 1
+            - name: Set facts
+              ansible.builtin.set_fact:
+                mariadb_mysqltuner_results: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json }}"
+                mariadb_mysqltuner_adjust_variables: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.adjvars) }}"
+                mariadb_mysqltuner_recommendations: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.recs) }}"
+                mariadb_mysqltuner_fragmented_tables: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.fragtabs) }}"
+                mariadb_mysqltuner_cve: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.cve) }}"
 
-        - name: Print mysqltuner results for Adjust variables
-          ansible.builtin.debug:
-            var: mariadb_mysqltuner_adjust_variables
-          when:
-            - mariadb_mysqltuner_adjust_variables != []
-            - mariadb_mysqltuner_adjust_variables | length > 0
+            - name: Print mysqltuner full results when running with -v
+              ansible.builtin.debug:
+                var: mariadb_mysqltuner_results
+              when:
+                - mariadb_mysqltuner_results | length > 0
+                - ansible_verbosity >= 1
 
-        - name: Print mysqltuner results for Fragmented tables
-          ansible.builtin.debug:
-            var: mariadb_mysqltuner_fragmented_tables
-          when:
-            - mariadb_mysqltuner_fragmented_tables != []
-            - mariadb_mysqltuner_fragmented_tables | length > 0
+            - name: Print mysqltuner results for Adjust variables
+              ansible.builtin.debug:
+                var: mariadb_mysqltuner_adjust_variables
+              when:
+                - mariadb_mysqltuner_adjust_variables != []
+                - mariadb_mysqltuner_adjust_variables | length > 0
 
-        - name: Print mysqltuner results for Recommendations
-          ansible.builtin.debug:
-            var: mariadb_mysqltuner_recommendations
-          when:
-            - mariadb_mysqltuner_recommendations != []
-            - mariadb_mysqltuner_recommendations | length > 0
+            - name: Print mysqltuner results for Fragmented tables
+              ansible.builtin.debug:
+                var: mariadb_mysqltuner_fragmented_tables
+              when:
+                - mariadb_mysqltuner_fragmented_tables != []
+                - mariadb_mysqltuner_fragmented_tables | length > 0
 
-        - name: Print mysqltuner results for CVE
-          ansible.builtin.debug:
-            var: mariadb_mysqltuner_cve
-          when:
-            - mariadb_mysqltuner_cve != []
-            - mariadb_mysqltuner_cve | length > 0
+            - name: Print mysqltuner results for Recommendations
+              ansible.builtin.debug:
+                var: mariadb_mysqltuner_recommendations
+              when:
+                - mariadb_mysqltuner_recommendations != []
+                - mariadb_mysqltuner_recommendations | length > 0
+
+            - name: Print mysqltuner results for CVE
+              ansible.builtin.debug:
+                var: mariadb_mysqltuner_cve
+              when:
+                - mariadb_mysqltuner_cve != []
+                - mariadb_mysqltuner_cve | length > 0
+
+          when: mariadb_mysqltuner_command is defined
 
       when: mariadb_mysqltuner_which.rc == 0
 
