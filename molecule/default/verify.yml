@@ -36,10 +36,10 @@
 
     - name: Set a variables for the MariaDB databases, users and version
       ansible.builtin.set_fact:
-        mariadb_databases: "{{ molecule_mariadb_info.databases.keys() | reject('regex', '.*lost[+]found$') | list }}"
-        mariadb_usernames: "{{ molecule_mariadb_info.users.localhost.keys() }}"
-        mariadb_version: "{{ molecule_mariadb_info.version.major }}.{{ molecule_mariadb_info.version.minor }}.{{ molecule_mariadb_info.version.release }}"
-        mariadb_version_major_minor: "{{ molecule_mariadb_info.version.major }}.{{ molecule_mariadb_info.version.minor }}"
+        molecule_mariadb_databases: "{{ molecule_mariadb_info.databases.keys() | reject('regex', '.*lost[+]found$') | list }}"
+        molecule_mariadb_usernames: "{{ molecule_mariadb_info.users.localhost.keys() }}"
+        molecule_mariadb_version: "{{ molecule_mariadb_info.version.major }}.{{ molecule_mariadb_info.version.minor }}.{{ molecule_mariadb_info.version.release }}"
+        molecule_mariadb_version_major_minor: "{{ molecule_mariadb_info.version.major }}.{{ molecule_mariadb_info.version.minor }}"
 
     - name: Debug MariaDB databases
       ansible.builtin.debug:

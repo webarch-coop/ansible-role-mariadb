@@ -34,11 +34,11 @@
       ansible.builtin.file:
         path: "{{ mariadb_cnf.path }}"
         state: absent
-      notify: Restart MariaDB
       when:
         - mariadb_cnf.state is defined
         - mariadb_cnf.state == "absent"
         - mariadb_cnf_file_path.stat.exists | bool
+      notify: Restart MariaDB
 
     - name: MariaDB configuration file present
       block:
