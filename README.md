@@ -2,7 +2,7 @@
 
 [![pipeline status](https://git.coop/webarch/mariadb/badges/master/pipeline.svg)](https://git.coop/webarch/mariadb/-/commits/master)
 
-This repository contains an Ansible role for installing and configuring [MariaDB](https://mariadb.org/) on Debian servers.
+This repository contains an Ansible role for installing and configuring [MariaDB](https://mariadb.org/) on Debian and Ubuntu servers.
 
 ## Role versions
 
