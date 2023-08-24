@@ -33,10 +33,25 @@
       ansible.builtin.set_fact:
         mariadb_mysqltuner_version_latest: "{{ mariadb_mysqltuner_headers.location | ansible.builtin.urlsplit('path') | ansible.builtin.basename | ansible.builtin.regex_replace('^v') }}"
 
+    - name: Debug the latest version of MySQLTuner
+      ansible.builtin.debug:
+        var: mariadb_mysqltuner_version_latest
+      when:
+        - mariadb_mysqltuner_version_latest is defined
+        - ansible_verbosity >= 1
+
     - name: Set a fact for the version of MySQLTuner that is required and the Debian version
       ansible.builtin.set_fact:
         mariadb_mysqltuner_version_required: "{% if mariadb_mysqltuner_version == 'latest' %}{{ mariadb_mysqltuner_version_latest }}{% else %}{{ mariadb_mysqltuner_version }}{% endif %}"
         mariadb_mysqltuner_version_debian: "{{ mariadb_mysqltuner_versions | community.general.json_query(mariadb_jpq.tunerver) }}"
+
+    - name: Debug the MySQLTuner version required
+      ansible.builtin.debug:
+        var: mariadb_mysqltuner_version_required
+
+    - name: Debug the Debian / Ubuntu version of MySQLTuner
+      ansible.builtin.debug:
+        var: mariadb_mysqltuner_version_debian
 
     - name: Use a Debian version of MySQLTuner
       block:
@@ -79,7 +94,10 @@
             - mariadb_mysqltuner_present.changed is defined
             - mariadb_mysqltuner_present.changed | bool
 
-      when: mariadb_mysqltuner_version_required is ansible.builtin.version(mariadb_mysqltuner_version_debian, 'le')
+      when:
+        - mariadb_mysqltuner_version_required is defined
+        - mariadb_mysqltuner_version_debian is defined
+        - mariadb_mysqltuner_version_required is ansible.builtin.version(mariadb_mysqltuner_version_debian, 'le')
 
     - name: Install MySQLTuner from GitHub
       block:
