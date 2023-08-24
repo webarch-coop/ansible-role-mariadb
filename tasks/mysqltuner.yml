@@ -93,12 +93,9 @@
             ( ansible_local.dpkg.installed is not defined ) or
             ( "mysqltuner" not in ansible_local.dpkg.installed )
 
-        - name: Re-read Ansible local facts  # noqa: no-handler
+        - name: Re-read Ansible local facts
           ansible.builtin.setup:
             filter: ansible_local
-          when:
-            - mariadb_mysqltuner_present.changed is defined
-            - mariadb_mysqltuner_present.changed | bool
 
       when:
         - mariadb_mysqltuner_version_required is defined
@@ -198,12 +195,19 @@
       register: mariadb_mysqltuner_which
       failed_when: mariadb_mysqltuner_which.rc is not regex('^0|1$')
 
+    - name: Check that /usr/share/mysqltuner/vulnerabilities.csv is present
+      ansible.builtin.stat:
+        path: /usr/share/mysqltuner/vulnerabilities.csv
+      register: mariadb_mysqltuner_vulnerabilities_csv
+
     - name: Run mysqltuner when it is installed
       block:
 
         # Full full results run `mysqltuner --json --cvefile=/usr/share/mysqltuner/vulnerabilities.csv | jq`
         - name: Run mysqltuner
-          ansible.builtin.command: mysqltuner --json --cvefile=/usr/share/mysqltuner/vulnerabilities.csv
+          ansible.builtin.command: >-
+            mysqltuner --json
+            {% if mariadb_mysqltuner_vulnerabilities_csv.stat.exists | bool %}--cvefile=/usr/share/mysqltuner/vulnerabilities.csv{% endif %}
           check_mode: false
           changed_when: false
           register: mariadb_mysqltuner_command

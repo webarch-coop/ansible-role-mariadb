@@ -273,6 +273,10 @@ argument_specs:
         type: str
         required: false
         description: Internal variables for the version of MySQLTuner required.
+      mariadb_mysqltuner_vulnerabilities_csv:
+        type: dict
+        required: false
+        description: Internal variables for the results from stating the MySQL Tuner vulnerabilities.csv file.
       mariadb_mysqltuner_which:
         type: dict
         required: false
