@@ -208,7 +208,7 @@
 
     - name: Set facts for the systemctl results
       ansible.builtin.set_fact:
-        mariadb_mysqltuner_systemctl: "{{ mariadb_systemctl.stdout | community.general.jc('systemctl') | community.general_json_query(mariadb_mysqltuner_systemctl_jpq) }}"
+        mariadb_mysqltuner_systemctl: "{{ mariadb_systemctl.stdout | string | community.general.jc('systemctl') | community.general.json_query(mariadb_mysqltuner_systemctl_jpq) }}"
       vars:
         mariadb_mysqltuner_systemctl_jpq: "[?unit=='mariadb.service'].sub|[0]"
 
