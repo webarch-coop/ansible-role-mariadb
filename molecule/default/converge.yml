@@ -36,6 +36,7 @@
       vars:  # noqa var-naming[no-role-prefix]
         mariadb: true
         mariadb_database: ansible
+        mariadb_systemd_units: []
         mariadb_username: ansible
         mariadb_underscore_autoupdate: true
 ...
