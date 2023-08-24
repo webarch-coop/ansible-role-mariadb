@@ -11,6 +11,11 @@
 - name: Use my_print_defaults and community.mysql.mysql_info to gather information about the MariaDB server databases, users and version
   block:
 
+    - name: This role has only been tested on Debian Buster, Bullseye, Bookworm and Trixie and Ubuntu Jammy
+      ansible.builtin.assert:
+        that:
+          - ansible_distribution_release is regex('bookworm|bullseye|buster|jammy|trixie')
+
     # When in a docker container mariadb_init.stdout == "sh"
     - name: Check if system has been booted with systemd as init system
       ansible.builtin.command: ps -p 1 -o comm=
