@@ -183,7 +183,9 @@
           check_mode: false
           changed_when: false
           register: mariadb_mysqltuner_command
-          failed_when: ( "JSON Module is needed" in mariadb_mysqltuner_command.stdout )
+          failed_when: >-
+            ( "JSON Module is needed" in mariadb_mysqltuner_command.stdout ) or
+            ( mariadb_mysqltuner_command.rc != 0 )
 
         - name: Set facts
           ansible.builtin.set_fact:
