@@ -152,7 +152,7 @@
                 src: /usr/local/src/MySQLTuner-perl/mysqltuner.pl
                 dest: /usr/local/bin/mysqltuner
                 remote_src: true
-                mode: 0755
+                mode: "0755"
                 owner: root
                 group: root
 
@@ -160,7 +160,7 @@
               ansible.builtin.file:
                 path: /usr/share/mysqltuner
                 state: directory
-                mode: 0755
+                mode: "0755"
                 owner: root
                 group: root
 
@@ -169,7 +169,7 @@
                 src: /usr/local/src/MySQLTuner-perl/basic_passwords.txt
                 dest: /usr/local/bin/basic_passwords.txt
                 remote_src: true
-                mode: 0644
+                mode: "0644"
                 owner: root
                 group: root
 
@@ -178,7 +178,7 @@
                 src: /usr/local/src/MySQLTuner-perl/vulnerabilities.csv
                 dest: /usr/share/mysqltuner/vulnerabilities.csv
                 remote_src: true
-                mode: 0644
+                mode: "0644"
                 owner: root
                 group: root
 

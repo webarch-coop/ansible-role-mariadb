@@ -100,7 +100,7 @@
                     line: "{{ mariadb_tzdata_latest }}"
                     state: present
                     create: true
-                    mode: 0640
+                    mode: "0640"
                     owner: root
                     group: root
 
