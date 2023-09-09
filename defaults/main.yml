@@ -50,7 +50,7 @@ mariadb_config:
       mysqldump:
         max_allowed_packet: "64M"
 mariadb_mysqltuner: true
-mariadb_mysqltuner_version: "1.9.9"
+mariadb_mysqltuner_version: "2.2.12"
 mariadb_pkgs_absent: []
 mariadb_pkgs_present:
   - git

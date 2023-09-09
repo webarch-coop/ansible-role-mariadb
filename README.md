@@ -40,7 +40,7 @@ A boolean, `mariadb_mysqltuner` defaults to `true` and results in [MySQLTuner](h
 
 ### mariadb_mysqltuner_version
 
-A version number for MySQLTuner, `mariadb_mysqltuner_version` defaults to `1.9.9` the version provided by [Debian Bookworm](https://packages.debian.org/bookworm/mysqltuner). If `mariadb_mysqltuner_version` is set to `latest` then the [versions available from GitHub](https://github.com/major/MySQLTuner-perl/releases) are checked and the latest release is installed.
+A version number for MySQLTuner, `mariadb_mysqltuner_version` defaults to `2.2.12` as this version has [a fix for this issue](https://github.com/major/MySQLTuner-perl/issues/715). If `mariadb_mysqltuner_version` is set to `latest` then the [versions available from GitHub](https://github.com/major/MySQLTuner-perl/releases) are checked and the latest release is installed.
 
 ### mariadb_pkgs_absent
 
