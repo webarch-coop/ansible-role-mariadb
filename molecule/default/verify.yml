@@ -26,46 +26,46 @@
 
     - name: Set facts for mysqltuner results
       ansible.builtin.set_fact:
-        mariadb_molecule_results: "{{ mariadb_molecule_command.stdout | ansible.builtin.from_json }}"
-        mariadb_molecule_adjust_variables: "{{ mariadb_molecule_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.adjvars) }}"
-        mariadb_molecule_recommendations: "{{ mariadb_molecule_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.recs) }}"
-        mariadb_molecule_fragmented_tables: "{{ mariadb_molecule_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.fragtabs) }}"
-        mariadb_molecule_cve: "{{ mariadb_molecule_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.cve) }}"
+        molecule_mysqltuner_results: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json }}"
+        molecule_mysqltuner_adjust_variables: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.adjvars) }}"
+        molecule_mysqltuner_recommendations: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.recs) }}"
+        molecule_mysqltuner_fragmented_tables: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.fragtabs) }}"
+        molecule_mysqltuner_cve: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.cve) }}"
 
     - name: Print mysqltuner full results when running with -v
       ansible.builtin.debug:
-        var: mariadb_molecule_results
+        var: molecule_mysqltuner_results
       when:
-        - mariadb_molecule_results | length > 0
+        - molecule_mysqltuner_results | length > 0
         - ansible_verbosity >= 1
 
     - name: Print mysqltuner results for Adjust variables
       ansible.builtin.debug:
-        var: mariadb_molecule_adjust_variables
+        var: molecule_mysqltuner_adjust_variables
       when:
-        - mariadb_molecule_adjust_variables != []
-        - mariadb_molecule_adjust_variables | length > 0
+        - molecule_mysqltuner_adjust_variables != []
+        - molecule_mysqltuner_adjust_variables | length > 0
 
     - name: Print mysqltuner results for Fragmented tables
       ansible.builtin.debug:
-        var: mariadb_molecule_fragmented_tables
+        var: molecule_mysqltuner_fragmented_tables
       when:
-        - mariadb_molecule_fragmented_tables != []
-        - mariadb_molecule_fragmented_tables | length > 0
+        - molecule_mysqltuner_fragmented_tables != []
+        - molecule_mysqltuner_fragmented_tables | length > 0
 
     - name: Print mysqltuner results for Recommendations
       ansible.builtin.debug:
-        var: mariadb_molecule_recommendations
+        var: molecule_mysqltuner_recommendations
       when:
-        - mariadb_molecule_recommendations != []
-        - mariadb_molecule_recommendations | length > 0
+        - molecule_mysqltuner_recommendations != []
+        - molecule_mysqltuner_recommendations | length > 0
 
     - name: Print mysqltuner results for CVE
       ansible.builtin.debug:
-        var: mariadb_molecule_cve
+        var: molecule_mysqltuner_cve
       when:
-        - mariadb_molecule_cve != []
-        - mariadb_molecule_cve | length > 0
+        - molecule_mysqltuner_cve != []
+        - molecule_mysqltuner_cve | length > 0
 
     - name: Query the MariaDB databases, users and version using a socket
       community.mysql.mysql_info:
