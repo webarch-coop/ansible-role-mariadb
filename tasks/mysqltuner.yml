@@ -232,7 +232,7 @@
         - name: Set fact for mysqltuner results
           block:
 
-            - name: Set facts
+            - name: Set facts for mysqltuner results
               ansible.builtin.set_fact:
                 mariadb_mysqltuner_results: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json }}"
                 mariadb_mysqltuner_adjust_variables: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.adjvars) }}"
