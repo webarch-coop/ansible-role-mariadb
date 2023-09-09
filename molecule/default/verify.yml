@@ -27,10 +27,19 @@
     - name: Set facts for mysqltuner results
       ansible.builtin.set_fact:
         molecule_mysqltuner_results: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json }}"
-        molecule_mysqltuner_adjust_variables: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.adjvars) }}"
-        molecule_mysqltuner_recommendations: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.recs) }}"
-        molecule_mysqltuner_fragmented_tables: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.fragtabs) }}"
-        molecule_mysqltuner_cve: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.cve) }}"
+        molecule_mysqltuner_adjust_variables: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(molecule_jpq.adjvars) }}"
+        molecule_mysqltuner_recommendations: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(molecule_jpq.recs) }}"
+        molecule_mysqltuner_fragmented_tables: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(molecule_jpq.fragtabs) }}"
+        molecule_mysqltuner_cve: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(molecule_jpq.cve) }}"
+      vars:
+        molecule_jpq:
+          adjvars: 'AdjustVariables'
+          cve: 'CVE'
+          fragtabs: 'Tables."Fragmented tables"'
+          groups: "[].group_name"
+          tunerver: "[?distro=='{{ ansible_distribution_release }}'].version|[0]"
+          recs: '"Recommendations"'
+          users: "[].username"
 
     - name: Print mysqltuner full results when running with -v
       ansible.builtin.debug:
