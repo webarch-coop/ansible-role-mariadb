@@ -18,6 +18,32 @@
     ansible_python_interpreter: /usr/bin/python3
   tasks:
 
+    - name: Check that the service is running
+      ansible.builtin.command: "systemctl status {{ lookup('ansible.builtin.env', 'CI_PROJECT_NAME') }}"
+      check_mode: false
+      changed_when: false
+      register: molecule_systemctl_status
+
+    - name: Set a fact for the Active and Loaded output from systemctl
+      ansible.builtin.set_fact:
+        molecule_systemctl_active: "{{ molecule_systemctl_status.stdout_lines | select('regex', '^     Active: ') | map('regex_replace', '^     Active: ') | first }}"
+        molecule_systemctl_loaded: "{{ molecule_systemctl_status.stdout_lines | select('regex', '^     Loaded: ') | map('regex_replace', '^     Loaded: ') | first }}"
+
+    - name: Debug systemctl active status
+      ansible.builtin.debug:
+        var: molecule_systemctl_active
+
+    - name: Debug systemctl loaded status
+      ansible.builtin.debug:
+        var: molecule_systemctl_loaded
+
+    - name: Check that the service is active and loaded
+      ansible.builtin.assert:
+        that:
+          - ( "active (running)" in molecule_systemctl_active )
+          - ( "enabled; preset: enabled" in molecule_systemctl_loaded )
+        quiet: true
+
     - name: Run mysqltuner
       ansible.builtin.command: mysqltuner --json
       check_mode: false
