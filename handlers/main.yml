@@ -33,6 +33,7 @@
 - name: Debug MariaDB service
   ansible.builtin.debug:
     msg: "{{ (mariadb_service_facts | community.general.json_query(mariadb_jpq.service)).status }}"
+  listen: Restart mariadb
   tags:
     - mariadb
 
