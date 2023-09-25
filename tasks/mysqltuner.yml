@@ -200,17 +200,9 @@
         path: /usr/share/mysqltuner/vulnerabilities.csv
       register: mariadb_mysqltuner_vulnerabilities_csv
 
-    - name: Check that MariaDB is running  # noqa: command-instead-of-module
-      ansible.builtin.command: systemctl
-      check_mode: false
-      changed_when: false
-      register: mariadb_systemctl
-
-    - name: Set facts for the systemctl results
-      ansible.builtin.set_fact:
-        mariadb_mysqltuner_systemctl: "{{ mariadb_systemctl.stdout | string | community.general.jc('systemctl') | community.general.json_query(mariadb_mysqltuner_systemctl_jpq) }}"
-      vars:
-        mariadb_mysqltuner_systemctl_jpq: "[?unit=='mariadb.service'].sub|[0]"
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+      register: mariadb_service_facts
 
     - name: Run mysqltuner when it is installed and MariaDB is running
       block:
@@ -279,8 +271,7 @@
 
       when:
         - mariadb_mysqltuner_which.rc == 0
-        - mariadb_mysqltuner_systemctl is defined
-        - mariadb_mysqltuner_systemctl == "running"
+        - (mariadb_service_facts | community.general.json_query(mariadb_jpq.service)).status == "running"
 
   tags:
     - mariadb

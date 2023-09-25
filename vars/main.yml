@@ -20,6 +20,7 @@ mariadb_jpq:
   groups: "[].group_name"
   tunerver: "[?distro=='{{ ansible_distribution_release }}'].version|[0]"
   recs: '"Recommendations"'
+  service: 'ansible_facts.services.["mariadb.service"]|[0]'
   users: "[].username"
 
 mariadb_mysqltuner_versions:

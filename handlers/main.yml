@@ -16,9 +16,19 @@
     - mariadb
 
 - name: MariaDB restarted
-  ansible.builtin.systemd:
+  ansible.builtin.systemd_service:
     name: mysql
     state: restarted
+  listen: Restart mariadb
+  tags:
+    - mariadb
+
+- name: Ensure MariaDB is running
+  ansible.builtin.service_facts:
+  register: mariadb_service_facts
+  until: (mariadb_service_facts | community.general.json_query(mariadb_jpq.service)).status == "running"
+  retries: 20
+  delay: 1
   listen: Restart mariadb
   tags:
     - mariadb

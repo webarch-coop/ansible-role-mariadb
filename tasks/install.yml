@@ -50,12 +50,20 @@
         path: /lib/systemd/system/mariadb.service
       register: mariadb_system_service
 
-    - name: MariaDB enabled
-      ansible.builtin.service:
+    - name: Stat /etc/systemd/system/multi-user.target.wants/mariadb.service
+      ansible.builtin.stat:
+        path: /etc/systemd/system/multi-user.target.wants/mariadb.service
+      register: mariadb_system_service_symlink
+
+    - name: MariaDB enabled and started
+      ansible.builtin.systemd_service:
         name: mariadb
+        enabled: true
         state: started
       register: mariadb_service
-      when: mariadb_system_service.stat.exists | bool
+      when:
+        - mariadb_system_service.stat.exists | bool
+        - mariadb_system_service_symlink.stat.exists | bool
 
     - name: Debug mariadb_service
       ansible.builtin.debug:
