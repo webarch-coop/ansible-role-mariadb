@@ -27,8 +27,8 @@
   ansible.builtin.service_facts:
   register: mariadb_service_facts
   until: (mariadb_service_facts | community.general.json_query(mariadb_jpq.service)).status == "running"
-  retries: 20
-  delay: 1
+  retries: 10
+  delay: 2
   listen: Restart mariadb
   tags:
     - mariadb
