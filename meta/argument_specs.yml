@@ -356,6 +356,10 @@ argument_specs:
         type: dict
         required: false
         description: Internal result from setting the MariaDB systemd service state to started.
+      mariadb_service_facts:
+        type: dict
+        required: false
+        description: Internal results registered as a result of running ansible.builtin.systemd_service.
       mariadb_socket:
         type: str
         required: true
@@ -372,6 +376,10 @@ argument_specs:
         type: dict
         required: false
         description: Internal result from stating the MariaDB systemd service file.
+      mariadb_system_service_symlink:
+        type: dict
+        required: false
+        description: Internal result from stating the MariaDB systemd service file symlink.
       mariadb_systemd_units:
         type: list
         elements: dict
