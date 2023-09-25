@@ -23,24 +23,10 @@
   tags:
     - mariadb
 
-- name: Check services
-  ansible.builtin.service_facts:
-  register: mariadb_service_facts
-  listen: Restart mariadb
-  tags:
-    - mariadb
-
-- name: Debug MariaDB service
-  ansible.builtin.debug:
-    msg: "{{ (mariadb_service_facts | community.general.json_query(mariadb_jpq.service)).status }}"
-  listen: Restart mariadb
-  tags:
-    - mariadb
-
 - name: Ensure MariaDB is running
   ansible.builtin.service_facts:
   register: mariadb_service_facts
-  until: (mariadb_service_facts | community.general.json_query(mariadb_jpq.service)).status == "running"
+  until: (mariadb_service_facts | community.general.json_query(mariadb_jpq.service)).state == "running"
   retries: 10
   delay: 2
   listen: Restart mariadb
