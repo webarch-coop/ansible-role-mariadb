@@ -22,6 +22,12 @@
       ansible.builtin.service_facts:
       register: molecule_service_facts
 
+    - name: Debug MariadDB service status
+      ansible.builtin.debug:
+        msg: "{{ molecule_service_facts | community.general.json_query(molecule_service_jpq) }}"
+      vars:
+        molecule_service_jpq: 'ansible_facts.services.["mariadb.service"]|[0]'
+
     - name: Check that MariaDB is enabled and running
       ansible.builtin.assert:
         that:
