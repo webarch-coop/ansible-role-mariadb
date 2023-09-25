@@ -18,23 +18,6 @@
 - name: MariaDB
   block:
 
-    # - name: Gather service facts
-    #   ansible.builtin.service_facts:
-    #   register: mariadb_service_facts
-
-    # - name: Debug service facts
-    #   ansible.builtin.debug:
-    #     var: mariadb_service_facts.ansible_facts
-
-    # - name: MariaDB should be running
-    #   ansible.builtin.debug:
-    #     msg: "{{ mariadb_service_facts | community.general.json_query(mariadb_service_jpq) }}"
-    #   vars:
-    #     mariadb_service_jpq: 'ansible_facts.services.["mariadb.service"]|[0]'
-
-    # - name: Fail
-    #   ansible.builtin.fail:
-
     - name: MariaDB include verify tasks
       ansible.builtin.include_tasks: verify.yml
       when:
