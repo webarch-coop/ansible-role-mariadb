@@ -6,7 +6,9 @@ This repository contains an Ansible role for installing and configuring [MariaDB
 
 ## Role versions
 
-Version 3.0.0 and greater of this role provide the option to edit or template MariaDB configuration files using YAML dictionaries to define the file configuration variables. Existing files are read using [the JC ini parser](https://kellyjonbrazil.github.io/jc/docs/parsers/ini) and edited using the [community.general.ini_file module](https://docs.ansible.com/ansible/latest/collections/community/general/ini_file_module.html) or clobbered or, if not existing, created using the [ansible.builtin.template module](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/template_module.html). As MariaDB can be configured using variables that contain dashes, `-` or underscores, `_` interchangeably this role will re-write variables that use dashes to ones that use underscores for consistency.
+Version 3.0.0 and greater of this role provide the option to edit or template MariaDB configuration files using YAML dictionaries to define the file configuration variables. Existing files are read using [the JC ini parser](https://kellyjonbrazil.github.io/jc/docs/parsers/ini) and edited using the [community.general.ini_file module](https://docs.ansible.com/ansible/latest/collections/community/general/ini_file_module.html) or clobbered or, if not existing, created using the [ansible.builtin.template module](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/template_module.html).
+
+As MariaDB can be configured using variables that contain dashes, `-` or underscores, `_` interchangeably this role will re-write variables that use dashes to ones that use underscores for consistency.
 
 The last 2.x version of this role [version 2.4.2](https://git.coop/webarch/mariadb/-/releases/2.4.2) is the last version that contains Ansible tasks to switch between password and socket authentication for the root user, all 3.x versions assume socket authentication is used.
 
