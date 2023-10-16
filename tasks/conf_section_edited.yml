@@ -100,7 +100,7 @@
       when:
         - mariadb_conf_variable_uncommented is defined
         - mariadb_conf_variable_uncommented.changed is defined
-        - mariadb_conf_variable_uncommented.changed | true
+        - mariadb_conf_variable_uncommented.changed | bool
         - mariadb_init is defined
         - mariadb_init == "systemd"
 
@@ -132,7 +132,7 @@
       when:
         - mariadb_conf_variable_edited is defined
         - mariadb_conf_variable_edited.changed is defined
-        - mariadb_conf_variable_edited.changed | true
+        - mariadb_conf_variable_edited.changed | bool
         - mariadb_init is defined
         - mariadb_init == "systemd"
 

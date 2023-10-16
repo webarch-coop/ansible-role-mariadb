@@ -30,7 +30,7 @@
       when:
         - mariadb_install is defined
         - mariadb_install.changed is defined
-        - mariadb_install.changed | true
+        - mariadb_install.changed | bool
         - mariadb_init is defined
         - mariadb_init == "systemd"
 

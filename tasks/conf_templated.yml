@@ -41,7 +41,7 @@
       when:
         - mariadb_cnf_file_templated is defined
         - mariadb_cnf_file_templated.changed is defined
-        - mariadb_cnf_file_templated.changed | true
+        - mariadb_cnf_file_templated.changed | bool
         - mariadb_init is defined
         - mariadb_init == "systemd"
 
