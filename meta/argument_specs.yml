@@ -65,6 +65,14 @@ argument_specs:
         elements: str
         required: false
         description: Internal list of proposed MariaDB configuration file variables that don't have values.
+      mariadb_cnf_variable_edited:
+        type: dict
+        required: false
+        description: Internal results from using ini_file to write a variable variable in a config file.
+      mariadb_cnf_variable_uncommented:
+        type: dict
+        required: false
+        description: Internal results from using lineinfile to uncomment a variable in a config file.
       mariadb_config:
         type: list
         elements: dict

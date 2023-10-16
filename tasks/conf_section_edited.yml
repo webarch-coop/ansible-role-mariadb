@@ -80,7 +80,7 @@
         mode: "{{ mariadb_cnf.mode | default('0644') }}"
         owner: "{{ mariadb_cnf.owner | default('root') }}"
         group: "{{ mariadb_cnf.owner | default('root') }}"
-      register: mariadb_conf_variable_uncommented
+      register: mariadb_cnf_variable_uncommented
       when: >-
         ( mariadb_cnf_variable_pair.key not in mariadb_cnf_file_section_existing_keys ) or
         ( ( mariadb_cnf_variable_pair.value | type_debug != "NoneType" ) and
@@ -98,9 +98,9 @@
         msg: MariaDB is to be restarted
       notify: Restart mariadb
       when:
-        - mariadb_conf_variable_uncommented is defined
-        - mariadb_conf_variable_uncommented.changed is defined
-        - mariadb_conf_variable_uncommented.changed | bool
+        - mariadb_cnf_variable_uncommented is defined
+        - mariadb_cnf_variable_uncommented.changed is defined
+        - mariadb_cnf_variable_uncommented.changed | bool
         - mariadb_init is defined
         - mariadb_init == "systemd"
 
@@ -114,7 +114,7 @@
         mode: "{{ mariadb_cnf.mode | default('0644') }}"
         owner: "{{ mariadb_cnf.owner | default('root') }}"
         group: "{{ mariadb_cnf.owner | default('root') }}"
-      register: mariadb_conf_variable_edited
+      register: mariadb_cnf_variable_edited
       when:
         - mariadb_cnf_variable_pair.key in mariadb_cnf_file_section_proposed_value_less_keys
         - mariadb_cnf_variable_pair.key not in mariadb_cnf_file_section_existing_keys
@@ -130,9 +130,9 @@
         msg: MariaDB is to be restarted
       notify: Restart mariadb
       when:
-        - mariadb_conf_variable_edited is defined
-        - mariadb_conf_variable_edited.changed is defined
-        - mariadb_conf_variable_edited.changed | bool
+        - mariadb_cnf_variable_edited is defined
+        - mariadb_cnf_variable_edited.changed is defined
+        - mariadb_cnf_variable_edited.changed | bool
         - mariadb_init is defined
         - mariadb_init == "systemd"
 
