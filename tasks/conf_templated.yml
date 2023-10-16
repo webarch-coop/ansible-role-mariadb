@@ -33,7 +33,17 @@
         owner: "{{ mariadb_cnf.owner | default('root') }}"
         group: "{{ mariadb_cnf.group | default('root') }}"
       register: mariadb_cnf_file_templated
+
+    - name: Notify handler to restart MariaDB
+      ansible.builtin.debug:
+        msg: MariaDB is to be restarted
       notify: Restart mariadb
+      when:
+        - mariadb_cnf_file_templated is defined
+        - mariadb_cnf_file_templated.changed is defined
+        - mariadb_cnf_file_templated.changed | true
+        - mariadb_init is defined
+        - mariadb_init == "systemd"
 
     - name: MariaDB configuration file backup absent when originial file is unchanged
       ansible.builtin.file:

@@ -80,6 +80,7 @@
         mode: "{{ mariadb_cnf.mode | default('0644') }}"
         owner: "{{ mariadb_cnf.owner | default('root') }}"
         group: "{{ mariadb_cnf.owner | default('root') }}"
+      register: mariadb_conf_variable_uncommented
       when: >-
         ( mariadb_cnf_variable_pair.key not in mariadb_cnf_file_section_existing_keys ) or
         ( ( mariadb_cnf_variable_pair.value | type_debug != "NoneType" ) and
@@ -91,7 +92,17 @@
       loop_control:
         loop_var: mariadb_cnf_variable_pair
         label: "{{ mariadb_cnf_variable_pair.key }}{% if mariadb_cnf_variable_pair.value | type_debug != 'NoneType' %} = {{ mariadb_cnf_variable_pair.value }}{% endif %}"
+
+    - name: Notify handler to restart MariaDB
+      ansible.builtin.debug:
+        msg: MariaDB is to be restarted
       notify: Restart mariadb
+      when:
+        - mariadb_conf_variable_uncommented is defined
+        - mariadb_conf_variable_uncommented.changed is defined
+        - mariadb_conf_variable_uncommented.changed | true
+        - mariadb_init is defined
+        - mariadb_init == "systemd"
 
     - name: "MariaDB configuration file edited for keys without values for section {{ mariadb_cnf_section.key }}"
       community.general.ini_file:
@@ -103,6 +114,7 @@
         mode: "{{ mariadb_cnf.mode | default('0644') }}"
         owner: "{{ mariadb_cnf.owner | default('root') }}"
         group: "{{ mariadb_cnf.owner | default('root') }}"
+      register: mariadb_conf_variable_edited
       when:
         - mariadb_cnf_variable_pair.key in mariadb_cnf_file_section_proposed_value_less_keys
         - mariadb_cnf_variable_pair.key not in mariadb_cnf_file_section_existing_keys
@@ -112,7 +124,17 @@
       loop_control:
         loop_var: mariadb_cnf_variable_pair
         label: "{{ mariadb_cnf_variable_pair.key }}"
+
+    - name: Notify handler to restart MariaDB
+      ansible.builtin.debug:
+        msg: MariaDB is to be restarted
       notify: Restart mariadb
+      when:
+        - mariadb_conf_variable_edited is defined
+        - mariadb_conf_variable_edited.changed is defined
+        - mariadb_conf_variable_edited.changed | true
+        - mariadb_init is defined
+        - mariadb_init == "systemd"
 
     - name: "MariaDB configuration file edited for keys with values for section {{ mariadb_cnf_section.key }}"
       community.general.ini_file:

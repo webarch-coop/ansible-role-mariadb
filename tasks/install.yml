@@ -16,13 +16,23 @@
         pkg: "{{ mariadb_pkgs_present | ansible.builtin.difference(ansible_local.dpkg.installed) }}"
         state: present
         update_cache: false
-      notify: Restart mariadb
       register: mariadb_install
       when:
         - mariadb_pkgs_present is defined
         - mariadb_pkgs_present != []
         - ansible_local.dpkg.installed is defined
         - mariadb_pkgs_present | ansible.builtin.difference(ansible_local.dpkg.installed) != []
+
+    - name: Notify handler to restart MariaDB
+      ansible.builtin.debug:
+        msg: MariaDB is to be restarted
+      notify: Restart mariadb
+      when:
+        - mariadb_install is defined
+        - mariadb_install.changed is defined
+        - mariadb_install.changed | true
+        - mariadb_init is defined
+        - mariadb_init == "systemd"
 
     - name: MariaDB packages absent
       ansible.builtin.apt:
