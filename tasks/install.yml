@@ -15,7 +15,7 @@
       ansible.builtin.apt:
         pkg: "{{ mariadb_pkgs_present | ansible.builtin.difference(ansible_local.dpkg.installed) }}"
         state: present
-        update_cache: false
+        update_cache: true
       register: mariadb_install
       when:
         - mariadb_pkgs_present is defined
