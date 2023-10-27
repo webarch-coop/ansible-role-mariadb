@@ -14,7 +14,7 @@
     - name: Include MariaDB verify tasks
       ansible.builtin.include_tasks: verify.yml
 
-    - name: Include MAriaDB user variable checks
+    - name: Include MariaDB user variable checks
       ansible.builtin.include_tasks: user_checks.yml
 
     - name: "MariaDB database present {{ mariadb_database }}"
