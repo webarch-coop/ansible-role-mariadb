@@ -147,6 +147,11 @@
                 depth: 1
                 update: true
 
+            - name: Check that MySQLTuner code is present
+              ansible.builtin.stat:
+                path: /usr/local/src/MySQLTuner-perl/mysqltuner.pl
+              register: mariadb_mysqltuner_script
+
             - name: MySQLTuner script in place
               ansible.builtin.copy:
                 src: /usr/local/src/MySQLTuner-perl/mysqltuner.pl
@@ -155,6 +160,7 @@
                 mode: "0755"
                 owner: root
                 group: root
+              when: mariadb_mysqltuner_script.stat.exists | bool
 
             - name: Directory for MySQLTuner assets in place
               ansible.builtin.file:
@@ -164,6 +170,11 @@
                 owner: root
                 group: root
 
+            - name: Check that MySQLTuner passwords is present
+              ansible.builtin.stat:
+                path: /usr/local/src/MySQLTuner-perl/basic_passwords.txt
+              register: mariadb_mysqltuner_passwords
+
             - name: MySQLTuner basic_passwords.txt file in place
               ansible.builtin.copy:
                 src: /usr/local/src/MySQLTuner-perl/basic_passwords.txt
@@ -172,6 +183,12 @@
                 mode: "0644"
                 owner: root
                 group: root
+              when: mariadb_mysqltuner_passwords.stat.exists | bool
+
+            - name: Check that MySQLTuner vulnerabilities is present
+              ansible.builtin.stat:
+                path: /usr/local/src/MySQLTuner-perl/vulnerabilities.csv
+              register: mariadb_mysqltuner_vulnerabilities
 
             - name: MySQLTuner vulnerabilities.csv file in place
               ansible.builtin.copy:
@@ -181,6 +198,7 @@
                 mode: "0644"
                 owner: root
                 group: root
+              when: mariadb_mysqltuner_vulnerabilities.stat.exists | bool
 
           when: >-
             ( ansible_local.dpkg.installed is not defined ) or

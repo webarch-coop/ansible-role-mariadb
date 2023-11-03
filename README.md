@@ -36,6 +36,12 @@ mariadb_config:
         default_character_set: utf8mb4
 ```
 
+You can get the existing configuration as YAML using:
+
+```bash
+cat /etc/mysql/mariadb.conf.d/50-server.cnf | jc --ini -p | yq -o=yaml -P
+```
+
 ### mariadb_mysqltuner
 
 A boolean, `mariadb_mysqltuner` defaults to `true` and results in [MySQLTuner](https://github.com/major/MySQLTuner-perl) being installed using a Debian package or from GitHub depending on the version specified using `mariadb_mysqltuner_version`.
