@@ -16,6 +16,7 @@ variables:
   ANSIBLE_SHELL_ALLOW_WORLD_READABLE_TEMP: "1"
   MOLECULE_VERBOSITY: "3"
   PY_COLORS: "1"
+  USER: "root"
 before_script:
   - whoami
   - pwd
