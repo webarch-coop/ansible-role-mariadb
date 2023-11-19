@@ -34,7 +34,6 @@ mariadb_config:
         max_heap_table_size: "32M"
         max_user_connections: "0"
         open_files_limit: "122880"
-        performance_schema: "1"
         query_cache_limit: "0"
         query_cache_size: "0"
         query_cache_type: "0"
@@ -45,6 +44,7 @@ mariadb_config:
         thread_concurrency: "10"
         tmp_table_size: "32M"
         transaction_isolation: "READ-COMMITTED"
+        performance_schema: "1"
   - name: MariaDB mysqldump configuration
     path: /etc/mysql/conf.d/mysqldump.cnf
     state: present
