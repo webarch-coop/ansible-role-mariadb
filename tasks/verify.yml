@@ -26,7 +26,6 @@
         argument_spec: "{{ (lookup('ansible.builtin.file', 'meta/argument_specs.yml') | from_yaml)['argument_specs']['main']['options'] }}"
         provided_arguments: "{{ mariadbhostvars }}"
 
-
   when: mariadb_verify | bool
   tags:
     - mariadb
