@@ -62,6 +62,7 @@ mariadb_pkgs_present:
   - mycli
   - pwgen
   - python3-mysqldb
+  - python3-pymysql
 mariadb_socket: /run/mysqld/mysqld.sock
 mariadb_systemd_units:
   - name: mariadb
