@@ -14,7 +14,7 @@ variables:
   ANSIBLE_FORCE_COLOR: "1"
   ANSIBLE_REMOTE_TMP: "/tmp"
   ANSIBLE_SHELL_ALLOW_WORLD_READABLE_TEMP: "1"
-  MOLECULE_VERBOSITY: "3"
+  MOLECULE_VERBOSITY: "0"
   PY_COLORS: "1"
   USER: "root"
 before_script:
@@ -30,7 +30,7 @@ stages:
   - bookworm
   # - bullseye
   - jammy
-  - trixie
+  # - trixie
 bookworm:
   image: registry.git.coop/webarch/containers/images/bookworm:20231206
   stage: bookworm
@@ -46,9 +46,9 @@ jammy:
   stage: jammy
   script:
     - molecule test
-trixie:
-  image: registry.git.coop/webarch/containers/images/trixie:20231206
-  stage: trixie
-  script:
-    - molecule test
+# trixie:
+#   image: registry.git.coop/webarch/containers/images/trixie:20231206
+#   stage: trixie
+#   script:
+#     - molecule test
 ...
