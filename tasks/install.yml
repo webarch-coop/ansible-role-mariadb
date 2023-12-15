@@ -46,7 +46,7 @@
         - ansible_local.dpkg.installed is defined
         - mariadb_pkgs_absent | ansible.builtin.intersect(ansible_local.dpkg.installed) != []
 
-    - name: Re-read local facts after instaling MariaDB
+    - name: Re-read local facts after installing MariaDB
       ansible.builtin.setup:
         filter: ansible_local
       when: >-
