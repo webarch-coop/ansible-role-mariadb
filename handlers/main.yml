@@ -8,18 +8,39 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects MariaDB Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Reload systemd
-  ansible.builtin.systemd:
-    daemon_reload: true
-  listen: Reload systemd
+- name: Ansible core >= 2.16.0
+  block:
+
+    - name: Reload systemd
+      ansible.builtin.systemd_service:
+        daemon_reload: true
+      listen: Reload systemd
+
+    - name: MariaDB restarted
+      ansible.builtin.systemd_service:
+        name: mysql
+        state: restarted
+      listen: Restart mariadb
+
+  when: ansible_version.string is ansible.builtin.version('2.16.0', 'ge')
   tags:
     - mariadb
 
-- name: MariaDB restarted
-  ansible.builtin.systemd_service:
-    name: mysql
-    state: restarted
-  listen: Restart mariadb
+- name: Ansible core < 2.16.0
+  block:
+
+    - name: Reload systemd
+      ansible.builtin.systemd:
+        daemon_reload: true
+      listen: Reload systemd
+
+    - name: MariaDB restarted
+      ansible.builtin.systemd:
+        name: mysql
+        state: restarted
+      listen: Restart mariadb
+
+  when: ansible_version.string is ansible.builtin.version('2.16.0', 'lt')
   tags:
     - mariadb
 
