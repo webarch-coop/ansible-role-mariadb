@@ -1,4 +1,5 @@
 # {{ ansible_managed }}
+# {# j2lint: disable=jinja-statements-indentation j2lint: disable=single-statement-per-line #}
 
 {% for mariadb_cnf_section in mariadb_cnf.conf | dict2items %}
 [{{ mariadb_cnf_section.key }}]
