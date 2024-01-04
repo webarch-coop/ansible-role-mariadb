@@ -85,24 +85,50 @@
           register: mariadb_upgrade
           changed_when: ( "This installation of MariaDB is already upgraded" not in mariadb_upgrade.stdout )
 
-        - name: Include the MariaDB configuration file tasks
-          ansible.builtin.include_tasks: conf.yml
-          loop: "{{ mariadb_config }}"
-          loop_control:
-            loop_var: mariadb_cnf
-            label: "{{ mariadb_cnf.name | default(mariadb_cnf.path) }}"
+        - name: MariaDB configuration
+          block:
+
+            - name: Debug the MariaDB configuration file variables
+              ansible.builtin.debug:
+                var: mariadb_cnf
+                verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+              loop: "{{ mariadb_config }}"
+              loop_control:
+                loop_var: mariadb_cnf
+                label: "{{ mariadb_cnf.name | default(mariadb_cnf.path) }}"
+
+            - name: Include the MariaDB configuration file tasks
+              ansible.builtin.include_tasks: conf.yml
+              loop: "{{ mariadb_config }}"
+              loop_control:
+                loop_var: mariadb_cnf
+                label: "{{ mariadb_cnf.name | default(mariadb_cnf.path) }}"
+
           when:
             - mariadb_config is defined
             - mariadb_config != []
 
-        - name: Include the systemd role
-          ansible.builtin.include_role:
-            name: systemd
-            tasks_from: unit_present.yml
-          loop: "{{ mariadb_systemd_units }}"
-          loop_control:
-            loop_var: systemd_unit
-            label: "{{ systemd_unit.name }}"
+        - name: MariaDB systemd configuration
+          block:
+
+            - name: Debug the MariaDB systemd configuration file variables
+              ansible.builtin.debug:
+                var: systemd_unit
+                verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+              loop: "{{ mariadb_systemd_units }}"
+              loop_control:
+                loop_var: systemd_unit
+                label: "{{ systemd_unit.name }}"
+
+            - name: Include the systemd role
+              ansible.builtin.include_role:
+                name: systemd
+                tasks_from: unit_present.yml
+              loop: "{{ mariadb_systemd_units }}"
+              loop_control:
+                loop_var: systemd_unit
+                label: "{{ systemd_unit.name }}"
+
           when:
             - mariadb_systemd_units is defined
             - mariadb_systemd_units != []
