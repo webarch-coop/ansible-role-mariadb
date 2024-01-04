@@ -42,6 +42,10 @@ You can get the existing configuration as YAML using:
 cat /etc/mysql/mariadb.conf.d/50-server.cnf | jc --ini -p | yq -o=yaml -P
 ```
 
+### mariadb_config_file_path_prefix
+
+A reguired prefix for the path for MariaDB config files, `mariadb_config_file_path_prefix` defaults to `/etc/mysql`.
+
 ### mariadb_mysqltuner
 
 A boolean, `mariadb_mysqltuner` defaults to `true` and results in [MySQLTuner](https://github.com/major/MySQLTuner-perl) being installed using a Debian package or from GitHub depending on the version specified using `mariadb_mysqltuner_version`.
@@ -96,6 +100,10 @@ mariadb_systemd_units:
             PrivateTmp: "true"
             LimitNOFILE: "122880"
 ```
+
+### mariadb_systemd_units_file_path_prefix
+
+A required variable for checking the systemd unit file paths, `mariadb_systemd_units_file_path_prefix` defaults to `/etc/systemd`.
 
 ### mariadb_sys_schema
 

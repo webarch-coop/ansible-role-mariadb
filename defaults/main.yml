@@ -51,6 +51,7 @@ mariadb_config:
     conf:
       mysqldump:
         max_allowed_packet: "64M"
+mariadb_config_file_path_prefix: /etc/mysql
 mariadb_mysqltuner: true
 mariadb_mysqltuner_version: "2.2.12"
 mariadb_pkgs_absent: []
@@ -75,6 +76,7 @@ mariadb_systemd_units:
             PrivateNetwork: "true"
             PrivateTmp: "true"
             LimitNOFILE: "122880"
+mariadb_systemd_units_file_path_prefix: /etc/systemd
 mariadb_sys_schema: false
 mariadb_time_zone_import: true
 

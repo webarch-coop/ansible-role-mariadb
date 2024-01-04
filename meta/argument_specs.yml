@@ -112,6 +112,10 @@ argument_specs:
               - edited
               - present
               - templated
+      mariadb_config_file_path_prefix:
+        type: str
+        required: true
+        description: Path prefix for checking MariaDB config file paths.
       mariadb_database:
         type: str
         required: false
@@ -352,6 +356,10 @@ argument_specs:
         type: str
         required: false
         description: Internal variable for the results from runing ps.
+      mariadb_regex:
+        type: dict
+        required: true
+        description: Internal dictionary of regulkar expressions.
       mariadb_remove:
         type: dict
         required: false
@@ -442,6 +450,10 @@ argument_specs:
             type: str
             required: false
             description: The name of the service to verify using systemd-analyze.
+      mariadb_systemd_units_file_path_prefix:
+        type: str
+        required: true
+        description: Path prefix for checking systemd unit paths.
       mariadb_time_zone_import:
         type: bool
         required: true
@@ -594,6 +606,10 @@ argument_specs:
               - edited
               - present
               - templated
+      mariadb_config_file_path_prefix:
+        type: str
+        required: true
+        description: Path prefix for checking MariaDB config file paths.
       mariadb_database:
         type: str
         required: false
@@ -896,6 +912,10 @@ argument_specs:
             type: str
             required: false
             description: The name of the service to verify using systemd-analyze.
+      mariadb_systemd_units_file_path_prefix:
+        type: str
+        required: true
+        description: Path prefix for checking systemd unit paths.
       mariadb_time_zone_import:
         type: bool
         required: true

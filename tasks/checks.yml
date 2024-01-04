@@ -92,28 +92,28 @@
     - name: Check that all the MariaDB config file paths start with /etc/mysql
       ansible.builtin.assert:
         that:
-          - mariadb_config_file_path is regex('^[/]etc[/]mysql[/]')
+          - mariadb_config_file_path is regex(mariadb_regex.config_path)
         quiet: "{% if ansible_verbosity < 3 %}true{% else %}false{% endif %}"
-      loop: "{{ mariadb_config | community.general.json_query('[].path') }}"
+      loop: "{{ mariadb_config | community.general.json_query(mariadb_jpq.config_path) }}"
       loop_control:
         loop_var: mariadb_config_file_path
         label: "{{ mariadb_config_file_path | ansible.builtin.basename }}"
       when:
-        - mariadb_config | community.general.json_query('[].path') is defined
-        - mariadb_config | community.general.json_query('[].path') != []
+        - mariadb_config | community.general.json_query(mariadb_jpq.config_path) is defined
+        - mariadb_config | community.general.json_query(mariadb_jpq.config_path) != []
 
     - name: Check that all the MariaDB systemd file paths start with /etc/mysql
       ansible.builtin.assert:
         that:
-          - mariadb_systemd_file_path is regex('^[/]etc[/]systemd[/]')
+          - mariadb_systemd_file_path is regex(mariadb_regex.systemd_path)
         quiet: "{% if ansible_verbosity < 3 %}true{% else %}false{% endif %}"
-      loop: "{{ mariadb_systemd_units | community.general.json_query('[].files[].path') }}"
+      loop: "{{ mariadb_systemd_units | community.general.json_query(mariadb_jpq.systemd_path) }}"
       loop_control:
         loop_var: mariadb_systemd_file_path
         label: "{{ mariadb_systemd_file_path | ansible.builtin.basename }}"
       when:
-        - mariadb_systemd_file_path | community.general.json_query('[].files[].path') is defined
-        - mariadb_systemd_file_path | community.general.json_query('[].files[].path') != []
+        - mariadb_systemd_file_path | community.general.json_query('mariadb_jpq.systemd_path') is defined
+        - mariadb_systemd_file_path | community.general.json_query('mariadb_jpq.systemd_path') != []
 
     - name: Query the MariaDB databases, users and version using a socket
       community.mysql.mysql_info:

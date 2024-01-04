@@ -15,13 +15,20 @@ mariadbhostvars: "{{ dict(mariadbvarnames | list | zip(q('vars', *mariadbvarname
 # JMESPath queries
 mariadb_jpq:
   adjvars: 'AdjustVariables'
+  config_path: "[].path"
   cve: 'CVE'
   fragtabs: 'Tables."Fragmented tables"'
   groups: "[].group_name"
   tunerver: "[?distro=='{{ ansible_distribution_release }}'].version|[0]"
   recs: '"Recommendations"'
   service: 'ansible_facts.services.["mariadb.service"]|[0]'
+  systemd_path: "[].files[].path"
   users: "[].username"
+
+# Regular expressions:
+mariadb_regex:
+  config_path: "^{{ mariadb_config_file_path_prefix | ansible.builtin.regex_escape }}"
+  systemd_path: "^{{ mariadb_systemd_units_file_path_prefix | ansible.builtin.regex_escape }}"
 
 mariadb_mysqltuner_versions:
   - distro: bookworm
