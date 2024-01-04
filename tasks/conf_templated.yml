@@ -32,6 +32,7 @@
         mode: "{{ mariadb_cnf.mode | default('0644') }}"
         owner: "{{ mariadb_cnf.owner | default('root') }}"
         group: "{{ mariadb_cnf.group | default('root') }}"
+      no_log: "{% if mariadb_cnf.path is regex(mariadb_regex.config_path) %}false{% else %}true{% endif %}"
       register: mariadb_cnf_file_templated
 
     - name: Notify handler to restart MariaDB
