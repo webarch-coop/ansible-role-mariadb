@@ -70,7 +70,7 @@
 
             - name: "Debug the base64 decoded the existing MariaDB configuration file variables for {{ mariadb_cnf.path }}"
               ansible.builtin.debug:
-                msg: "{{ mariadb_cnf_file_b64encoded['content'] | ansible.builtin.b64decode }}"
+                msg: "{{ mariadb_cnf_file_b64encoded['content'] | ansible.builtin.b64decode | string }}"
                 verbosity: "{% if ansible_check_mode | bool %}2{% else %}3{% endif %}"
 
             - name: "Set a fact for the existing MariaDB configuration file variables for {{ mariadb_cnf.path }}"
