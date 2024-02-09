@@ -29,6 +29,8 @@ before_script:
   - yamllint --version
   - which molecule
   - molecule --version
+  - which jc
+  - jc --version
 stages:
   - lint
   - bookworm
