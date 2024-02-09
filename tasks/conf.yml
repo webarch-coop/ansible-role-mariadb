@@ -70,7 +70,7 @@
 
             - name: "Set a fact for the existing MariaDB configuration file variables for {{ mariadb_cnf.path }}"
               ansible.builtin.set_fact:
-                mariadb_cnf_file_existing_vars: "{{ mariadb_cnf_file_b64encoded['content'] | ansible.builtin.b64decode | community.general.jc('ini') }}"
+                mariadb_cnf_file_existing_vars: "{{ mariadb_cnf_file_b64encoded['content'] | ansible.builtin.b64decode | string | community.general.jc('ini') }}"
 
             - name: "Debug the existing MariaDB configuration file variables for {{ mariadb_cnf.path }}"
               ansible.builtin.debug:
