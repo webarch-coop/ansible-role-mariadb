@@ -14,10 +14,11 @@ variables:
   ANSIBLE_FORCE_COLOR: "1"
   ANSIBLE_REMOTE_TMP: "/tmp"
   ANSIBLE_SHELL_ALLOW_WORLD_READABLE_TEMP: "1"
+  DEBIAN_FRONTEND: noninteractive
   DEFAULT_MANAGED_STR: "Ansible managed"
   MOLECULE_VERBOSITY: "0"
-  PY_COLORS: "1"
   PRE_COMMIT_COLOR: always
+  PY_COLORS: "1"
   USER: "root"
 before_script:
   - whoami
@@ -31,6 +32,7 @@ before_script:
   - molecule --version
   - which jc
   - jc --version
+  - ansible-galaxy collection list
 stages:
   - lint
   - bookworm
