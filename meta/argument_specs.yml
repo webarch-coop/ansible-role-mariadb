@@ -128,6 +128,10 @@ argument_specs:
           - SHOW VIEW
           - TRIGGER
           - UPDATE
+      mariadb_socket:
+        type: str
+        required: true
+        description: Path to the MariaDB socket.
       mariadb_systemd_units:
         type: list
         elements: dict
