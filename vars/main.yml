@@ -29,7 +29,7 @@ mariadb_jpq:
 mariadb_regex:
   config_path: "^{{ mariadb_config_file_path_prefix | ansible.builtin.regex_escape }}"
   systemd_path: "^{{ mariadb_systemd_units_file_path_prefix | ansible.builtin.regex_escape }}"
-  distros: "^{{ mariadb_mysqltuner_versions | community.general.json_query('[].distro') | join('|') }}$"
+  distros: "^({{ mariadb_mysqltuner_versions | community.general.json_query('[].distro') | join('|') }})$"
 
 # MySQLTuner distro versions
 # https://packages.debian.org/trixie/mysqltuner
