@@ -33,7 +33,7 @@
     - name: Check mariadb_ variables using the combined argument spec
       ansible.builtin.validate_argument_spec:
         argument_spec: "{{ mariadb_combined_argument_spec['argument_specs']['main']['options'] }}"
-        provided_arguments: "{{ matomohostvars }}"
+        provided_arguments: "{{ mariadbhostvars }}"
 
   when: mariadb_verify | bool
   tags:
