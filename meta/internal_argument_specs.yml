@@ -1,0 +1,362 @@
+# Copyright 2018-2024 Chris Croome
+#
+# This file is part of the Webarchitects MariaDB Ansible role.
+#
+# The Webarchitects MariaDB Ansible role is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# The Webarchitects MariaDB Ansible role is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with the Webarchitects MariaDB Ansible role. If not, see <https://www.gnu.org/licenses/>.
+---
+argument_specs:
+  main:
+    author: Chris Croome
+    description: Ansible role for installing and configuring MariaDB on Debian
+    short_description: The main entry point for the MariaDB role.
+    options:
+      mariadb_argument_spec:
+        type: dict
+        required: false
+        description: Internal variable for the argument spec.
+      mariadb_cnf_file_b64encoded:
+        type: dict
+        required: false
+        description: Internal base64 encoded MariaDB configuration file.
+      mariadb_cnf_file_backup:
+        type: dict
+        required: false
+        description: Internal results of copying a MariaDB configuration file.
+      mariadb_cnf_file_diff:
+        type: dict
+        required: false
+        description: Internal results of diffing a MariaDB configuration file.
+      mariadb_cnf_file_edited:
+        type: dict
+        required: false
+        description: Internal results of stating a MariaDB configuration file.
+      mariadb_cnf_file_existing_vars:
+        type: dict
+        required: false
+        description: Internal results of converting a MariaDB configuration file into JSON using JC.
+      mariadb_cnf_file_path:
+        type: dict
+        required: false
+        description: Internal results of stating a MariaDB configuration file.
+      mariadb_cnf_file_path_backup:
+        type: str
+        required: false
+        description: Internal path for MariaDB configuration file backup.
+      mariadb_cnf_file_path_backup_check:
+        type: dict
+        required: false
+        description: Internal results of converting checking a MariaDB configuration file backup.
+      mariadb_cnf_file_section_existing_keys:
+        type: list
+        elements: str
+        required: false
+        description: Internal list of existing MariaDB configuration file sections.
+      mariadb_cnf_file_section_proposed_keys:
+        type: list
+        elements: str
+        required: false
+        description: Internal list of proposed MariaDB configuration file sections.
+      mariadb_cnf_file_section_proposed_value_less_keys:
+        type: list
+        elements: str
+        required: false
+        description: Internal list of proposed MariaDB configuration file variables that don't have values.
+      mariadb_cnf_file_templated:
+        type: dict
+        required: false
+        description: Internal results from templating a MariaDB configuration file.
+      mariadb_cnf_variable_edited:
+        type: dict
+        required: false
+        description: Internal results from using ini_file to write a variable variable in a config file.
+      mariadb_cnf_variable_uncommented:
+        type: dict
+        required: false
+        description: Internal results from using lineinfile to uncomment a variable in a config file.
+      mariadb_combined_argument_spec:
+        type: dict
+        required: false
+        desciption: Internal variable for the combined argument spec.
+      mariadb_databases:
+        type: list
+        elements: str
+        required: false
+        description: Internal list of existing MariaDB database names.
+      mariadb_defaults:
+        type: dict
+        required: false
+        description: Internal dictionary of the results of my_print_defaults --mysqld converted into JSON usng the JC ini filter.
+      mariadb_etc_group_b64encoded:
+        type: dict
+        required: false
+        description: Internal results of slurping /etc/group.
+      mariadb_etc_my_cnf:
+        type: dict
+        required: false
+        description: Internal results of stating a MariaDB configuration file.
+      mariadb_etc_passwd_b64encoded:
+        type: dict
+        required: false
+        description: Internal results of slurping /etc/passwd.
+      mariadb_git_present:
+        type: dict
+        required: false
+        description: Internal results from installing git and related packages for MySQLTuner install.
+      mariadb_group:
+        type: list
+        elements: dict
+        required: false
+        description: Internal group from /etc/group.
+      mariadb_groups:
+        type: list
+        elements: str
+        required: false
+        description: Internal list of groups.
+      mariadb_host:
+        type: str
+        required: false
+        description: MariaDB user host.
+      mariadb_info:
+        type: dict
+        required: false
+        description: Internal results from the community.mysql.mysql_info module.
+      mariadb_init:
+        type: str
+        required: false
+        description: Internal results from checking the init system.
+      mariadb_install:
+        type: dict
+        required: false
+        description: Internal results from installing packages in the mariadb_pkgs_present array.
+      mariadb_internal_argument_spec:
+        type: dict
+        required: false
+        description: Internal variable for the internal argument spec.
+      mariadb_jpq:
+        type: dict
+        required: true
+        description: Internal dictionary of JMESPATH variables.
+      mariadb_mysqld_defaults:
+        type: dict
+        required: false
+        description: Internal JSON version of the results from runnimg the my_print_defaults --mysqld command.
+      mariadb_mysqld_defaults_lines:
+        type: list
+        elements: str
+        required: false
+        description: Internal array of the lines returned from runnimg the my_print_defaults --mysqld command.
+      mariadb_mysqld_defaults_variables:
+        type: list
+        elements: str
+        required: false
+        description: Internal array of variables names returned from runnimg the my_print_defaults --mysqld command.
+      mariadb_mycnf_path:
+        type: dict
+        required: false
+        description: Internal result form stating .my.cnf file.
+      mariadb_mycnf_present:
+        type: bool
+        required: false
+        description: Internal variable for the state of the .my.cnf file.
+      mariadb_mysqltuner:
+        type: int
+        required: true
+        description: Install MySQLTuner from GitHub.
+      mariadb_mysqltuner_absent:
+        type: dict
+        required: false
+        description: Internal results from uninstalling the mysqltuner Debian package.
+      mariadb_mysqltuner_adjust_variables:
+        type: list
+        elements: str
+        required: false
+        description: Internal array containing the adjust variables resulys from running MySQLTuner.
+      mariadb_mysqltuner_command:
+        type: dict
+        required: false
+        description: Internal results from running the mysqltuner command.
+      mariadb_mysqltuner_cve:
+        type: dict
+        required: false
+        description: Internal results from running the mysqltuner command for CVEs.
+      mariadb_mysqltuner_fragmented_tables:
+        type: list
+        elements: str
+        required: false
+        description: Internal array of fragmented tables results from running MySQLTuner.
+      mariadb_mysqltuner_headers:
+        type: dict
+        required: false
+        description: Internal results from a URI HEAD request for the latest version of MySQLTuner.
+      mariadb_mysqltuner_passwords:
+        type: dict
+        required: false
+        description: Internal results from running stat on MySQLTuner passwords file.
+      mariadb_mysqltuner_present:
+        type: dict
+        required: false
+        description: Internal results from installing the Debian MySQLTuner package.
+      mariadb_mysqltuner_recommendations:
+        type: list
+        elements: str
+        required: false
+        description: Internal array of recommendations from running MySQLTuner.
+      mariadb_mysqltuner_results:
+        type: dict
+        required: false
+        description: Internal dictionary of recommendations from running MySQLTuner.
+      mariadb_mysqltuner_script:
+        type: dict
+        required: false
+        description: Internal results from running stat on the MySQLTuner Perl script.
+      mariadb_mysqltuner_versions:
+        type: list
+        elements: str
+        description: Internal list of MySQLTuner versions provided by different versions of Debian.
+        options:
+          distro:
+            type: str
+            required: true
+            description: Internal name of the Debian distro that provides MySQLTuner.
+          version:
+            type: str
+            required: true
+            description: Internal version of MySQLTuner provided by the Debian distro.
+      mariadb_mysqltuner_version_debian:
+        type: str
+        required: false
+        description: Internal string for the Debian version of MySQL Tuner for the distro the server is running.
+      mariadb_mysqltuner_version_latest:
+        type: str
+        required: false
+        description: Internal string for the latest version of MySQLTuner.
+      mariadb_mysqltuner_version_required:
+        type: str
+        required: false
+        description: Internal variables for the version of MySQLTuner required.
+      mariadb_mysqltuner_vulnerabilities:
+        type: dict
+        required: false
+        description: Internal dictionay containing the result from running stat on MySQLTuner vulnerabilities CSV file path.
+      mariadb_mysqltuner_vulnerabilities_csv:
+        type: dict
+        required: false
+        description: Internal variables for the results from stating the MySQL Tuner vulnerabilities.csv file.
+      mariadb_mysqltuner_which:
+        type: dict
+        required: false
+        description: Internal variable for the results of which mysqltuner.
+      mariadb_my_print_defaults_command:
+        type: dict
+        required: false
+        description: Internal variable for the results of my_print_defaults.
+      mariadb_my_print_mysqld_defaults:
+        type: dict
+        required: false
+        description: Internal results from runnimg the my_print_defaults --mysqld command.
+      mariadb_passwd:
+        type: str
+        required: false
+        description: Internal variable for the MySQL users password.
+      mariadb_password:
+        type: str
+        required: false
+        description: Internal variable for the MariaDB password.
+      mariadb_password_gen:
+        type: dict
+        required: false
+        description: Internal result from running the pwgen command.
+      mariadb_ps:
+        type: str
+        required: false
+        description: Internal variable for the results from runing ps.
+      mariadb_regex:
+        type: dict
+        required: true
+        description: Internal dictionary of regular expressions.
+      mariadb_remove:
+        type: dict
+        required: false
+        description: Internal variable for the results of uninstalling MariaDB packages.
+      mariadb_root_fact:
+        type: dict
+        required: false
+        description: Internal result from the removal of the legacy mariadb_root.fact file.
+      mariadb_service:
+        type: dict
+        required: false
+        description: Internal result from setting the MariaDB systemd service state to started.
+      mariadb_service_facts:
+        type: dict
+        required: false
+        description: Internal results registered as a result of running ansible.builtin.systemd_service.
+      mariadb_sys_repo_path:
+        type: dict
+        required: false
+        description: Internal result from stating the MariaDB sys repo directory.
+      mariadb_sys_schema:
+        type: bool
+        required: true
+        description: Install the MariaDB sys schema.
+      mariadb_system_service:
+        type: dict
+        required: false
+        description: Internal result from stating the MariaDB systemd service file.
+      mariadb_system_service_symlink:
+        type: dict
+        required: false
+        description: Internal result from stating the MariaDB systemd service file symlink.
+      mariadb_tzdata_changelog:
+        type: dict
+        required: false
+        description: Internal result from stating the Debian tzdata changelog.
+      mariadb_tzdata_deb_date:
+        type: dict
+        required: false
+        description: Internal result from running dpkg-parsechangelog -l /usr/share/doc/tzdata/changelog.Debian.gz -S Date.
+      mariadb_tzdata_latest:
+        type: str
+        required: false
+        description: Internal variable for the date of the latest version of the tzdata package changelog.
+      mariadb_tzdata_mariadb:
+        type: str
+        required: false
+        description: Internal variable for the content of the /root/.my.tzdata file.
+      mariadb_tzdata_mariadb_file:
+        type: dict
+        required: false
+        description: Internal result from stating the /root/.my.tzdata file.
+      mariadb_tzdata_mariadb_file_b64encoded:
+        type: dict
+        required: false
+        description: Internal result from slurping the /root/.my.tzdata file.
+      mariadb_tzdata_sql:
+        type: dict
+        required: false
+        description: Internal result from stating the /root/timezoneinfo.sql file.
+      mariadb_upgrade:
+        type: dict
+        required: false
+        description: Internal variables for the results from running mysql_upgrade.
+      mariadb_usernames:
+        type: list
+        elements: str
+        required: false
+        description: Internal array of MariaDB existing usernames.
+      mariadb_users:
+        type: list
+        required: false
+        description: Internal list of usernames from /etc/passwd.
+      mariadb_version:
+        type: str
+        required: false
+        description: Internal MariaDB full version string.
+      mariadb_version_major_minor:
+        type: str
+        required: false
+        description: Internal MariaDB two part version string.
+...

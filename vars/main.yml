@@ -29,7 +29,11 @@ mariadb_jpq:
 mariadb_regex:
   config_path: "^{{ mariadb_config_file_path_prefix | ansible.builtin.regex_escape }}"
   systemd_path: "^{{ mariadb_systemd_units_file_path_prefix | ansible.builtin.regex_escape }}"
+  distros: "^{{ mariadb_mysqltuner_versions | community.general.json_query('[].distro') | ansible.builtin.split('|') }}$"
 
+# MySQLTuner distro versions
+# https://packages.debian.org/trixie/mysqltuner
+# https://packages.ubuntu.com/noble/mysqltuner
 mariadb_mysqltuner_versions:
   - distro: bookworm
     version: 1.9.9
@@ -39,6 +43,8 @@ mariadb_mysqltuner_versions:
     version: 1.7.13
   - distro: jammy
     version: 1.7.17
+  - distro: noble
+    version: 2.5.2
   - distro: trixie
-    version: 1.9.9
+    version: 2.5.2
 ...
