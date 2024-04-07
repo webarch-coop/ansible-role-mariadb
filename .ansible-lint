@@ -10,5 +10,6 @@
 ---
 skip_list:
   - key-order[task]
+var_naming_pattern: "^[php|mariadb]_?[a-z0-9_]*$"
 # vim: syntax=yaml
 ...
