@@ -16,6 +16,11 @@
         var: mariadb_cnf_section.value
         verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
 
+    - name: "Debug the existing values for section {{ mariadb_cnf_section.key }}"
+      ansible.builtin.debug:
+        var: mariadb_cnf_file_existing_vars
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+
     - name: "Set a fact for the file section existing keys for section {{ mariadb_cnf_section.key }}"
       ansible.builtin.set_fact:
         mariadb_cnf_file_section_existing_keys: "{{ mariadb_cnf_file_existing_vars | community.general.json_query(mariadb_cnf_file_section_existing_keys_jpq) | sort }}"
