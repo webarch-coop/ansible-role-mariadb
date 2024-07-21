@@ -67,7 +67,7 @@
         --mariadbd
         {% else %}
         --mysqld
-        {% endif %}
+        {% endif -%}
       check_mode: false
       changed_when: false
       register: mariadb_my_print_mysqld_defaults

@@ -38,9 +38,9 @@ before_script:
   - jc --version
   - ansible-galaxy collection list
 stages:
-  - jammy
   - lint
   - bookworm
+  - jammy
   - noble
   - trixie
 lint:
