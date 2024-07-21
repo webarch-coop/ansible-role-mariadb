@@ -99,47 +99,13 @@
         loop_var: mariadb_cnf_variable_pair
         label: "{{ mariadb_cnf_variable_pair.key }}"
 
-    # This is to ensure that variables are written to the same place as existing commented values
-    - name: "Uncomment commented variables in the MariaDB configuration file that are to be edited for section {{ mariadb_cnf_section.key }}"
-      ansible.builtin.lineinfile:
-        path: "{{ mariadb_cnf.path }}"
-        line: "{{ mariadb_cnf_variable_pair.key }}{% if mariadb_cnf_variable_pair.value | type_debug != 'NoneType' %} = {{ mariadb_cnf_variable_pair.value }}{% endif %}"
-        regex: "{{ mariadb_cnf_variable_regex }}"
-        state: present
-        backrefs: true
-        mode: "{{ mariadb_cnf.mode | default('0644') }}"
-        owner: "{{ mariadb_cnf.owner | default('root') }}"
-        group: "{{ mariadb_cnf.owner | default('root') }}"
-      register: mariadb_cnf_variable_uncommented
-      when: >-
-        ( mariadb_cnf_variable_pair.key not in mariadb_cnf_file_section_existing_keys ) or
-        ( ( mariadb_cnf_variable_pair.value | type_debug != "NoneType" ) and
-        ( mariadb_cnf_variable_pair.value != mariadb_cnf_file_existing_vars | community.general.json_query(mariadb_cnf_variable_jpq) ) )
-      vars:
-        mariadb_cnf_variable_jpq: '"{{ mariadb_cnf_section.key }}"."{{ mariadb_cnf_variable_pair.key }}"'
-        mariadb_cnf_variable_regex: "^[#][ ]{0,9}{{ mariadb_cnf_variable_pair.key | regex_replace('_', '[_-]') }}[ ]{0,9}[=]{0,1}"
-      loop: "{{ mariadb_cnf_section.value | ansible.builtin.dict2items }}"
-      loop_control:
-        loop_var: mariadb_cnf_variable_pair
-        label: "{{ mariadb_cnf_variable_pair.key }}{% if mariadb_cnf_variable_pair.value | type_debug != 'NoneType' %} = {{ mariadb_cnf_variable_pair.value }}{% endif %}"
-
-    - name: Notify handler to restart MariaDB
-      ansible.builtin.debug:
-        msg: MariaDB is to be restarted
-      notify: Restart mariadb
-      when:
-        - mariadb_cnf_variable_uncommented is defined
-        - mariadb_cnf_variable_uncommented.changed is defined
-        - mariadb_cnf_variable_uncommented.changed | bool
-        - mariadb_init is defined
-        - mariadb_init == "systemd"
-
     - name: "MariaDB configuration file edited for keys without values for section {{ mariadb_cnf_section.key }}"
       community.general.ini_file:
         path: "{{ mariadb_cnf.path }}"
         section: "{{ mariadb_cnf_section.key }}"
         option: "{{ mariadb_cnf_variable_pair.key }}"
         allow_no_value: true
+        modify_inactive_option: true
         no_extra_spaces: false
         mode: "{{ mariadb_cnf.mode | default('0644') }}"
         owner: "{{ mariadb_cnf.owner | default('root') }}"
