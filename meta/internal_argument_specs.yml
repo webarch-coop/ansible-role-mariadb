@@ -38,6 +38,10 @@ argument_specs:
         type: dict
         required: false
         description: Internal results of converting a MariaDB configuration file into JSON using JC.
+      mariadb_cnf_file_existing_sections:
+        type: list
+        required: false
+        description: Internal list of existing config file section names.
       mariadb_cnf_file_path:
         type: dict
         required: false
