@@ -93,7 +93,7 @@ argument_specs:
       mariadb_defaults:
         type: dict
         required: false
-        description: Internal dictionary of the results of my_print_defaults --mysqld converted into JSON usng the JC ini filter.
+        description: Internal dictionary of the results of my_print_defaults --mariadbd converted into JSON usng the JC ini filter.
       mariadb_etc_group_b64encoded:
         type: dict
         required: false
@@ -147,17 +147,17 @@ argument_specs:
       mariadb_mysqld_defaults:
         type: dict
         required: false
-        description: Internal JSON version of the results from runnimg the my_print_defaults --mysqld command.
+        description: Internal JSON version of the results from runnimg the my_print_defaults --mariadbd command.
       mariadb_mysqld_defaults_lines:
         type: list
         elements: str
         required: false
-        description: Internal array of the lines returned from runnimg the my_print_defaults --mysqld command.
+        description: Internal array of the lines returned from runnimg the my_print_defaults --mariadbd command.
       mariadb_mysqld_defaults_variables:
         type: list
         elements: str
         required: false
-        description: Internal array of variables names returned from runnimg the my_print_defaults --mysqld command.
+        description: Internal array of variables names returned from runnimg the my_print_defaults --mariadbd command.
       mariadb_mycnf_path:
         type: dict
         required: false
@@ -261,7 +261,7 @@ argument_specs:
       mariadb_my_print_mysqld_defaults:
         type: dict
         required: false
-        description: Internal results from runnimg the my_print_defaults --mysqld command.
+        description: Internal results from runnimg the my_print_defaults --mariadbd command.
       mariadb_passwd:
         type: str
         required: false

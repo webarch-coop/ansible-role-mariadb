@@ -41,12 +41,12 @@
         verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
 
     - name: Run my_print_defaults
-      ansible.builtin.command: my_print_defaults --mysqld
+      ansible.builtin.command: my_print_defaults --mariadbd
       check_mode: false
       changed_when: false
       register: mariadb_my_print_mysqld_defaults
 
-    - name: Set a fact for the my_print_defaults --mysqld results
+    - name: Set a fact for the my_print_defaults --mariadbd results
       ansible.builtin.set_fact:
         mariadb_mysqld_defaults_lines: "{{ mariadb_my_print_mysqld_defaults.stdout_lines | map('regex_replace', '^[-]{2}') }}"
         mariadb_mysqld_defaults_variables: "{{ mariadb_my_print_mysqld_defaults.stdout_lines | map('regex_replace', '^[-]{2}') | map('regex_replace', '=.*$') | sort }}"
@@ -56,7 +56,7 @@
         that:
           - mariadb_mysqld != ansible_loop.nextitem
         quiet: "{% if ansible_verbosity < 3 %}true{% else %}false{% endif %}"
-        fail_msg: "The MariaDB variable {{ mariadb_mysqld }} is duplicated in the settings returned with `my_print_defaults --mysqld`"
+        fail_msg: "The MariaDB variable {{ mariadb_mysqld }} is duplicated in the settings returned with `my_print_defaults --mariadbd`"
       when:
         - not ansible_loop.last
         - mariadb_mysqld != "plugin_load_add"
@@ -66,11 +66,11 @@
         label: "{{ mariadb_mysqld }}"
         loop_var: mariadb_mysqld
 
-    - name: Set a fact for the my_print_defaults --mysqld results
+    - name: Set a fact for the my_print_defaults --mariadbd results
       ansible.builtin.set_fact:
         mariadb_mysqld_defaults: "{% for mariadb_default in mariadb_mysqld_defaults_lines %}{{ mariadb_default + '\n' }}{% endfor %}"
 
-    - name: Set a fact for the my_print_defaults --mysqld results
+    - name: Set a fact for the my_print_defaults --mariadbd results
       ansible.builtin.set_fact:
         mariadb_defaults: "{{ mariadb_mysqld_defaults | string | community.general.jc('ini') }}"
 

@@ -19,7 +19,7 @@ variables:
   ANSIBLE_SHELL_ALLOW_WORLD_READABLE_TEMP: "1"
   DEBIAN_FRONTEND: noninteractive
   DEFAULT_MANAGED_STR: "Ansible managed"
-  MOLECULE_VERBOSITY: "3"
+  MOLECULE_VERBOSITY: "0"
   PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
   PRE_COMMIT_COLOR: always
   PY_COLORS: "1"
@@ -38,12 +38,11 @@ before_script:
   - jc --version
   - ansible-galaxy collection list
 stages:
-  - trixie
   - lint
   - bookworm
-  # - bullseye
   - jammy
   - noble
+  - trixie
 lint:
   image: registry.git.coop/webarch/containers/images/trixie:20240721
   stage: lint
@@ -60,15 +59,14 @@ jammy:
   stage: jammy
   script:
     - molecule test
-trixie:
-  # image: registry.git.coop/webarch/containers/images/trixie:20240721
-  image: registry.git.coop/webarch/containers/images/trixie:20240605
-  stage: trixie
-  script:
-    - molecule test
 noble:
   image: registry.git.coop/webarch/containers/images/noble:20240721
   stage: noble
+  script:
+    - molecule test
+trixie:
+  image: registry.git.coop/webarch/containers/images/trixie:20240721
+  stage: trixie
   script:
     - molecule test
 ...
