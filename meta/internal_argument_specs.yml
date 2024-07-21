@@ -73,10 +73,6 @@ argument_specs:
         type: dict
         required: false
         description: Internal results from templating a MariaDB configuration file.
-      mariadb_cnf_variable_edited:
-        type: dict
-        required: false
-        description: Internal results from using ini_file to write a variable variable in a config file.
       mariadb_combined_argument_spec:
         type: dict
         required: false
