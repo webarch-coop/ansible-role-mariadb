@@ -250,6 +250,15 @@ argument_specs:
         type: dict
         required: false
         description: Internal variable for the results of my_print_defaults.
+      mariadb_my_print_defaults_help:
+        type: dict
+        required: false
+        description: Internal results from runnimg the my_print_defaults --help command.
+      mariadb_my_print_defaults_options:
+        type: list
+        elements: str
+        required: false
+        description: Internal variable for the my_print_defaults options available.
       mariadb_my_print_mysqld_defaults:
         type: dict
         required: false
