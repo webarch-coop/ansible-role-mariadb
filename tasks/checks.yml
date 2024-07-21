@@ -57,7 +57,7 @@
 
     - name: Debug my_print_defaults options
       ansible.builtin.debug:
-        var: mariadb_my_print_mysqld_options
+        var: mariadb_my_print_defaults_options
         verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
 
     - name: Run my_print_defaults --mysqld
@@ -66,15 +66,15 @@
       changed_when: false
       register: mariadb_my_print_mysqld_defaults
       when:
-        - ( "--mysqld" in mariadb_my_print_mysqld_options )
-        - ( "--mariadbd" not in mariadb_my_print_mysqld_options )
+        - ( "--mysqld" in mariadb_my_print_defaults_options )
+        - ( "--mariadbd" not in mariadb_my_print_defaults_options )
 
     - name: Run my_print_defaults --mariadbd
       ansible.builtin.command: my_print_defaults --mariadbd
       check_mode: false
       changed_when: false
       register: mariadb_my_print_mysqld_defaults
-      when: ( "--mariadbd" in mariadb_my_print_mysqld_options )
+      when: ( "--mariadbd" in mariadb_my_print_defaults_options )
 
     - name: Set a fact for the my_print_defaults results
       ansible.builtin.set_fact:
