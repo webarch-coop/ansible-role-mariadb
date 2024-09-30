@@ -13,7 +13,7 @@
 
     - name: "Set a fact for the MariaDB configuration file backup path for {{ mariadb_cnf.path }}"
       ansible.builtin.set_fact:
-        mariadb_cnf_file_path_backup: "{{ mariadb_cnf.path | ansible.builtin.dirname }}/{% if mariadb_cnf.path | ansible.builtin.basename is not regex('^[.]') %}.{% endif %}{{ mariadb_cnf.path | ansible.builtin.basename }}.{{ ansible_date_time.iso8601_basic_short }}.bak"
+        mariadb_cnf_file_path_backup: "{{ mariadb_cnf.path | ansible.builtin.dirname }}/{% if mariadb_cnf.path | ansible.builtin.basename is not regex('^[.]') %}.{% endif %}{{ mariadb_cnf.path | ansible.builtin.basename }}.{{ ansible_facts.date_time.iso8601_basic_short }}.bak"
 
     - name: "MariaDB configuration file backup present {{ mariadb_cnf_file_path_backup }}"
       ansible.builtin.copy:
