@@ -57,7 +57,7 @@
       ansible.builtin.assert:
         that:
           - mariadb_mysqltuner_version_debian is defined
-        fail_msg: "Please check that {{ ansible_distribution_release }} is in the mariadb_mysqltuner_versions array."
+        fail_msg: "Please check that {{ ansible_facts.distribution_release }} is in the mariadb_mysqltuner_versions array."
 
     - name: Use a Debian version of MySQLTuner
       block:

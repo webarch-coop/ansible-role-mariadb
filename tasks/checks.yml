@@ -14,7 +14,7 @@
     - name: Check that we are running a supported system
       ansible.builtin.assert:
         that:
-          - ansible_distribution_release is regex(mariadb_regex.distros)
+          - ansible_facts.distribution_release is regex(mariadb_regex.distros)
         quiet: true
 
     # When in a docker container mariadb_init.stdout == "sh"
