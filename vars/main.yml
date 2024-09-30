@@ -19,7 +19,7 @@ mariadb_jpq:
   cve: 'CVE'
   fragtabs: 'Tables."Fragmented tables"'
   groups: "[].group_name"
-  tunerver: "[?distro=='{{ ansible_distribution_release }}'].version|[0]"
+  tunerver: "[?distro=='{{ ansible_facts.distribution_release }}'].version|[0]"
   recs: '"Recommendations"'
   service: 'ansible_facts.services.["mariadb.service"]|[0]'
   systemd_path: "[].files[].path"
