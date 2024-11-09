@@ -34,8 +34,8 @@
             name: apt
             tasks_from: local_facts.yml
           when: >-
-            ( ansible_local.bash.path is not defined ) or
-            ( ansible_local.dpkg.installed is not defined )
+            ( ansible_facts.ansible_local.bash.path is not defined ) or
+            ( ansible_facts.ansible_local.dpkg.installed is not defined )
 
         - name: Legacy /etc/ansible/facts.d/mariadb_root.fact file absent
           ansible.builtin.file:
@@ -59,9 +59,9 @@
     - name: Check variables and gather MariaDB info
       ansible.builtin.include_tasks: checks.yml
       when:
-        - ansible_local.dpkg.installed is defined
-        - ( "mariadb-server" in ansible_local.dpkg.installed )
-        - ( "python3-mysqldb" in ansible_local.dpkg.installed )
+        - ansible_facts.ansible_local.dpkg.installed is defined
+        - ( "mariadb-server" in ansible_facts.ansible_local.dpkg.installed )
+        - ( "python3-mysqldb" in ansible_facts.ansible_local.dpkg.installed )
       tags:
         - mariadb_checks
         - mariadb_info
@@ -162,7 +162,7 @@
             - mysqltuner
 
       when:
-        - ansible_local.dpkg.installed is defined
+        - ansible_facts.ansible_local.dpkg.installed is defined
         - ( "mariadb-server" in ansible_local.dpkg.installed )
       tags:
         - mariadb_conf

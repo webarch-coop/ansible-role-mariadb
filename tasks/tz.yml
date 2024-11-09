@@ -70,7 +70,7 @@
                 mysql_tzinfo_to_sql /usr/share/zoneinfo > /root/timezoneinfo.sql
               changed_when: true
               args:
-                executable: "{{ ansible_local.bash.path | default('/usr/bin/bash') }}"
+                executable: "{{ ansible_facts.ansible_local.bash.path | default('/usr/bin/bash') }}"
 
             - name: Check that the timezone database dump exists
               ansible.builtin.stat:

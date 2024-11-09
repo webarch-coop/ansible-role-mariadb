@@ -57,7 +57,7 @@
       ansible.builtin.assert:
         that:
           - mariadb_mysqltuner_version_debian is defined
-        fail_msg: "Please check that {{ ansible_facts.distribution_release }} is in the mariadb_mysqltuner_versions array."
+        fail_msg: "Please check that {{ ansible_facts.ansible_facts.distribution_release }} is in the mariadb_mysqltuner_versions array."
 
     - name: Use a Debian version of MySQLTuner
       block:
@@ -81,7 +81,7 @@
           ansible.builtin.file:
             path: /usr/share/mysqltuner/vulnerabilities.csv
             state: absent
-          when: ( "mysqltuner" not in ansible_local.dpkg.installed )
+          when: ( "mysqltuner" not in ansible_facts.ansible_local.dpkg.installed )
 
         - name: Debian MySQLTuner present
           ansible.builtin.apt:
@@ -90,8 +90,8 @@
             state: present
           register: mariadb_mysqltuner_present
           when: >-
-            ( ansible_local.dpkg.installed is not defined ) or
-            ( "mysqltuner" not in ansible_local.dpkg.installed )
+            ( ansible_facts.ansible_local.dpkg.installed is not defined ) or
+            ( "mysqltuner" not in ansible_facts.ansible_local.dpkg.installed )
 
         - name: Re-read Ansible local facts
           ansible.builtin.setup:
@@ -112,8 +112,8 @@
             state: absent
           register: mariadb_mysqltuner_absent
           when: >-
-            ( ansible_local.dpkg.installed is not defined ) or
-            ( "mysqltuner" in ansible_local.dpkg.installed )
+            ( ansible_facts.ansible_local.dpkg.installed is not defined ) or
+            ( "mysqltuner" in ansible_facts.ansible_local.dpkg.installed )
 
         - name: Debian git package present
           ansible.builtin.apt:
@@ -123,9 +123,9 @@
             state: present
           register: mariadb_git_present
           when: >-
-            ( ansible_local.dpkg.installed is not defined ) or
-            ( "git" not in ansible_local.dpkg.installed ) or
-            ( "libjson-perl" not in ansible_local.dpkg.installed )
+            ( ansible_facts.ansible_local.dpkg.installed is not defined ) or
+            ( "git" not in ansible_facts.ansible_local.dpkg.installed ) or
+            ( "libjson-perl" not in ansible_facts.ansible_local.dpkg.installed )
 
         - name: Re-read Ansible local facts  # noqa: no-handler
           ansible.builtin.setup:
@@ -201,8 +201,8 @@
               when: mariadb_mysqltuner_vulnerabilities.stat.exists | bool
 
           when: >-
-            ( ansible_local.dpkg.installed is not defined ) or
-            ( "git" in ansible_local.dpkg.installed )
+            ( ansible_facts.ansible_local.dpkg.installed is not defined ) or
+            ( "git" in ansible_facts.ansible_local.dpkg.installed )
 
       when: mariadb_mysqltuner_version_required is ansible.builtin.version(mariadb_mysqltuner_version_debian, 'gt')
 
