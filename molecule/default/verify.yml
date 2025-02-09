@@ -18,49 +18,116 @@
     ansible_python_interpreter: /usr/bin/python3
   tasks:
 
-    - name: Check Skel dirs for www profile
-      ansible.builtin.stat:
-        path: "{{ molecule_path }}"
-      loop:
-        - /usr/local/etc/skel.d/www/.ansible/tmp
-        - /usr/local/etc/skel.d/www/.cache
-        - /usr/local/etc/skel.d/www/.composer
-        - /usr/local/etc/skel.d/www/.config
-        - /usr/local/etc/skel.d/www/.console
-        - /usr/local/etc/skel.d/www/.drush
-        - /usr/local/etc/skel.d/www/.git
-        - /usr/local/etc/skel.d/www/.gnupg
-        - /usr/local/etc/skel.d/www/.local
-        - /usr/local/etc/skel.d/www/.moosh
-        - /usr/local/etc/skel.d/www/.mutt
-        - /usr/local/etc/skel.d/www/.mysql
-        - /usr/local/etc/skel.d/www/.npm
-        - /usr/local/etc/skel.d/www/.ssh
-        - /usr/local/etc/skel.d/www/.terminfo
-        - /usr/local/etc/skel.d/www/.vim
-        - /usr/local/etc/skel.d/www/.wp-cli
-        - /usr/local/etc/skel.d/www/.yarn
-        - /usr/local/etc/skel.d/www/bin
-        - /usr/local/etc/skel.d/www/private
-        - /usr/local/etc/skel.d/www/tmp
-      loop_control:
-        loop_var: molecule_path
-      register: molecule_www_dir_paths
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+      register: molecule_service_facts
 
-    - name: Debug molecule_www_dir_paths
+    - name: Debug MariaDB service status
       ansible.builtin.debug:
-        var: molecule_www_dir_paths
+        msg: "{{ molecule_service_facts | community.general.json_query(molecule_service_jpq) }}"
+        verbosity: 3
+      vars:
+        molecule_service_jpq: 'ansible_facts.services.["mariadb.service"]|[0]'
 
-    - name: Set some facts for the results using JMESPath
+    - name: Check that MariaDB is enabled and running
+      ansible.builtin.assert:
+        that:
+          - (molecule_service_facts | community.general.json_query(molecule_service_jpq)).status == "enabled"
+          - (molecule_service_facts | community.general.json_query(molecule_service_jpq)).state == "running"
+        quiet: true
+      vars:
+        molecule_service_jpq: 'ansible_facts.services.["mariadb.service"]|[0]'
+
+    - name: Run mysqltuner
+      ansible.builtin.command: mysqltuner --json
+      check_mode: false
+      changed_when: false
+      register: molecule_mysqltuner_command
+
+    - name: Set facts for mysqltuner results
       ansible.builtin.set_fact:
-        molecule_www_dir_paths_state: "{{ molecule_www_dir_paths | community.general.json_query('results[*].{path: invocation.module_args.path, exists: stat.exists}') }}"
-        molecule_www_dir_paths_exists: "{{ molecule_www_dir_paths | community.general.json_query('results[?stat.exists].stat.path') }}"
+        molecule_mysqltuner_results: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json }}"
+        molecule_mysqltuner_adjust_variables: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(molecule_jpq.adjvars) }}"
+        molecule_mysqltuner_recommendations: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(molecule_jpq.recs) }}"
+        molecule_mysqltuner_fragmented_tables: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(molecule_jpq.fragtabs) }}"
+        molecule_mysqltuner_cve: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(molecule_jpq.cve) }}"
+      vars:
+        molecule_jpq:
+          adjvars: 'AdjustVariables'
+          cve: 'CVE'
+          fragtabs: 'Tables."Fragmented tables"'
+          groups: "[].group_name"
+          tunerver: "[?distro=='{{ ansible_facts.distribution_release }}'].version|[0]"
+          recs: '"Recommendations"'
+          users: "[].username"
 
-    - name: Debug molecule_www_dir_paths_state
+    - name: Print mysqltuner full results when running with -v
       ansible.builtin.debug:
-        var: molecule_www_dir_paths_state
+        var: molecule_mysqltuner_results
+      when:
+        - molecule_mysqltuner_results | length > 0
+        - ansible_verbosity >= 1
 
-    - name: Debug molecule_www_dir_paths_exists
+    - name: Print mysqltuner results for Adjust variables
       ansible.builtin.debug:
-        var: molecule_www_dir_paths_exists
+        var: molecule_mysqltuner_adjust_variables
+      when:
+        - molecule_mysqltuner_adjust_variables != []
+        - molecule_mysqltuner_adjust_variables | length > 0
+
+    - name: Print mysqltuner results for Fragmented tables
+      ansible.builtin.debug:
+        var: molecule_mysqltuner_fragmented_tables
+      when:
+        - molecule_mysqltuner_fragmented_tables != []
+        - molecule_mysqltuner_fragmented_tables | length > 0
+
+    - name: Print mysqltuner results for Recommendations
+      ansible.builtin.debug:
+        var: molecule_mysqltuner_recommendations
+      when:
+        - molecule_mysqltuner_recommendations != []
+        - molecule_mysqltuner_recommendations | length > 0
+
+    - name: Print mysqltuner results for CVE
+      ansible.builtin.debug:
+        var: molecule_mysqltuner_cve
+      when:
+        - molecule_mysqltuner_cve != []
+        - molecule_mysqltuner_cve | length > 0
+
+    - name: Query the MariaDB databases, users and version using a socket
+      community.mysql.mysql_info:
+        filter:
+          - databases
+          - users
+          - version
+        return_empty_dbs: true
+        login_user: root
+        login_unix_socket: /run/mysqld/mysqld.sock
+      register: molecule_mariadb_info
+
+    - name: Debug MariaDB info
+      ansible.builtin.debug:
+        var: molecule_mariadb_info
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+
+    - name: Set a variables for the MariaDB databases, users and version
+      ansible.builtin.set_fact:
+        molecule_mariadb_databases: "{{ molecule_mariadb_info.databases.keys() | reject('regex', '.*lost[+]found$') | list }}"
+        molecule_mariadb_usernames: "{{ molecule_mariadb_info.users.localhost.keys() }}"
+        molecule_mariadb_version: "{{ molecule_mariadb_info.version.major }}.{{ molecule_mariadb_info.version.minor }}.{{ molecule_mariadb_info.version.release }}"
+        molecule_mariadb_version_major_minor: "{{ molecule_mariadb_info.version.major }}.{{ molecule_mariadb_info.version.minor }}"
+
+    - name: Debug MariaDB databases
+      ansible.builtin.debug:
+        var: molecule_mariadb_databases
+
+    - name: Debug MariaDB usernames
+      ansible.builtin.debug:
+        var: molecule_mariadb_usernames
+
+    - name: Debug MariaDB version
+      ansible.builtin.debug:
+        var: molecule_mariadb_version
 ...
