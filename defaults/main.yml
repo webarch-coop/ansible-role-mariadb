@@ -23,7 +23,7 @@ mariadb_config:
     conf:
       mysqld:
         binlog_format: "ROW"
-        ignore_db_dir: "lost+found"
+        ignore_db_dirs: "lost+found"
         innodb_buffer_pool_instances: "1"
         innodb_buffer_pool_size: "256M"
         innodb_log_file_size: "64M"
