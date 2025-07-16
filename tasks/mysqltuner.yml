@@ -308,15 +308,17 @@
 
             - name: Decode the base64 encoded version of mysqltuner, split it by lines and set a fact for the version
               ansible.builtin.set_fact:
-                mariadb_mysqltuner_file_version: "{{ (((mariadb_mysqltuner_file_b64encoded['content'] | ansible.builtin.b64decode | trim ).split('\n')[1]).split)[-1] }}"
+                mariadb_mysqltuner_file_line2: "{{ (mariadb_mysqltuner_file_b64encoded['content'] | ansible.builtin.b64decode | trim ).split('\n')[1] }}"
 
-            - name: Debug mariadb_mysqltuner_file_version
+            - name: Debug mariadb_mysqltuner_file_line2
               ansible.builtin.debug:
-                var: mariadb_mysqltuner_file_version
+                var: mariadb_mysqltuner_file_line2
 
             - name: Fail because mysqltuner failed
               ansible.builtin.fail:
                 msg:
+                  - "Path {{ mariadb_mysqltuner_path }}"
+                  - "Line 2 {{ mariadb_mysqltuner_file_line2 }}"
                   - "Return code {{ mariadb_mysqltuner_command.rc }}"
                   - "Standard out {{ mariadb_mysqltuner_command.stdout }}"
                   - "Standard error {{ mariadb_mysqltuner_command.stderr }}"

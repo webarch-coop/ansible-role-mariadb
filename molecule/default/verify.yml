@@ -79,6 +79,8 @@
         - name: Fail because mysqltuner failed
           ansible.builtin.fail:
             msg:
+              - "Path {{ molecule_mysqltuner_path }}"
+              - "Line 2 {{ molecule_mysqltuner_file_line2 }}"
               - "Return code {{ molecule_mysqltuner_command.rc }}"
               - "Standard out {{ molecule_mysqltuner_command.stdout }}"
               - "Standard error {{ molecule_mysqltuner_command.stderr }}"

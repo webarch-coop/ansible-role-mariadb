@@ -183,10 +183,10 @@ argument_specs:
         type: dict
         required: false
         description: Internal results from slurping mysqltuner.
-      mariadb_mysqltuner_file_version:
+      mariadb_mysqltuner_file_line2:
         type: str
         required: false
-        description: The mysqltuner version.
+        description: Line two of mysqltuner which contains the version number.
       mariadb_mysqltuner_fragmented_tables:
         type: list
         elements: str

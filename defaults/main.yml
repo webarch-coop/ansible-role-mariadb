@@ -53,7 +53,9 @@ mariadb_config:
         max_allowed_packet: "64M"
 mariadb_config_file_path_prefix: /etc/mysql
 mariadb_mysqltuner: true
-mariadb_mysqltuner_version: "2.2.12"
+# Note mysqltuner 2.6.0 fails with MariaDB >= 10.11.12
+# https://github.com/major/MySQLTuner-perl/issues/828
+mariadb_mysqltuner_version: "2.6.0"
 mariadb_pkgs_absent: []
 mariadb_pkgs_present:
   - git
