@@ -38,11 +38,50 @@
       vars:
         molecule_service_jpq: 'ansible_facts.services.["mariadb.service"]|[0]'
 
-    - name: Run mysqltuner
-      ansible.builtin.command: mysqltuner --json
-      check_mode: false
-      changed_when: false
-      register: molecule_mysqltuner_command
+    - name: Run mysqltuner in a block to debug errors
+      block:
+
+        - name: Run mysqltuner
+          ansible.builtin.command: mysqltuner --json
+          check_mode: false
+          changed_when: false
+          register: molecule_mysqltuner_command
+
+      rescue:
+
+        - name: Check mysqltuner path
+          ansible.builtin.command: which mysqltuner
+          check_mode: false
+          changed_when: false
+          register: molecule_mysqltuner_which
+
+        - name: Set a fact for the mysqltuner path
+          ansible.builtin.set_fact:
+            molecule_mysqltuner_path: "{{ molecule_mysqltuner_which.stdout }}"
+
+        - name: Debug molecule_mysqltuner_path
+          ansible.builtin.debug:
+            var: molecule_mysqltuner_path
+
+        - name: "Slurp {{ molecule_mysqltuner_path }}"
+          ansible.builtin.slurp:
+            src: "{{ molecule_mysqltuner_path }}"
+          register: molecule_mysqltuner_file_b64encoded
+
+        - name: Decode the base64 encoded version of mysqltuner, split it by lines and set a fact for the version
+          ansible.builtin.set_fact:
+            molecule_mysqltuner_file_version: "{{ (((molecule_mysqltuner_file_b64encoded['content'] | ansible.builtin.b64decode | trim ).split('\n')[1]).split)[-1] }}"
+
+        - name: Debug molecule_mysqltuner_file_version
+          ansible.builtin.debug:
+            var: molecule_mysqltuner_file_version
+
+        - name: Fail because mysqltuner failed
+          ansible.builtin.fail:
+            msg:
+              - "Return code {{ molecule_mysqltuner_command.rc }}"
+              - "Standard out {{ molecule_mysqltuner_command.stdout }}"
+              - "Standard error {{ molecule_mysqltuner_command.stderr }}"
 
     - name: Set facts for mysqltuner results
       ansible.builtin.set_fact:

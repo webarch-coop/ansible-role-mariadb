@@ -314,6 +314,13 @@
               ansible.builtin.debug:
                 var: mariadb_mysqltuner_file_version
 
+            - name: Fail because mysqltuner failed
+              ansible.builtin.fail:
+                msg:
+                  - "Return code {{ mariadb_mysqltuner_command.rc }}"
+                  - "Standard out {{ mariadb_mysqltuner_command.stdout }}"
+                  - "Standard error {{ mariadb_mysqltuner_command.stderr }}"
+
           when: mariadb_mysqltuner_command is defined
 
       when:
