@@ -68,13 +68,13 @@
             src: "{{ molecule_mysqltuner_path }}"
           register: molecule_mysqltuner_file_b64encoded
 
-        - name: Decode the base64 encoded version of mysqltuner, split it by lines and set a fact for the version
+        - name: Decode the base64 encoded version of mysqltuner, split it by lines and set a fact for the second line
           ansible.builtin.set_fact:
-            molecule_mysqltuner_file_version: "{{ (((molecule_mysqltuner_file_b64encoded['content'] | ansible.builtin.b64decode | trim ).split('\n')[1]).split)[-1] }}"
+            molecule_mysqltuner_file_line2: "{{ (molecule_mysqltuner_file_b64encoded['content'] | ansible.builtin.b64decode | trim ).split('\n')[1] }}"
 
-        - name: Debug molecule_mysqltuner_file_version
+        - name: Debug molecule_mysqltuner_file_line2
           ansible.builtin.debug:
-            var: molecule_mysqltuner_file_version
+            var: molecule_mysqltuner_file_line2
 
         - name: Fail because mysqltuner failed
           ansible.builtin.fail:
