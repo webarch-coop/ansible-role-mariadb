@@ -285,6 +285,35 @@
                 - mariadb_mysqltuner_cve != []
                 - mariadb_mysqltuner_cve | length > 0
 
+          rescue:
+
+            - name: Check mysqltuner path
+              ansible.builtin.command: which mysqltuner
+              check_mode: false
+              changed_when: false
+              register: mariadb_mysqltuner_which
+
+            - name: Set a fact for the mysqltuner path
+              ansible.builtin.set_fact:
+                mariadb_mysqltuner_path: "{{ mariadb_mysqltuner_which.stdout }}"
+
+            - name: Debug mariadb_mysqltuner_path
+              ansible.builtin.debug:
+                var: mariadb_mysqltuner_path
+
+            - name: "Slurp {{ mariadb_mysqltuner_path }}"
+              ansible.builtin.slurp:
+                src: "{{ mariadb_mysqltuner_path }}"
+              register: mariadb_mysqltuner_file_b64encoded
+
+            - name: Decode the base64 encoded version of mysqltuner, split it by lines and set a fact for the version
+              ansible.builtin.set_fact:
+                mariadb_mysqltuner_file_version: "{{ (((mariadb_mysqltuner_file_b64encoded['content'] | ansible.builtin.b64decode | trim ).split('\n')[1]).split)[-1] }}"
+
+            - name: Debug mariadb_mysqltuner_file_version
+              ansible.builtin.debug:
+                var: mariadb_mysqltuner_file_version
+
           when: mariadb_mysqltuner_command is defined
 
       when:
