@@ -103,10 +103,10 @@
 
       when:
         - mariadb_mysqltuner_version_required is defined
-        - mariadb_mysqltuner_version_debian is defined
         - >-
-          (mariadb_mysqltuner_version_required == "master") or
+          (mariadb_mysqltuner_version_required != "master") or
           (mariadb_mysqltuner_version_required is ansible.builtin.version(mariadb_mysqltuner_version_debian, 'le'))
+        - mariadb_mysqltuner_version_debian is defined
 
     - name: Install MySQLTuner from GitHub
       block:
