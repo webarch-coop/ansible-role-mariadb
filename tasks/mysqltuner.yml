@@ -212,7 +212,9 @@
             ( ansible_facts.ansible_local.dpkg.installed is not defined ) or
             ( "git" in ansible_facts.ansible_local.dpkg.installed )
 
-      when: mariadb_mysqltuner_version_required is ansible.builtin.version(mariadb_mysqltuner_version_debian, 'gt')
+      when: >-
+        (mariadb_mysqltuner_version_required == "master") or
+        (mariadb_mysqltuner_version_required is ansible.builtin.version(mariadb_mysqltuner_version_debian, 'gt'))
 
     - name: Check that mysqltuner is installed
       ansible.builtin.command: which mysqltuner
