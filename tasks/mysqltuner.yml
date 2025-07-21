@@ -42,7 +42,10 @@
 
     - name: Set a fact for the version of MySQLTuner that is required and the Debian / Ubuntu version
       ansible.builtin.set_fact:
-        mariadb_mysqltuner_version_required: "{% if mariadb_mysqltuner_version == 'latest' %}{{ mariadb_mysqltuner_version_latest }}{% else %}{{ mariadb_mysqltuner_version }}{% endif %}"
+        mariadb_mysqltuner_version_required: >-
+          {%- if mariadb_mysqltuner_version == 'latest' -%}{{ mariadb_mysqltuner_version_latest }}
+          {%- elif mariadb_mysqltuner_version == 'master' -%}master
+          {%- else -%}{{ mariadb_mysqltuner_version }}{%- endif -%}
         mariadb_mysqltuner_version_debian: "{{ mariadb_mysqltuner_versions | community.general.json_query(mariadb_jpq.tunerver) }}"
 
     - name: Debug the MySQLTuner version required
@@ -101,7 +104,9 @@
       when:
         - mariadb_mysqltuner_version_required is defined
         - mariadb_mysqltuner_version_debian is defined
-        - mariadb_mysqltuner_version_required is ansible.builtin.version(mariadb_mysqltuner_version_debian, 'le')
+        - >-
+          (mariadb_mysqltuner_version_required == "master") or
+          (mariadb_mysqltuner_version_required is ansible.builtin.version(mariadb_mysqltuner_version_debian, 'le'))
 
     - name: Install MySQLTuner from GitHub
       block:
@@ -144,7 +149,9 @@
               ansible.builtin.git:
                 repo: https://github.com/major/MySQLTuner-perl.git
                 dest: /usr/local/src/MySQLTuner-perl
-                version: "v{{ mariadb_mysqltuner_version_required }}"
+                version: >-
+                  {%- if mariadb_mysqltuner_version_required == "master" -%}master
+                  {%- else -%}v{{ mariadb_mysqltuner_version_required }}{%- endif -%}
                 depth: 1
                 update: true
 
