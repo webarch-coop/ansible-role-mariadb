@@ -38,4 +38,6 @@
         mariadb_database: ansible
         mariadb_username: ansible
         mariadb_underscore_autoupdate: true
+        # https://github.com/major/MySQLTuner-perl/issues/828
+        mariadb_mysqltuner_version: "master"
 ...
