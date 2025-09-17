@@ -31,6 +31,8 @@
       ansible.builtin.debug:
         var: mariadb_cnf_file_backup
         verbosity: "{% if ansible_check_mode | bool %}2{% else %}3{% endif %}"
+      tags:
+        - debug
 
     - name: "Include the MariaDB configuration file section edited tasks for {{ mariadb_cnf.path }}"
       ansible.builtin.include_tasks: conf_section_edited.yml
@@ -71,6 +73,8 @@
       ansible.builtin.debug:
         var: mariadb_cnf_file_edited
         verbosity: "{% if ansible_check_mode | bool %}2{% else %}3{% endif %}"
+      tags:
+        - debug
 
     - name: "MariaDB configuration file backup absent when it is unchanged {{ mariadb_cnf_file_path_backup }}"
       ansible.builtin.file:

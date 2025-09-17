@@ -33,6 +33,8 @@
         - mariadb_install.changed | bool
         - mariadb_init is defined
         - mariadb_init == "systemd"
+      tags:
+        - debug
 
     - name: MariaDB packages absent
       ansible.builtin.apt:
@@ -79,6 +81,8 @@
       ansible.builtin.debug:
         var: mariadb_service
         verbosity: 2
+      tags:
+        - debug
 
     - name: Flush handlers  # noqa: no-handler
       ansible.builtin.meta: flush_handlers

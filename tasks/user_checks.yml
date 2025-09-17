@@ -17,6 +17,8 @@
         ( ( enable_task_debugger is defined ) and
         ( enable_task_debugger | bool ) ) or
         ( ansible_verbosity >= 2 )
+      tags:
+        - debug
 
     - name: Check the mariadb_username variable is valid
       ansible.builtin.assert:
@@ -100,6 +102,8 @@
         var: mariadb_mycnf_path
         verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
       when: mariadb_mycnf_path is defined
+      tags:
+        - debug
 
     - name: "Set a fact if a file exists at {{ mariadb_mycnf }}"
       ansible.builtin.set_fact:

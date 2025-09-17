@@ -96,6 +96,8 @@
               loop_control:
                 loop_var: mariadb_cnf
                 label: "{{ mariadb_cnf.name | default(mariadb_cnf.path) }}"
+              tags:
+                - debug
 
             - name: Include the MariaDB configuration file tasks
               ansible.builtin.include_tasks: conf.yml
@@ -119,6 +121,8 @@
               loop_control:
                 loop_var: systemd_unit
                 label: "{{ systemd_unit.name }}"
+              tags:
+                - debug
 
             - name: Include the systemd role
               ansible.builtin.include_role:

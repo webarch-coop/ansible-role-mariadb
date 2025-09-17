@@ -39,6 +39,8 @@
       ansible.builtin.debug:
         var: mariadb_init
         verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+      tags:
+        - debug
 
     - name: Run my_print_defaults --help
       ansible.builtin.command: my_print_defaults --help
@@ -104,6 +106,8 @@
       ansible.builtin.debug:
         var: mariadb_defaults
         verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
 
     - name: Check that the MariaDB defaults socket path matches the specified socket path
       ansible.builtin.assert:
@@ -157,6 +161,8 @@
       ansible.builtin.debug:
         var: mariadb_info
         verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
 
     - name: Set a variables for the MariaDB databases, users and version
       ansible.builtin.set_fact:
@@ -169,16 +175,22 @@
       ansible.builtin.debug:
         var: mariadb_databases
         verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+      tags:
+        - debug
 
     - name: Debug MariaDB usernames
       ansible.builtin.debug:
         var: mariadb_usernames
         verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+      tags:
+        - debug
 
     - name: Debug MariaDB version
       ansible.builtin.debug:
         var: mariadb_version
         verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+      tags:
+        - debug
 
   tags:
     - mariadb

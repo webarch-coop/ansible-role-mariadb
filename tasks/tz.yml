@@ -58,6 +58,8 @@
                   - "mariadb_tzdata_latest: {{ mariadb_tzdata_latest }}"
                   - "mariadb_tzdata_mariadb: {{ mariadb_tzdata_mariadb }}"
                 verbosity: 1
+              tags:
+                - debug
 
           when: mariadb_tzdata_mariadb_file.stat.exists | bool
 
