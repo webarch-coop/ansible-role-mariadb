@@ -25,9 +25,12 @@
       tags:
         - debug
 
-    - name: Set a fact for the existing sections
+    - name: "Set a facts for the existing sections and value of section {{ mariadb_cnf_section.key }}"
       ansible.builtin.set_fact:
         mariadb_cnf_file_existing_sections: "{{ mariadb_cnf_file_existing_vars.keys() }}"
+        mariadb_cnf_file_existing_section: "{{ mariadb_cnf_file_existing_vars | community.general.json_query(mariadb_cnf_file_section_existing_jpq) }}"
+      vars:
+        mariadb_cnf_file_section_existing_jpq: "{{ mariadb_cnf_section.key }}"
 
     - name: Debug mariadb_cnf_file_existing_sections
       ansible.builtin.debug:
@@ -36,11 +39,12 @@
       tags:
         - debug
 
-    - name: "Debug existing keys for section {{ mariadb_cnf_section.key }}"
+    - name: Debug mariadb_cnf_file_existing_section
       ansible.builtin.debug:
-        msg: "{{ mariadb_cnf_file_existing_vars | community.general.json_query(mariadb_cnf_file_section_existing_jpq) }}"
-      vars:
-        mariadb_cnf_file_section_existing_jpq: "{{ mariadb_cnf_section.key }}"
+        var: mariadb_cnf_file_existing_section
+        # verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
 
     - name: Set facts when the proposed section is an existing section
       block:
@@ -60,7 +64,9 @@
           tags:
             - debug
 
-      when: mariadb_cnf_section.key in mariadb_cnf_file_existing_vars
+      when:
+        - mariadb_cnf_section.key in mariadb_cnf_file_existing_vars
+        - mariadb_cnf_file_existing_section != {}
 
     - name: "Set an empty existing keys array as there is no existing section named {{ mariadb_cnf_section.key }}"
       ansible.builtin.set_fact:
@@ -93,6 +99,7 @@
       ansible.builtin.debug:
         var: mariadb_cnf_file_section_existing_keys
         verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+      when: mariadb_cnf_file_existing_section != {}
       tags:
         - debug
 
