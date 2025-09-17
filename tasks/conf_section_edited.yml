@@ -38,7 +38,7 @@
 
     - name: "Debug existing keys for section {{ mariadb_cnf_section.key }}"
       ansible.builtin.debug:
-        mag: "{{ mariadb_cnf_file_existing_vars | community.general.json_query(mariadb_cnf_file_section_existing_jpq) }}"
+        msg: "{{ mariadb_cnf_file_existing_vars | community.general.json_query(mariadb_cnf_file_section_existing_jpq) }}"
       vars:
         mariadb_cnf_file_section_existing_jpq: "{{ mariadb_cnf_section.key }}"
 
