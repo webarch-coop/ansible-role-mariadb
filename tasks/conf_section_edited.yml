@@ -29,6 +29,13 @@
       ansible.builtin.set_fact:
         mariadb_cnf_file_existing_sections: "{{ mariadb_cnf_file_existing_vars.keys() }}"
 
+    - name: Debug mariadb_cnf_file_existing_sections
+      ansible.builtin.debug:
+        var: mariadb_cnf_file_existing_sections
+        # verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
+
     - name: Set facts when the proposed section is an existing section
       block:
 
