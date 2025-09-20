@@ -71,7 +71,9 @@
     - name: "Set an empty existing keys array as there is no existing section named {{ mariadb_cnf_section.key }}"
       ansible.builtin.set_fact:
         mariadb_cnf_file_section_existing_keys: []
-      when: mariadb_cnf_section.key not in mariadb_cnf_file_existing_vars
+      when: >-
+        (mariadb_cnf_section.key not in mariadb_cnf_file_existing_vars) or
+        (mariadb_cnf_file_existing_section == {})
 
     - name: "Debug the proposed values for section {{ mariadb_cnf_section.key }}"
       ansible.builtin.debug:
