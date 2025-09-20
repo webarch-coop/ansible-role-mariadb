@@ -14,14 +14,14 @@
     - name: Debug mariadb_cnf_section.key
       ansible.builtin.debug:
         var: mariadb_cnf_section.key
-        # verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
       tags:
         - debug
 
     - name: "Debug the existing values for section {{ mariadb_cnf_section.key }}"
       ansible.builtin.debug:
         var: mariadb_cnf_file_existing_vars
-        # verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
       tags:
         - debug
 
@@ -35,14 +35,14 @@
     - name: Debug mariadb_cnf_file_existing_sections
       ansible.builtin.debug:
         var: mariadb_cnf_file_existing_sections
-        # verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
       tags:
         - debug
 
     - name: Debug mariadb_cnf_file_existing_section
       ansible.builtin.debug:
         var: mariadb_cnf_file_existing_section
-        # verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
       tags:
         - debug
 
@@ -60,7 +60,7 @@
         - name: "Debug the existing variable keys for section {{ mariadb_cnf_section.key }}"
           ansible.builtin.debug:
             var: mariadb_cnf_file_section_existing_keys
-            # verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+            verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
           tags:
             - debug
 
@@ -78,7 +78,7 @@
     - name: "Debug the proposed values for section {{ mariadb_cnf_section.key }}"
       ansible.builtin.debug:
         var: mariadb_cnf_section.value
-        # verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
       tags:
         - debug
 
@@ -89,7 +89,7 @@
     - name: "Debug the proposed variable keys for section {{ mariadb_cnf_section.key }}"
       ansible.builtin.debug:
         var: mariadb_cnf_file_section_proposed_keys
-        # verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
       tags:
         - debug
 
@@ -100,7 +100,7 @@
     - name: "Debug the existing variable keys for section {{ mariadb_cnf_section.key }}"
       ansible.builtin.debug:
         var: mariadb_cnf_file_section_existing_keys
-        # verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
       when: mariadb_cnf_file_existing_section != {}
       tags:
         - debug
@@ -117,7 +117,7 @@
     - name: "Debug the proposed variables without values for section {{ mariadb_cnf_section.key }}"
       ansible.builtin.debug:
         var: mariadb_cnf_file_section_proposed_value_less_keys
-        # verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
       tags:
         - debug
 
