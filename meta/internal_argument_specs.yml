@@ -246,6 +246,10 @@ argument_specs:
         type: str
         required: false
         description: Internal string for the latest version of MySQLTuner.
+      mariadb_mysqltuner_version_local:
+        type: str
+        required: false
+        description: Internal string for the local version of MySQLTuner.
       mariadb_mysqltuner_version_required:
         type: str
         required: false
