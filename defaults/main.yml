@@ -56,7 +56,7 @@ mariadb_mysqltuner: true
 # Note mysqltuner 2.6.0 fails with MariaDB >= 10.11.12
 # https://github.com/major/MySQLTuner-perl/issues/828
 # Set the folowing to a branch name or release version
-mariadb_mysqltuner_version: "2.6.0"
+mariadb_mysqltuner_version: master
 mariadb_pkgs_absent: []
 mariadb_pkgs_present:
   - git
