@@ -28,6 +28,8 @@
           - "Path: {{ mariadb_mysqltuner_headers.location | ansible.builtin.urlsplit('path') }}"
           - "Version: {{ mariadb_mysqltuner_headers.location | ansible.builtin.urlsplit('path') | ansible.builtin.basename | ansible.builtin.regex_replace('^v') }}"
         verbosity: 2
+      tags:
+        - debug
 
     - name: Set a fact for the latest version of MySQLTuner
       ansible.builtin.set_fact:
@@ -39,6 +41,8 @@
       when:
         - mariadb_mysqltuner_version_latest is defined
         - ansible_verbosity >= 1
+      tags:
+        - debug
 
     - name: Set a fact for the version of MySQLTuner that is required and the Debian / Ubuntu version
       ansible.builtin.set_fact:
@@ -51,10 +55,14 @@
     - name: Debug the MySQLTuner version required
       ansible.builtin.debug:
         var: mariadb_mysqltuner_version_required
+      tags:
+        - debug
 
     - name: Debug the Debian / Ubuntu version of MySQLTuner
       ansible.builtin.debug:
         var: mariadb_mysqltuner_version_debian
+      tags:
+        - debug
 
     - name: Fail if the Debian / Ubuntu version of MySQLTuner is not defined
       ansible.builtin.assert:
@@ -267,6 +275,8 @@
               when:
                 - mariadb_mysqltuner_results | length > 0
                 - ansible_verbosity >= 1
+              tags:
+                - debug
 
             - name: Print mysqltuner results for Adjust variables
               ansible.builtin.debug:
@@ -274,6 +284,8 @@
               when:
                 - mariadb_mysqltuner_adjust_variables != []
                 - mariadb_mysqltuner_adjust_variables | length > 0
+              tags:
+                - debug
 
             - name: Print mysqltuner results for Fragmented tables
               ansible.builtin.debug:
@@ -281,6 +293,8 @@
               when:
                 - mariadb_mysqltuner_fragmented_tables != []
                 - mariadb_mysqltuner_fragmented_tables | length > 0
+              tags:
+                - debug
 
             - name: Print mysqltuner results for Recommendations
               ansible.builtin.debug:
@@ -288,6 +302,8 @@
               when:
                 - mariadb_mysqltuner_recommendations != []
                 - mariadb_mysqltuner_recommendations | length > 0
+              tags:
+                - debug
 
             - name: Print mysqltuner results for CVE
               ansible.builtin.debug:
@@ -295,6 +311,8 @@
               when:
                 - mariadb_mysqltuner_cve != []
                 - mariadb_mysqltuner_cve | length > 0
+              tags:
+                - debug
 
           rescue:
 

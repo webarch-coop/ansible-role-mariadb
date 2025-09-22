@@ -45,6 +45,8 @@
         - mariadb_cnf_file_templated.changed | bool
         - mariadb_init is defined
         - mariadb_init == "systemd"
+      tags:
+        - debug
 
     - name: MariaDB configuration file backup absent when originial file is unchanged
       ansible.builtin.file:

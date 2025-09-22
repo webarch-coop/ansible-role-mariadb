@@ -11,14 +11,40 @@
 - name: MariaDB configuration file section edited
   block:
 
+    - name: Debug mariadb_cnf_section.key
+      ansible.builtin.debug:
+        var: mariadb_cnf_section.key
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
+
     - name: "Debug the existing values for section {{ mariadb_cnf_section.key }}"
       ansible.builtin.debug:
         var: mariadb_cnf_file_existing_vars
         verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
 
-    - name: Set a fact for the existing sections
+    - name: "Set a facts for the existing sections and value of section {{ mariadb_cnf_section.key }}"
       ansible.builtin.set_fact:
         mariadb_cnf_file_existing_sections: "{{ mariadb_cnf_file_existing_vars.keys() }}"
+        mariadb_cnf_file_existing_section: "{{ mariadb_cnf_file_existing_vars | community.general.json_query(mariadb_cnf_file_section_existing_jpq) }}"
+      vars:
+        mariadb_cnf_file_section_existing_jpq: "{{ mariadb_cnf_section.key }}"
+
+    - name: Debug mariadb_cnf_file_existing_sections
+      ansible.builtin.debug:
+        var: mariadb_cnf_file_existing_sections
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
+
+    - name: Debug mariadb_cnf_file_existing_section
+      ansible.builtin.debug:
+        var: mariadb_cnf_file_existing_section
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
 
     - name: Set facts when the proposed section is an existing section
       block:
@@ -27,24 +53,34 @@
           ansible.builtin.set_fact:
             mariadb_cnf_file_section_existing_keys: "{{ mariadb_cnf_file_existing_vars | community.general.json_query(mariadb_cnf_file_section_existing_keys_jpq) | sort }}"
           vars:
+            mariadb_cnf_file_section_existing_jpq: "{{ mariadb_cnf_section.key }}"
             mariadb_cnf_file_section_existing_keys_jpq: "{{ mariadb_cnf_section.key }}|keys(@)"
+          when: mariadb_cnf_file_existing_vars | community.general.json_query(mariadb_cnf_file_section_existing_jpq) != {}
 
         - name: "Debug the existing variable keys for section {{ mariadb_cnf_section.key }}"
           ansible.builtin.debug:
             var: mariadb_cnf_file_section_existing_keys
             verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+          tags:
+            - debug
 
-      when: mariadb_cnf_section.key in mariadb_cnf_file_existing_vars
+      when:
+        - mariadb_cnf_section.key in mariadb_cnf_file_existing_vars
+        - mariadb_cnf_file_existing_section != {}
 
     - name: "Set an empty existing keys array as there is no existing section named {{ mariadb_cnf_section.key }}"
       ansible.builtin.set_fact:
         mariadb_cnf_file_section_existing_keys: []
-      when: mariadb_cnf_section.key not in mariadb_cnf_file_existing_vars
+      when: >-
+        (mariadb_cnf_section.key not in mariadb_cnf_file_existing_vars) or
+        (mariadb_cnf_file_existing_section == {})
 
     - name: "Debug the proposed values for section {{ mariadb_cnf_section.key }}"
       ansible.builtin.debug:
         var: mariadb_cnf_section.value
         verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
 
     - name: "Set a fact for the proposed keys for section {{ mariadb_cnf_section.key }}"
       ansible.builtin.set_fact:
@@ -54,6 +90,8 @@
       ansible.builtin.debug:
         var: mariadb_cnf_file_section_proposed_keys
         verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
 
     - name: "Set a empty array fact for the proposed value-less keys for section {{ mariadb_cnf_section.key }}"
       ansible.builtin.set_fact:
@@ -63,6 +101,9 @@
       ansible.builtin.debug:
         var: mariadb_cnf_file_section_existing_keys
         verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+      when: mariadb_cnf_file_existing_section != {}
+      tags:
+        - debug
 
     - name: "Set a fact for the proposed variables without values for section {{ mariadb_cnf_section.key }}"
       ansible.builtin.set_fact:
@@ -77,6 +118,8 @@
       ansible.builtin.debug:
         var: mariadb_cnf_file_section_proposed_value_less_keys
         verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
 
     - name: "Debug the existing and proposed MariaDB configuration file variables for section {{ mariadb_cnf_section.key }}"
       ansible.builtin.debug:
@@ -98,6 +141,8 @@
       loop_control:
         loop_var: mariadb_cnf_variable_pair
         label: "{{ mariadb_cnf_variable_pair.key }}"
+      tags:
+        - debug
 
     - name: "MariaDB configuration file edited for keys without values for section {{ mariadb_cnf_section.key }}"
       community.general.ini_file:

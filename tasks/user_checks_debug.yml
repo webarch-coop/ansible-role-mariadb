@@ -37,5 +37,6 @@
       when: mariadb_mycnf_group is defined
 
   tags:
+    - debug
     - mariadb
 ...
