@@ -11,11 +11,21 @@
 - name: Use my_print_defaults and community.mysql.mysql_info to gather information about the MariaDB server databases, users and version
   block:
 
+    - name: Debug MySQLTuner distro versions
+      ansible.builtin.debug:
+        msg: "{{ mariadb_mysqltuner_versions | community.general.json_query('[].distro') }}"
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+
+    - name: Debug ansible_facts.distribution_release
+      ansible.builtin.debug:
+        var: ansible_facts.distribution_release
+        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+
     - name: Check that we are running a supported system
       ansible.builtin.assert:
         that:
           - ansible_facts.distribution_release is regex(mariadb_regex.distros)
-        quiet: true
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
 
     # When in a docker container mariadb_init.stdout == "sh"
     - name: Check if system has been booted with systemd as init system
