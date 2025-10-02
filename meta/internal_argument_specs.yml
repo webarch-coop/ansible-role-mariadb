@@ -200,6 +200,14 @@ argument_specs:
         type: dict
         required: false
         description: Internal results from a URI HEAD request for the latest version of MySQLTuner.
+      mariadb_mysqltuner_local_bin:
+        type: dict
+        required: false
+        description: Internal results from running stat on /usr/local/bin/mysqltuner.
+      mariadb_mysqltuner_local_help:
+        type: dict
+        required: false
+        description: Internal results from running /usr/local/bin/mysqltuner --help.
       mariadb_mysqltuner_passwords:
         type: dict
         required: false
