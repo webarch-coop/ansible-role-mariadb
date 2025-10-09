@@ -146,7 +146,7 @@
 
       when:
         - mariadb_mysqltuner_version_required != "master"
-        - mariadb_mysqltuner_version_required is ansible.builtin.version(mariadb_mysqltuner_version_debian, 'eq')))
+        - mariadb_mysqltuner_version_required is ansible.builtin.version(mariadb_mysqltuner_version_debian, 'eq')
 
     - name: Install MySQLTuner from GitHub
       block:
