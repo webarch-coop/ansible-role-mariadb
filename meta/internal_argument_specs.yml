@@ -18,6 +18,10 @@ argument_specs:
         type: dict
         required: false
         description: Internal variable for the argument spec.
+      mariadb_argument_spec_lookup:
+        type: str
+        required: false
+        description: Internal variable for the results of a lookup for the argument spec.
       mariadb_cnf_file_b64encoded:
         type: dict
         required: false
@@ -136,6 +140,10 @@ argument_specs:
         type: dict
         required: false
         description: Internal variable for the internal argument spec.
+      mariadb_internal_argument_spec_lookup:
+        type: str
+        required: false
+        description: Internal variable for the results of a lookup for the internal argument spec.
       mariadb_jpq:
         type: dict
         required: true

@@ -18,8 +18,6 @@ provisioner:
   name: ansible
   config_options:
     defaults:
-      # error_on_undefined_vars: true
-      # ansible_managed: Ansible managed
       duplicate_dict_key: error
       inject_facts_as_vars: false
   options:

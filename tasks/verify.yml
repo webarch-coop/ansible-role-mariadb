@@ -53,7 +53,7 @@
       tags:
         - debug
 
-    - name: Set a fact for the argument spec and internal argument spec for ansible greater than or equal to version 2.19.0
+    - name: Set a fact for the argument spec and internal argument spec
       ansible.builtin.set_fact:
         mariadb_argument_spec: "{{ mariadb_argument_spec_lookup | ansible.builtin.from_yaml }}"
         mariadb_internal_argument_spec: "{{ mariadb_internal_argument_spec_lookup | ansible.builtin.from_yaml }}"
