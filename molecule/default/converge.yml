@@ -30,7 +30,7 @@
       ansible.builtin.debug:
         var: ansible_facts.user_dir
 
-    - name: Include MariaDB role as root
+    - name: Include MariaDB role
       ansible.builtin.include_role:
         name: mariadb
       vars:  # noqa var-naming[no-role-prefix]
@@ -38,4 +38,9 @@
         mariadb_database: ansible
         mariadb_username: ansible
         mariadb_underscore_autoupdate: true
+
+    - name: Include MariaDB role verify argument spec tasks
+      ansible.builtin.include_role:
+        name: mariadb
+        tasks_from: verify.yml
 ...
