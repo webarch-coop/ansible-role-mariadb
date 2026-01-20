@@ -18,7 +18,9 @@ provisioner:
   name: ansible
   config_options:
     defaults:
+      callback_result_format: yaml
       duplicate_dict_key: error
+      force_color: true
       inject_facts_as_vars: false
   options:
     D: true
