@@ -51,4 +51,6 @@ mariadb_mysqltuner_versions:
     version: 2.5.2
   - distro: trixie
     version: 2.6.0
+  - distro: resolute
+    version: 2.8.29
 ...
