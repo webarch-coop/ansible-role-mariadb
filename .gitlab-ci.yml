@@ -45,6 +45,7 @@ stages:
   - forky
   - noble
   - trixie
+  - resolute
 lint:
   image: registry.git.coop/webarch/containers/images/trixie:20260405
   stage: lint
@@ -69,6 +70,11 @@ noble:
 trixie:
   image: registry.git.coop/webarch/containers/images/trixie:20260405
   stage: trixie
+  script:
+    - molecule test
+resolute:
+  image: registry.git.coop/webarch/containers/images/resolute:20260405
+  stage: resolute
   script:
     - molecule test
 ...
