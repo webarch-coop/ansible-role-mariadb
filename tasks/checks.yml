@@ -123,7 +123,7 @@
 
     - name: Set a fact for the my_print_defaults results
       ansible.builtin.set_fact:
-        mariadb_mysqld_defaults: "{% for mariadb_default in mariadb_mysqld_defaults_lines %}{{ mariadb_default + '\n' }}{% endfor %}"
+        mariadb_mysqld_defaults: "{{ mariadb_mysqld_defaults_lines | map('split', '\n') }}"
 
     - name: Debug mariadb_mysqld_defaults
       ansible.builtin.debug:
