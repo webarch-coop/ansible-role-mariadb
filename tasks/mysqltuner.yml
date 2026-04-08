@@ -51,7 +51,8 @@
       block:
 
         - name: Run /usr/local/bin/mysqltuner --help
-          ansible.builtin.command: /usr/local/bin/mysqltuner --help
+          ansible.builtin.command:
+            cmd: /usr/local/bin/mysqltuner --help
           check_mode: false
           changed_when: false
           register: mariadb_mysqltuner_local_help
@@ -128,7 +129,7 @@
           ansible.builtin.file:
             path: /usr/share/mysqltuner/vulnerabilities.csv
             state: absent
-          when: ( "mysqltuner" not in ansible_facts.ansible_local.dpkg.installed )
+          when: ("mysqltuner" not in ansible_facts.ansible_local.dpkg.installed)
 
         - name: Debian MySQLTuner present
           ansible.builtin.apt:
@@ -137,8 +138,8 @@
             state: present
           register: mariadb_mysqltuner_present
           when: >-
-            ( ansible_facts.ansible_local.dpkg.installed is not defined ) or
-            ( "mysqltuner" not in ansible_facts.ansible_local.dpkg.installed )
+            (ansible_facts.ansible_local.dpkg.installed is not defined) or
+            ("mysqltuner" not in ansible_facts.ansible_local.dpkg.installed)
 
         - name: Re-read Ansible local facts
           ansible.builtin.setup:
@@ -158,8 +159,8 @@
             state: absent
           register: mariadb_mysqltuner_absent
           when: >-
-            ( ansible_facts.ansible_local.dpkg.installed is not defined ) or
-            ( "mysqltuner" in ansible_facts.ansible_local.dpkg.installed )
+            (ansible_facts.ansible_local.dpkg.installed is not defined) or
+            ("mysqltuner" in ansible_facts.ansible_local.dpkg.installed)
 
         - name: Debian git package present
           ansible.builtin.apt:
@@ -169,18 +170,18 @@
             state: present
           register: mariadb_git_present
           when: >-
-            ( ansible_facts.ansible_local.dpkg.installed is not defined ) or
-            ( "git" not in ansible_facts.ansible_local.dpkg.installed ) or
-            ( "libjson-perl" not in ansible_facts.ansible_local.dpkg.installed )
+            (ansible_facts.ansible_local.dpkg.installed is not defined) or
+            ("git" not in ansible_facts.ansible_local.dpkg.installed) or
+            ("libjson-perl" not in ansible_facts.ansible_local.dpkg.installed)
 
         - name: Re-read Ansible local facts  # noqa: no-handler
           ansible.builtin.setup:
             filter: ansible_local
           when: >-
-            ( ( mariadb_mysqltuner_absent.changed is defined ) and
-            ( mariadb_mysqltuner_absent.changed | bool ) ) or
-            ( ( mariadb_git_present.changed is defined ) and
-            ( mariadb_git_present.changed | bool ) )
+            ((mariadb_mysqltuner_absent.changed is defined) and
+            (mariadb_mysqltuner_absent.changed | bool)) or
+            ((mariadb_git_present.changed is defined) and
+            (mariadb_git_present.changed | bool))
 
         - name: Source MySQLTuner install using git
           block:
@@ -247,15 +248,16 @@
               when: mariadb_mysqltuner_vulnerabilities.stat.exists | bool
 
           when: >-
-            ( ansible_facts.ansible_local.dpkg.installed is not defined ) or
-            ( "git" in ansible_facts.ansible_local.dpkg.installed )
+            (ansible_facts.ansible_local.dpkg.installed is not defined) or
+            ("git" in ansible_facts.ansible_local.dpkg.installed)
 
       when: >-
         (mariadb_mysqltuner_version_required == 'master') or
         (mariadb_mysqltuner_version_required is ansible.builtin.version(mariadb_mysqltuner_version_debian, 'ne'))
 
     - name: Check that mysqltuner is installed
-      ansible.builtin.command: which mysqltuner
+      ansible.builtin.command:
+        cmd: which mysqltuner
       check_mode: false
       changed_when: false
       register: mariadb_mysqltuner_which
@@ -275,15 +277,14 @@
 
         # Full full results run `mysqltuner --json --cvefile=/usr/share/mysqltuner/vulnerabilities.csv | jq`
         - name: Run mysqltuner
-          ansible.builtin.command: >-
-            mysqltuner --json
-            {% if mariadb_mysqltuner_vulnerabilities_csv.stat.exists | bool %}--cvefile=/usr/share/mysqltuner/vulnerabilities.csv{% endif %}
+          ansible.builtin.command:
+            cmd: "mysqltuner --json {% if mariadb_mysqltuner_vulnerabilities_csv.stat.exists | ansible.builtin.bool %}--cvefile=/usr/share/mysqltuner/vulnerabilities.csv{% endif %}"
           check_mode: false
           changed_when: false
           register: mariadb_mysqltuner_command
           failed_when: >-
-            ( "JSON Module is needed" in mariadb_mysqltuner_command.stdout ) or
-            ( mariadb_mysqltuner_command.rc != 0 )
+            ("JSON Module is needed" in mariadb_mysqltuner_command.stdout) or
+            (mariadb_mysqltuner_command.rc != 0)
           tags:
             - molecule-idempotence-notest
 
@@ -346,7 +347,8 @@
           rescue:
 
             - name: Check mysqltuner path
-              ansible.builtin.command: which mysqltuner
+              ansible.builtin.command:
+                cmd: which mysqltuner
               check_mode: false
               changed_when: false
               register: mariadb_mysqltuner_which
@@ -366,7 +368,7 @@
 
             - name: Decode the base64 encoded version of mysqltuner, split it by lines and set a fact for the version
               ansible.builtin.set_fact:
-                mariadb_mysqltuner_file_line2: "{{ (mariadb_mysqltuner_file_b64encoded['content'] | ansible.builtin.b64decode | trim ).split('\n')[1] }}"
+                mariadb_mysqltuner_file_line2: "{{ (mariadb_mysqltuner_file_b64encoded['content'] | ansible.builtin.b64decode | trim).split('\n')[1] }}"
 
             - name: Debug mariadb_mysqltuner_file_line2
               ansible.builtin.debug:

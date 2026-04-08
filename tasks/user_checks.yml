@@ -14,9 +14,9 @@
     - name: Include debugging
       ansible.builtin.include_tasks: user_checks_debug.yml
       when: >-
-        ( ( enable_task_debugger is defined ) and
-        ( enable_task_debugger | bool ) ) or
-        ( ansible_verbosity >= 2 )
+        ((enable_task_debugger is defined) and
+        (enable_task_debugger | bool)) or
+        (ansible_verbosity >= 2)
       tags:
         - debug
 
@@ -116,15 +116,16 @@
       ansible.builtin.set_fact:
         mariadb_mycnf_present: false
       when: >-
-        ( mariadb_mycnf_path is not defined ) or
-        ( ( mariadb_mycnf_path is defined ) and
-        ( not mariadb_mycnf_path.stat.exists | bool ) )
+        (mariadb_mycnf_path is not defined) or
+        ((mariadb_mycnf_path is defined) and
+        (not mariadb_mycnf_path.stat.exists | bool))
 
     - name: "Read the password from {{ mariadb_mycnf }}"
       block:
 
         - name: "The mariadb_password has been loaded since the file exists and the password was not set from {{ mariadb_mycnf }}"
-          ansible.builtin.command: "my_print_defaults --defaults-file='{{ mariadb_mycnf }}' client"
+          ansible.builtin.command:
+            cmd: "my_print_defaults --defaults-file='{{ mariadb_mycnf }}' client"
           check_mode: false
           changed_when: false
           register: mariadb_my_print_defaults_command
@@ -147,7 +148,8 @@
       block:
 
         - name: "Generate a random password as it is not defined or empty for {{ mariadb_username }}"
-          ansible.builtin.command: "pwgen -n {{ 36 | random(24) }} 1"
+          ansible.builtin.command:
+            cmd: "pwgen -n {{ 36 | random(24) }} 1"
           check_mode: false
           changed_when: false
           register: mariadb_password_gen
@@ -175,9 +177,9 @@
     - name: Include debugging
       ansible.builtin.include_tasks: user_checks_debug.yml
       when: >-
-        ( ( enable_task_debugger is defined ) and
-        ( enable_task_debugger | bool ) ) or
-        ( ansible_verbosity >= 2 )
+        ((enable_task_debugger is defined) and
+        (enable_task_debugger | bool)) or
+        (ansible_verbosity >= 2)
 
   tags:
     - mariadb

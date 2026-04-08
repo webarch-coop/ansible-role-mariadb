@@ -29,7 +29,8 @@
 
     # When in a docker container mariadb_init.stdout == "sh"
     - name: Check if system has been booted with systemd as init system
-      ansible.builtin.command: ps -p 1 -o comm=
+      ansible.builtin.command:
+        cmd: "ps -p 1 -o comm="
       changed_when: false
       check_mode: false
       register: mariadb_ps
@@ -53,7 +54,8 @@
         - debug
 
     - name: Run my_print_defaults --help
-      ansible.builtin.command: my_print_defaults --help
+      ansible.builtin.command:
+        cmd: my_print_defaults --help
       check_mode: false
       changed_when: false
       register: mariadb_my_print_defaults_help
@@ -73,13 +75,14 @@
         verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
 
     - name: Run my_print_defaults
-      ansible.builtin.command: >-
-        my_print_defaults
-        {% if "--mariadbd" in mariadb_my_print_defaults_options %}
-        --mariadbd
-        {% else %}
-        --mysqld
-        {% endif -%}
+      ansible.builtin.command:
+        cmd: >-
+          my_print_defaults
+          {% if "--mariadbd" in mariadb_my_print_defaults_options %}
+          --mariadbd
+          {% else %}
+          --mysqld
+          {% endif -%}
       check_mode: false
       changed_when: false
       register: mariadb_my_print_mysqld_defaults

@@ -110,22 +110,22 @@
         - name: "Include the MariaDB configuration file templated tasks for {{ mariadb_cnf.path }}"
           ansible.builtin.include_tasks: conf_templated.yml
           when: >-
-            ( mariadb_cnf.state == "templated" ) or
-            ( ( mariadb_cnf.state == "present" ) and
-            ( not mariadb_cnf_file_path.stat.exists ) )
+            (mariadb_cnf.state == "templated") or
+            ((mariadb_cnf.state == "present") and
+            (not mariadb_cnf_file_path.stat.exists))
 
         - name: "Include the MariaDB configuration edited tasks for {{ mariadb_cnf.path }}"
           ansible.builtin.include_tasks: conf_edited.yml
           when: >-
-            ( ( mariadb_cnf.state == "edited" ) or
-            ( ( mariadb_cnf.state == "present" ) and
-            ( mariadb_cnf_file_path.stat.exists ) ) ) and
-            ( mariadb_cnf.conf != mariadb_cnf_file_existing_vars )
+            ((mariadb_cnf.state == "edited") or
+            ((mariadb_cnf.state == "present") and
+            (mariadb_cnf_file_path.stat.exists))) and
+            (mariadb_cnf.conf != mariadb_cnf_file_existing_vars)
 
       when: >-
-        ( mariadb_cnf.state is not defined ) or
-        ( ( mariadb_cnf.state is defined ) and
-        ( mariadb_cnf.state != "absent" ) )
+        (mariadb_cnf.state is not defined) or
+        ((mariadb_cnf.state is defined) and
+        (mariadb_cnf.state != "absent"))
 
   tags:
     - mariadb

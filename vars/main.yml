@@ -21,6 +21,7 @@ mariadb_jpq:
   cve: 'CVE'
   fragtabs: 'Tables."Fragmented tables"'
   groups: "[].group_name"
+  ignore_db_dir: "[?path=='/etc/mysql/mariadb.conf.d/50-server.cnf'].conf.mysqld.ignore_db_dir|[0]"
   tunerver: "[?distro=='{{ ansible_facts.distribution_release }}'].version|[0]"
   recs: '"Recommendations"'
   service: 'ansible_facts.services.["mariadb.service"]|[0]'

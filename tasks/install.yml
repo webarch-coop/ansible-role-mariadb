@@ -52,10 +52,10 @@
       ansible.builtin.setup:
         filter: ansible_local
       when: >-
-        ( ( mariadb_install.changed is defined ) and
-        ( mariadb_install.changed | bool ) ) or
-        ( ( mariadb_remove.changed is defined ) or
-        ( mariadb_remove.changed | bool ) )
+        ((mariadb_install.changed is defined) and
+        (mariadb_install.changed | bool)) or
+        ((mariadb_remove.changed is defined) or
+        (mariadb_remove.changed | bool))
 
     - name: Stat /lib/systemd/system/mariadb.service
       ansible.builtin.stat:

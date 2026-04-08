@@ -34,8 +34,8 @@
             name: apt
             tasks_from: local_facts.yml
           when: >-
-            ( ansible_facts.ansible_local.bash.path is not defined ) or
-            ( ansible_facts.ansible_local.dpkg.installed is not defined )
+            (ansible_facts.ansible_local.bash.path is not defined) or
+            (ansible_facts.ansible_local.dpkg.installed is not defined)
 
         - name: Legacy /etc/ansible/facts.d/mariadb_root.fact file absent
           ansible.builtin.file:
@@ -60,8 +60,8 @@
       ansible.builtin.include_tasks: checks.yml
       when:
         - ansible_facts.ansible_local.dpkg.installed is defined
-        - ( "mariadb-server" in ansible_facts.ansible_local.dpkg.installed )
-        - ( "python3-mysqldb" in ansible_facts.ansible_local.dpkg.installed )
+        - ("mariadb-server" in ansible_facts.ansible_local.dpkg.installed)
+        - ("python3-mysqldb" in ansible_facts.ansible_local.dpkg.installed)
       tags:
         - mariadb_checks
         - mariadb_info
@@ -81,9 +81,10 @@
             - not mariadb_etc_my_cnf.stat.islnk | bool
 
         - name: Run mysql_upgrade
-          ansible.builtin.command: mysql_upgrade
+          ansible.builtin.command:
+            cmd: mysql_upgrade
           register: mariadb_upgrade
-          changed_when: ( "This installation of MariaDB is already upgraded" not in mariadb_upgrade.stdout )
+          changed_when: ("This installation of MariaDB is already upgraded" not in mariadb_upgrade.stdout)
 
         - name: MariaDB configuration
           block:
@@ -98,6 +99,19 @@
                 label: "{{ mariadb_cnf.name | default(mariadb_cnf.path) }}"
               tags:
                 - debug
+
+            # The configuration option ignore_db_dirs should be used rather than ignore_db_dir
+            - name: Config ignore_db_dir = lost+found absent from /etc/mysql/mariadb.conf.d/50-server.cnf
+              community.general.ini_file:
+                path: /etc/mysql/mariadb.conf.d/50-server.cnf
+                section: mysqld
+                option: ignore_db_dir
+                state: absent
+                exclusive: true
+                owner: root
+                group: root
+                mode: "0600"
+              when: mariadb_config | community.general.json_query(mariadb_jpq.ignore_db_dir) == "lost+found"
 
             - name: Include the MariaDB configuration file tasks
               ansible.builtin.include_tasks: conf.yml
@@ -141,7 +155,7 @@
           ansible.builtin.include_tasks: sys.yml
           when:
             - mariadb_sys_schema | bool
-            - ( "sys" not in mariadb_databases )
+            - ("sys" not in mariadb_databases)
             - mariadb_version is ansible.builtin.version('10.6.0', 'lt')
 
         - name: Conditionally include the the time zone tables import tasks
@@ -167,7 +181,7 @@
 
       when:
         - ansible_facts.ansible_local.dpkg.installed is defined
-        - ( "mariadb-server" in ansible_local.dpkg.installed )
+        - ("mariadb-server" in ansible_local.dpkg.installed)
       tags:
         - mariadb_conf
 

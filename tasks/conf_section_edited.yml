@@ -132,9 +132,9 @@
           - "Regex: ^[#][ ]{0,9}{{ mariadb_cnf_variable_pair.key | regex_replace('_', '[_-]') }}[ ]{0,9}[=]{0,1}"
         verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
       when: >-
-        ( mariadb_cnf_variable_pair.key not in mariadb_cnf_file_section_existing_keys ) or
-        ( ( mariadb_cnf_variable_pair.key not in mariadb_cnf_file_section_proposed_value_less_keys ) and
-        ( mariadb_cnf_variable_pair.value != mariadb_cnf_file_existing_vars | community.general.json_query(mariadb_cnf_variable_jpq) ) )
+        (mariadb_cnf_variable_pair.key not in mariadb_cnf_file_section_existing_keys) or
+        ((mariadb_cnf_variable_pair.key not in mariadb_cnf_file_section_proposed_value_less_keys) and
+        (mariadb_cnf_variable_pair.value != mariadb_cnf_file_existing_vars | community.general.json_query(mariadb_cnf_variable_jpq)))
       vars:
         mariadb_cnf_variable_jpq: '"{{ mariadb_cnf_section.key }}"."{{ mariadb_cnf_variable_pair.key }}"'
       loop: "{{ mariadb_cnf_section.value | ansible.builtin.dict2items }}"
@@ -178,9 +178,9 @@
         owner: "{{ mariadb_cnf.owner | default('root') }}"
         group: "{{ mariadb_cnf.owner | default('root') }}"
       when: >-
-        ( mariadb_cnf_variable_pair.key not in mariadb_cnf_file_section_proposed_value_less_keys ) and
-        ( ( mariadb_cnf_variable_pair.key not in mariadb_cnf_file_section_existing_keys ) or
-        ( mariadb_cnf_variable_pair.value != mariadb_cnf_file_existing_vars | community.general.json_query(mariadb_cnf_variable_jpq) ) )
+        (mariadb_cnf_variable_pair.key not in mariadb_cnf_file_section_proposed_value_less_keys) and
+        ((mariadb_cnf_variable_pair.key not in mariadb_cnf_file_section_existing_keys) or
+        (mariadb_cnf_variable_pair.value != mariadb_cnf_file_existing_vars | community.general.json_query(mariadb_cnf_variable_jpq)))
       vars:
         mariadb_cnf_variable_jpq: '"{{ mariadb_cnf_section.key }}"."{{ mariadb_cnf_variable_pair.key }}"'
       loop: "{{ mariadb_cnf_section.value | ansible.builtin.dict2items }}"

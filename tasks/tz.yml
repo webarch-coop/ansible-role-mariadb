@@ -26,7 +26,8 @@
       block:
 
         - name: Get the latest date from the tzdata package changelog
-          ansible.builtin.command: dpkg-parsechangelog -l /usr/share/doc/tzdata/changelog.Debian.gz -S Date
+          ansible.builtin.command:
+            cmd: dpkg-parsechangelog -l /usr/share/doc/tzdata/changelog.Debian.gz -S Date
           check_mode: false
           changed_when: false
           register: mariadb_tzdata_deb_date
@@ -109,9 +110,9 @@
               when: mariadb_tzdata_sql.stat.exists | bool
 
           when: >-
-            ( not mariadb_tzdata_mariadb_file.stat.exists | bool ) or
-            ( ( mariadb_tzdata_mariadb_file.stat.exists | bool ) and
-            ( mariadb_tzdata_mariadb != mariadb_tzdata_latest ) )
+            (not mariadb_tzdata_mariadb_file.stat.exists | bool) or
+            ((mariadb_tzdata_mariadb_file.stat.exists | bool) and
+            (mariadb_tzdata_mariadb != mariadb_tzdata_latest))
 
       when:
         - mariadb_tzdata_changelog.stat.exists is defined

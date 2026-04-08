@@ -9,7 +9,8 @@
 # You should have received a copy of the GNU General Public License along with the Webarchitects MariaDB Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
 - name: Upgrade from Debian Jessie MySQL configuration
-  ansible.builtin.command: update-alternatives --remove my.cnf /etc/mysql/my.cnf.migrated
+  ansible.builtin.command:
+    cmd: update-alternatives --remove my.cnf /etc/mysql/my.cnf.migrated
   changed_when: true
   notify: Restart mariadb
   tags:

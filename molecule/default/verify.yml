@@ -42,7 +42,8 @@
       block:
 
         - name: Run mysqltuner
-          ansible.builtin.command: mysqltuner --json
+          ansible.builtin.command:
+            cmd: mysqltuner --json
           check_mode: false
           changed_when: false
           register: molecule_mysqltuner_command
@@ -50,7 +51,8 @@
       rescue:
 
         - name: Check mysqltuner path
-          ansible.builtin.command: which mysqltuner
+          ansible.builtin.command:
+            cmd: which mysqltuner
           check_mode: false
           changed_when: false
           register: molecule_mysqltuner_which
