@@ -152,12 +152,12 @@ argument_specs:
         type: list
         elements: str
         required: false
-        description: Internal array of the lines returned from runnimg the my_print_defaults --mariadbd command.
+        description: Internal array of the lines returned from running the my_print_defaults --mariadbd command.
       mariadb_mysqld_defaults_variables:
         type: list
         elements: str
         required: false
-        description: Internal array of variables names returned from runnimg the my_print_defaults --mariadbd command.
+        description: Internal array of variables names returned from running the my_print_defaults --mariadbd command.
       mariadb_mycnf_path:
         type: dict
         required: false
@@ -285,7 +285,7 @@ argument_specs:
       mariadb_my_print_defaults_help:
         type: dict
         required: false
-        description: Internal results from runnimg the my_print_defaults --help command.
+        description: Internal results from running the my_print_defaults --help command.
       mariadb_my_print_defaults_options:
         type: list
         elements: str
@@ -294,7 +294,7 @@ argument_specs:
       mariadb_my_print_mysqld_defaults:
         type: dict
         required: false
-        description: Internal results from runnimg the my_print_defaults --mariadbd command.
+        description: Internal results from running the my_print_defaults --mariadbd command.
       mariadb_passwd:
         type: str
         required: false
