@@ -92,6 +92,20 @@
         mariadb_mysqld_defaults_lines: "{{ mariadb_my_print_mysqld_defaults.stdout_lines | map('regex_replace', '^[-]{2}') }}"
         mariadb_mysqld_defaults_variables: "{{ mariadb_my_print_mysqld_defaults.stdout_lines | map('regex_replace', '^[-]{2}') | map('regex_replace', '=.*$') | sort }}"
 
+    - name: Debug mariadb_mysqld_defaults_lines
+      ansible.builtin.debug:
+        var: mariadb_mysqld_defaults_lines
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
+
+    - name: Debug mariadb_mysqld_defaults_variables
+      ansible.builtin.debug:
+        var: mariadb_mysqld_defaults_variables
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
+
     - name: Check that no variables are duplicated
       ansible.builtin.assert:
         that:
@@ -111,11 +125,18 @@
       ansible.builtin.set_fact:
         mariadb_mysqld_defaults: "{% for mariadb_default in mariadb_mysqld_defaults_lines %}{{ mariadb_default + '\n' }}{% endfor %}"
 
+    - name: Debug mariadb_mysqld_defaults
+      ansible.builtin.debug:
+        var: mariadb_mysqld_defaults
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+      tags:
+        - debug
+
     - name: Set a fact for the my_print_defaults results
       ansible.builtin.set_fact:
         mariadb_defaults: "{{ mariadb_mysqld_defaults | string | community.general.jc('ini') }}"
 
-    - name: Debug MariaDB defaults
+    - name: Debug mariadb_defaults
       ansible.builtin.debug:
         var: mariadb_defaults
         verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
