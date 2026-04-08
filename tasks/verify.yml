@@ -11,14 +11,6 @@
 - name: Verify variables starting with mariadb_
   block:
 
-    - name: Debug mariadb_mysqld_defaults
-      ansible.builtin.debug:
-        var: mariadbvarnames
-        verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
-      when: mariadb_mysqld_defaults is defined
-      tags:
-        - debug
-
     - name: Debug mariadbvarnames
       ansible.builtin.debug:
         var: mariadbvarnames

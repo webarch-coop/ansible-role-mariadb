@@ -148,10 +148,6 @@ argument_specs:
         type: dict
         required: true
         description: Internal dictionary of JMESPATH variables.
-      mariadb_mysqld_defaults:
-        type: dict
-        required: false
-        description: Internal JSON version of the results from runnimg the my_print_defaults --mariadbd command.
       mariadb_mysqld_defaults_lines:
         type: list
         elements: str
