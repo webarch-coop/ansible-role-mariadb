@@ -111,7 +111,9 @@
                 owner: root
                 group: root
                 mode: "0600"
-              when: mariadb_config | community.general.json_query(mariadb_jpq.ignore_db_dir) == "lost+found"
+              when:
+                - mariadb_defaults.ignore_db_dir is defined
+                - mariadb_defaults.ignore_db_dir == "lost+found"
 
             - name: Include the MariaDB configuration file tasks
               ansible.builtin.include_tasks: conf.yml
