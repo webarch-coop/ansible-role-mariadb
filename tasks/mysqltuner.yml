@@ -66,7 +66,11 @@
 
         - name: Set a fact for the /usr/local/bin/mysqltuner version
           ansible.builtin.set_fact:
-            mariadb_mysqltuner_version_local: "{{ (mariadb_mysqltuner_local_help.stdout_lines[1] | trim | ansible.builtin.split(' '))[1] }}"
+            mariadb_mysqltuner_version_local: >-
+             {{- (mariadb_mysqltuner_local_help.stdout_lines |
+                 ansible.builtin.first |
+                 ansible.builtin.trim |
+                 ansible.builtin.split)[1] -}}
 
         - name: Debug mariadb_mysqltuner_version_local
           ansible.builtin.debug:
