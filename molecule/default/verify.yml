@@ -116,28 +116,28 @@
         var: molecule_mysqltuner_adjust_variables
       when:
         - molecule_mysqltuner_adjust_variables != []
-        - molecule_mysqltuner_adjust_variables | length > 0
+        - molecule_mysqltuner_adjust_variables | ansible.builtin.type_debug != "NoneType"
 
     - name: Print mysqltuner results for Fragmented tables
       ansible.builtin.debug:
         var: molecule_mysqltuner_fragmented_tables
       when:
         - molecule_mysqltuner_fragmented_tables != []
-        - molecule_mysqltuner_fragmented_tables | length > 0
+        - molecule_mysqltuner_fragmented_tables | ansible.builtin.type_debug != "NoneType"
 
     - name: Print mysqltuner results for Recommendations
       ansible.builtin.debug:
         var: molecule_mysqltuner_recommendations
       when:
         - molecule_mysqltuner_recommendations != []
-        - molecule_mysqltuner_recommendations | length > 0
+        - molecule_mysqltuner_recommendations | ansible.builtin.type_debug != "NoneType"
 
     - name: Print mysqltuner results for CVE
       ansible.builtin.debug:
         var: molecule_mysqltuner_cve
       when:
         - molecule_mysqltuner_cve != []
-        - molecule_mysqltuner_cve | length > 0
+        - molecule_mysqltuner_cve | ansible.builtin.type_debug != "NoneType"
 
     - name: Query the MariaDB databases, users and version using a socket
       community.mysql.mysql_info:

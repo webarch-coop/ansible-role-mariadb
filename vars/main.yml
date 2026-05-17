@@ -44,7 +44,7 @@ mariadb_mysqltuner_versions:
   - distro: buster
     version: 1.7.13
   - distro: forky
-    version: 2.6.0
+    version: 2.8.29
   - distro: jammy
     version: 1.7.17
   - distro: noble
