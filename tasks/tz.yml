@@ -68,12 +68,12 @@
           block:
 
             - name: Timezone database dump created
-              ansible.builtin.shell: >
-                set -e -o pipefail
-                mysql_tzinfo_to_sql /usr/share/zoneinfo > /root/timezoneinfo.sql
-              changed_when: true
-              args:
+              ansible.builtin.shell:
+                cmd: >-
+                  set -e -o pipefail
+                  mysql_tzinfo_to_sql /usr/share/zoneinfo > /root/timezoneinfo.sql
                 executable: "{{ ansible_facts.ansible_local.bash.path | default('/usr/bin/bash') }}"
+              changed_when: true
 
             - name: Check that the timezone database dump exists
               ansible.builtin.stat:

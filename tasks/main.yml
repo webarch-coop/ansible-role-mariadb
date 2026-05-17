@@ -187,6 +187,14 @@
       tags:
         - mariadb_conf
 
+    - name: MariaDB include verify tasks
+      ansible.builtin.include_tasks: verify.yml
+      when:
+        - mariadb_verify is defined
+        - mariadb_verify | bool
+      tags:
+        - mariadb_verify
+
   when: mariadb | bool
   tags:
     - mariadb
