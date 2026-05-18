@@ -138,10 +138,9 @@
 
     - name: Print mysqltuner results for CVE
       ansible.builtin.debug:
-        var: molecule_mysqltuner_cve
+        var: molecule_mysqltuner_cve.List
       when:
-        - molecule_mysqltuner_cve != []
-        - molecule_mysqltuner_cve | ansible.builtin.type_debug != "NoneType"
+        - molecule_mysqltuner_cve.List is defined
 
     - name: Query the MariaDB databases, users and version using a socket
       ansible.mysql.mysql_info:

@@ -274,7 +274,7 @@ argument_specs:
         required: false
         description: Path for mysqltuner.
       mariadb_mysqltuner_performance:
-        type: dict
+        type: list
         required: false
         description: Internal results from running the mysqltuner command for Performance.
       mariadb_mysqltuner_present:
@@ -291,7 +291,7 @@ argument_specs:
         required: false
         description: Internal dictionary of recommendations from running MySQLTuner.
       mariadb_mysqltuner_security:
-        type: dict
+        type: list
         required: false
         description: Internal results from running the mysqltuner command for Security.
       mariadb_mysqltuner_script:

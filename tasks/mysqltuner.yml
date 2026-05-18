@@ -382,10 +382,9 @@
 
             - name: Print mysqltuner results for CVE
               ansible.builtin.debug:
-                var: mariadb_mysqltuner_cve
+                var: mariadb_mysqltuner_cve.List
               when:
-                - mariadb_mysqltuner_cve != []
-                - mariadb_mysqltuner_cve | length > 0
+                - mariadb_mysqltuner_cve.List is defined
 
             - name: Print mysqltuner results for Fragmented tables
               ansible.builtin.debug:
