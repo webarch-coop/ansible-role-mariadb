@@ -18,14 +18,14 @@
       ansible.builtin.include_tasks: user_checks.yml
 
     - name: "MariaDB database present {{ mariadb_database }}"
-      community.mysql.mysql_db:
+      ansible.mysql.mysql_db:
         login_user: root
         login_unix_socket: "{{ mariadb_socket }}"
         name: "{{ mariadb_database }}"
         state: present
 
     - name: "MariaDB user present {{ mariadb_username }}"
-      community.mysql.mysql_user:
+      ansible.mysql.mysql_user:
         login_user: root
         login_unix_socket: "{{ mariadb_socket }}"
         name: "{{ mariadb_username }}"

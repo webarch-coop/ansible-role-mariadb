@@ -22,7 +22,9 @@ mariadb_jpq:
   fragtabs: 'Tables."Fragmented tables"'
   groups: "[].group_name"
   tunerver: "[?distro=='{{ ansible_facts.distribution_release }}'].version|[0]"
+  pref: "Modules.Performance"
   recs: '"Recommendations"'
+  sec: "Modules.Security"
   service: 'ansible_facts.services.["mariadb.service"]|[0]'
   systemd_path: "[].files[].path"
   users: "[].username"

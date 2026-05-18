@@ -32,8 +32,8 @@
             clone: true
             version: v1.5.3
 
-        - name: Use import the sys schema using community.mysql.mysql_db and a socket
-          community.mysql.mysql_db:
+        - name: Use import the sys schema using ansible.mysql.mysql_db and a socket
+          ansible.mysql.mysql_db:
             name: all
             state: import
             chdir: /usr/local/src/mariadb-sys

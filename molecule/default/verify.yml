@@ -89,19 +89,23 @@
 
     - name: Set facts for mysqltuner results
       ansible.builtin.set_fact:
-        molecule_mysqltuner_results: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json }}"
         molecule_mysqltuner_adjust_variables: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(molecule_jpq.adjvars) }}"
-        molecule_mysqltuner_recommendations: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(molecule_jpq.recs) }}"
-        molecule_mysqltuner_fragmented_tables: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(molecule_jpq.fragtabs) }}"
         molecule_mysqltuner_cve: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(molecule_jpq.cve) }}"
+        molecule_mysqltuner_fragmented_tables: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(molecule_jpq.fragtabs) }}"
+        molecule_mysqltuner_performance: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(molecule_jpq.pref) }}"
+        molecule_mysqltuner_recommendations: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(molecule_jpq.recs) }}"
+        molecule_mysqltuner_security: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(molecule_jpq.sec) }}"
+        molecule_mysqltuner_results: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json }}"
       vars:
         molecule_jpq:
           adjvars: 'AdjustVariables'
           cve: 'CVE'
           fragtabs: 'Tables."Fragmented tables"'
           groups: "[].group_name"
+          pref: "Modules.Performance"
           tunerver: "[?distro=='{{ ansible_facts.distribution_release }}'].version|[0]"
           recs: '"Recommendations"'
+          sec: "Modules.Security"
           users: "[].username"
 
     - name: Print mysqltuner full results when running with -v
@@ -140,7 +144,7 @@
         - molecule_mysqltuner_cve | ansible.builtin.type_debug != "NoneType"
 
     - name: Query the MariaDB databases, users and version using a socket
-      community.mysql.mysql_info:
+      ansible.mysql.mysql_info:
         filter:
           - databases
           - users

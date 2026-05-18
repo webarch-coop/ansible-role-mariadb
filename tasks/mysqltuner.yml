@@ -50,27 +50,67 @@
     - name: Check /usr/local/bin/mysqltuner version
       block:
 
-        - name: Run /usr/local/bin/mysqltuner --help
+        - name: Run /usr/local/bin/mysqltuner --json
           ansible.builtin.command:
-            cmd: /usr/local/bin/mysqltuner --help
+            cmd: /usr/local/bin/mysqltuner --json
           check_mode: false
           changed_when: false
-          register: mariadb_mysqltuner_local_help
+          register: mariadb_mysqltuner_local_json
 
-        - name: Debug mariadb_mysqltuner_local_help
+        - name: Debug mariadb_mysqltuner_local_json
           ansible.builtin.debug:
-            var: mariadb_mysqltuner_local_help
+            var: mariadb_mysqltuner_local_json
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}2{% else %}3{% endif %}"
+          tags:
+            - debug
+
+        - name: Debug mariadb_mysqltuner_local_help.stderr_lines
+          ansible.builtin.debug:
+            var: mariadb_mysqltuner_local_json.stderr_lines
             verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+          when:
+            - mariadb_mysqltuner_local_json.stderr_lines is defined
+            - mariadb_mysqltuner_local_json.stderr_lines != []
+          tags:
+            - debug
+
+        - name: Debug mariadb_mysqltuner_local_help.stdout_lines
+          ansible.builtin.debug:
+            var: mariadb_mysqltuner_local_json.stdout_lines
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
+          when:
+            - mariadb_mysqltuner_local_json.stdout_lines is defined
+            - mariadb_mysqltuner_local_json.stdout_lines != []
+          tags:
+            - debug
+
+        - name: Debug mariadb_mysqltuner_local_help.stdout_lines[-1]
+          ansible.builtin.debug:
+            var: mariadb_mysqltuner_local_json.stdout_lines[-1]
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}2{% else %}3{% endif %}"
+          tags:
+            - debug
+
+        - name: Debug mariadb_mysqltuner_local_help.stdout_lines[-1] | ansible.builtin.from_json
+          ansible.builtin.debug:
+            msg: "{{ mariadb_mysqltuner_local_json.stdout_lines[-1] | ansible.builtin.from_json }}"
+            verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}2{% else %}3{% endif %}"
+          tags:
+            - debug
+
+        - name: Debug mariadb_mysqltuner_local_help.stdout_lines[-1] | ansible.builtin.from_json | ommunity.general.json_query('MySQLTuner.version')
+          ansible.builtin.debug:
+            msg: "{{ mariadb_mysqltuner_local_json.stdout_lines[-1] | ansible.builtin.from_json | community.general.json_query('MySQLTuner.version') }}"
+            # verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}1{% else %}2{% endif %}"
           tags:
             - debug
 
         - name: Set a fact for the /usr/local/bin/mysqltuner version
           ansible.builtin.set_fact:
             mariadb_mysqltuner_version_local: >-
-             {{- (mariadb_mysqltuner_local_help.stdout_lines |
-                 ansible.builtin.first |
-                 ansible.builtin.trim |
-                 ansible.builtin.split)[1] -}}
+             {{- mariadb_mysqltuner_local_json.stdout_lines[-1] |
+                 ansible.builtin.from_json |
+                 community.general.json_query('MySQLTuner.version') -}}
 
         - name: Debug mariadb_mysqltuner_version_local
           ansible.builtin.debug:
@@ -84,6 +124,11 @@
             that:
               - mariadb_mysqltuner_version_local is ansible.builtin.version('1.0.0', 'gt', version_type='semver')
             quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+            fail_msg: >-
+              The mariadb_mysqltuner_version_local variable has the value of
+              {{ mariadb_mysqltuner_version_local }} and is type
+              {{ mariadb_mysqltuner_version_local | ansible.builtin.type_debug }}
+              when it should be a version string.
 
       when: mariadb_mysqltuner_local_bin.stat.exists | bool
 
@@ -276,6 +321,20 @@
       ansible.builtin.service_facts:
       register: mariadb_service_facts
 
+    - name: Debug mariadb_mysqltuner_which.rc
+      ansible.builtin.debug:
+        var: mariadb_mysqltuner_which.rc
+        # verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+      tags:
+        - debug
+
+    - name: Debug (mariadb_service_facts | community.general.json_query(mariadb_jpq.service)).status
+      ansible.builtin.debug:
+        msg: "{{ (mariadb_service_facts | community.general.json_query(mariadb_jpq.service)).status }}"
+        # verbosity: "{% if ansible_check_mode | bool or ansible_diff_mode | bool %}0{% else %}1{% endif %}"
+      tags:
+        - debug
+
     - name: Run mysqltuner when it is installed and MariaDB is running
       block:
 
@@ -297,11 +356,13 @@
 
             - name: Set facts for mysqltuner results
               ansible.builtin.set_fact:
-                mariadb_mysqltuner_results: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json }}"
                 mariadb_mysqltuner_adjust_variables: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.adjvars) }}"
-                mariadb_mysqltuner_recommendations: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.recs) }}"
-                mariadb_mysqltuner_fragmented_tables: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.fragtabs) }}"
                 mariadb_mysqltuner_cve: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.cve) }}"
+                mariadb_mysqltuner_fragmented_tables: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.fragtabs) }}"
+                mariadb_mysqltuner_performance: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.pref) }}"
+                mariadb_mysqltuner_recommendations: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.recs) }}"
+                mariadb_mysqltuner_security: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(mariadb_jpq.sec) }}"
+                mariadb_mysqltuner_results: "{{ mariadb_mysqltuner_command.stdout | ansible.builtin.from_json }}"
 
             - name: Print mysqltuner full results when running with -v
               ansible.builtin.debug:
@@ -318,26 +379,6 @@
               when:
                 - mariadb_mysqltuner_adjust_variables != []
                 - mariadb_mysqltuner_adjust_variables | length > 0
-              tags:
-                - debug
-
-            - name: Print mysqltuner results for Fragmented tables
-              ansible.builtin.debug:
-                var: mariadb_mysqltuner_fragmented_tables
-              when:
-                - mariadb_mysqltuner_fragmented_tables != []
-                - mariadb_mysqltuner_fragmented_tables | length > 0
-              tags:
-                - debug
-
-            - name: Print mysqltuner results for Recommendations
-              ansible.builtin.debug:
-                var: mariadb_mysqltuner_recommendations
-              when:
-                - mariadb_mysqltuner_recommendations != []
-                - mariadb_mysqltuner_recommendations | length > 0
-              tags:
-                - debug
 
             - name: Print mysqltuner results for CVE
               ansible.builtin.debug:
@@ -345,8 +386,34 @@
               when:
                 - mariadb_mysqltuner_cve != []
                 - mariadb_mysqltuner_cve | length > 0
-              tags:
-                - debug
+
+            - name: Print mysqltuner results for Fragmented tables
+              ansible.builtin.debug:
+                var: mariadb_mysqltuner_fragmented_tables
+              when:
+                - mariadb_mysqltuner_fragmented_tables != []
+                - mariadb_mysqltuner_fragmented_tables | length > 0
+
+            - name: Print mysqltuner results for Performance
+              ansible.builtin.debug:
+                var: mariadb_mysqltuner_performance
+              when:
+                - mariadb_mysqltuner_performance != []
+                - mariadb_mysqltuner_performance | length > 0
+
+            - name: Print mysqltuner results for Recommendations
+              ansible.builtin.debug:
+                var: mariadb_mysqltuner_recommendations
+              when:
+                - mariadb_mysqltuner_recommendations != []
+                - mariadb_mysqltuner_recommendations | length > 0
+
+            - name: Print mysqltuner results for Security
+              ansible.builtin.debug:
+                var: mariadb_mysqltuner_security
+              when:
+                - mariadb_mysqltuner_security != []
+                - mariadb_mysqltuner_security | length > 0
 
           rescue:
 
@@ -391,7 +458,9 @@
 
       when:
         - mariadb_mysqltuner_which.rc == 0
-        - (mariadb_service_facts | community.general.json_query(mariadb_jpq.service)).status == "running"
+        - >-
+          ((mariadb_service_facts | community.general.json_query(mariadb_jpq.service)).status == "running") or
+          ((mariadb_service_facts | community.general.json_query(mariadb_jpq.service)).status == "enabled")
 
   tags:
     - mariadb

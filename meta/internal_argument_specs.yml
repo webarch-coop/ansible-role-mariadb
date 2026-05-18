@@ -127,7 +127,7 @@ argument_specs:
       mariadb_info:
         type: dict
         required: false
-        description: Internal results from the community.mysql.mysql_info module.
+        description: Internal results from the ansible.mysql.mysql_info module.
       mariadb_init:
         type: str
         required: false
@@ -147,7 +147,56 @@ argument_specs:
       mariadb_jpq:
         type: dict
         required: true
-        description: Internal dictionary of JMESPATH variables.
+        description: Internal dictionary of JMESPath queries.
+        options:
+          adjvars:
+            type: str
+            required: true
+            description: JMESPath query.
+          config_path:
+            type: str
+            required: true
+            description: JMESPath query.
+          cve:
+            type: str
+            required: true
+            description: JMESPath query.
+          fragtabs:
+            type: str
+            required: true
+            description: JMESPath query.
+          groups:
+            type: str
+            required: true
+            description: JMESPath query.
+          tunerver:
+            type: str
+            required: true
+            description: JMESPath query.
+          prefs:
+            type: str
+            required: true
+            description: JMESPath query.
+          recs:
+            type: str
+            required: true
+            description: JMESPath query.
+          sec:
+            type: str
+            required: true
+            description: JMESPath query.
+          service:
+            type: str
+            required: true
+            description: JMESPath query.
+          systemd_path:
+            type: str
+            required: true
+            description: JMESPath query.
+          users:
+            type: str
+            required: true
+            description: JMESPath query.
       mariadb_mysqld_defaults_lines:
         type: list
         elements: str
@@ -208,10 +257,14 @@ argument_specs:
         type: dict
         required: false
         description: Internal results from running stat on /usr/local/bin/mysqltuner.
+      mariadb_mysqltuner_local_json:
+        type: dict
+        required: false
+        description: Internal results from running the ansible.builtin.command module.
       mariadb_mysqltuner_local_help:
         type: dict
         required: false
-        description: Internal results from running /usr/local/bin/mysqltuner --help.
+        description: Internal results from running the ansible.builtin.command module.
       mariadb_mysqltuner_passwords:
         type: dict
         required: false
@@ -220,6 +273,10 @@ argument_specs:
         type: str
         required: false
         description: Path for mysqltuner.
+      mariadb_mysqltuner_performance:
+        type: dict
+        required: false
+        description: Internal results from running the mysqltuner command for Performance.
       mariadb_mysqltuner_present:
         type: dict
         required: false
@@ -233,6 +290,10 @@ argument_specs:
         type: dict
         required: false
         description: Internal dictionary of recommendations from running MySQLTuner.
+      mariadb_mysqltuner_security:
+        type: dict
+        required: false
+        description: Internal results from running the mysqltuner command for Security.
       mariadb_mysqltuner_script:
         type: dict
         required: false
