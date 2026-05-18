@@ -38,6 +38,7 @@ before_script:
   - molecule --version
   - which jc
   - jc --version
+  - ansible-galaxy collection install ansible.mysql
   - ansible-galaxy collection list
 stages:
   - lint
