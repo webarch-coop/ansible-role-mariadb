@@ -76,7 +76,7 @@
     - name: Debug my_print_defaults options
       ansible.builtin.debug:
         var: mariadb_my_print_defaults_options
-        verbosity: "{% if ansible_check_mode | bool %}0{% else %}1{% endif %}"
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
       tags:
         - debug
 
