@@ -39,7 +39,7 @@ before_script:
   - which jc
   - jc --version
   # The images should have ansible.mysql...
-  # - ansible-galaxy collection install ansible.mysql
+  - ansible-galaxy collection install ansible.mysql
   - ansible-galaxy collection list
 stages:
   - lint
