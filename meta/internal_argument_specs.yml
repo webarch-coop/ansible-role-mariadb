@@ -127,7 +127,7 @@ argument_specs:
       mariadb_info:
         type: dict
         required: false
-        description: Internal results from the ansible.mariadb.mysql_info module.
+        description: Internal results from the ansible.mariadb.mariadb_info module.
       mariadb_init:
         type: str
         required: false

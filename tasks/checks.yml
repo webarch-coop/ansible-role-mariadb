@@ -8,7 +8,7 @@
 #
 # You should have received a copy of the GNU General Public License along with the Webarchitects MariaDB Ansible role. If not, see <https://www.gnu.org/licenses/>.
 ---
-- name: Use my_print_defaults and ansible.mariadb.mysql_info to gather information about the MariaDB server databases, users and version
+- name: Use my_print_defaults and ansible.mariadb.mariadb_info to gather information about the MariaDB server databases, users and version
   block:
 
     - name: Debug MySQLTuner distro versions
@@ -183,7 +183,7 @@
         - mariadb_systemd_file_path | community.general.json_query('mariadb_jpq.systemd_path') != []
 
     - name: Query the MariaDB databases, users and version using a socket
-      ansible.mariadb.mysql_info:
+      ansible.mariadb.mariadb_info:
         filter:
           - databases
           - users
