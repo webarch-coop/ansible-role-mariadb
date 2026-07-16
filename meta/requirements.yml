@@ -11,7 +11,7 @@
 - name: apt
   # https://git.coop/webarch/apt/-/releases
   src: https://git.coop/webarch/apt.git
-  version: 4.12.2  # apt
+  version: 4.14.2  # apt
   scm: git
 
 - name: systemd
