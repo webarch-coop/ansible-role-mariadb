@@ -83,8 +83,8 @@
             - name: Import the tzdata
               block:
 
-                - name: Import the tzdata into the mysql database tables using the ansible.mysql.mysql_db module
-                  ansible.mysql.mysql_db:
+                - name: Import the tzdata into the mysql database tables using the ansible.mariadb.mysql_db module
+                  ansible.mariadb.mysql_db:
                     name: mysql
                     state: import
                     target: /root/timezoneinfo.sql
