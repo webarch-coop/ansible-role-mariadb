@@ -134,7 +134,14 @@
 
     - name: Set a fact for the version of MySQLTuner that is required and the Debian / Ubuntu version
       ansible.builtin.set_fact:
-        mariadb_mysqltuner_version_required: "{% if mariadb_mysqltuner_version == 'latest' %}{{ mariadb_mysqltuner_version_latest }}{% elif mariadb_mysqltuner_version == 'master' %}master{% else %}{{ mariadb_mysqltuner_version }}{% endif %}"
+        mariadb_mysqltuner_version_required: >-
+          {%- if mariadb_mysqltuner_version == 'latest' -%}
+          {{- mariadb_mysqltuner_version_latest -}}
+          {%- elif mariadb_mysqltuner_version == 'master' -%}
+          master
+          {%- else -%}
+          {{- mariadb_mysqltuner_version -}}
+          {%- endif -%}
         mariadb_mysqltuner_version_debian: "{{ mariadb_mysqltuner_versions | community.general.json_query(mariadb_jpq.tunerver) }}"
 
     - name: Debug the MySQLTuner version required
