@@ -59,6 +59,7 @@ mariadb_config_file_path_prefix: /etc/mysql
 mariadb_mysqltuner: true
 # Set the folowing to latest, master or a version string, eg 2.9.1
 mariadb_mysqltuner_version: latest
+mariadb_http_agent: "Lynx/2.9.0dev.6 libwww-FM/2.14 SSL-MM/1.4.1 GNUTLS/3.7.1"
 mariadb_pkgs_absent: []
 mariadb_pkgs_present:
   - git

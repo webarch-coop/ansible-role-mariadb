@@ -70,6 +70,10 @@ argument_specs:
         type: str
         required: false
         description: MariaDB user host.
+      mariadb_http_agent:
+        type: str
+        required: true
+        description: HTTP User-Agent to use when making requests.
       mariadb_mycnf:
         type: str
         required: false

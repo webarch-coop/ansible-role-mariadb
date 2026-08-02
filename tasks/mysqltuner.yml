@@ -17,6 +17,7 @@
         method: HEAD
         status_code: 302
         follow_redirects: none
+        http_agent: "{{mariadb_http_agent }}"
       check_mode: false
       changed_when: false
       register: mariadb_mysqltuner_headers
