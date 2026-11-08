@@ -248,7 +248,7 @@
                 repo: https://github.com/major/MySQLTuner-perl.git
                 dest: /usr/local/src/MySQLTuner-perl
                 version: "{{ mariadb_mysqltuner_git_version }}"
-                # depth: 1 failes due to this following bug
+                # depth: 1 fails due to this following bug
                 # https://github.com/ansible/ansible/issues/87881
                 # depth: 1
                 single_branch: true
