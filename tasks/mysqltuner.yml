@@ -17,7 +17,7 @@
         method: HEAD
         status_code: 302
         follow_redirects: none
-        http_agent: "{{mariadb_http_agent }}"
+        http_agent: "{{ mariadb_http_agent }}"
       check_mode: false
       changed_when: false
       register: mariadb_mysqltuner_headers
@@ -133,7 +133,7 @@
 
       when: mariadb_mysqltuner_local_bin.stat.exists | bool
 
-    - name: Set a fact for the version of MySQLTuner that is required and the Debian / Ubuntu version
+    - name: Set a fact for the version of MySQLTuner that is required and the Debian / Ubuntu version  # noqa: jinja[spacing]
       ansible.builtin.set_fact:
         mariadb_mysqltuner_version_required: >-
           {%- if mariadb_mysqltuner_version == 'latest' -%}
@@ -251,11 +251,16 @@
                     repo: https://github.com/major/MySQLTuner-perl.git
                     dest: /usr/local/src/MySQLTuner-perl
                     version: "{% if mariadb_mysqltuner_version_required == 'master' %}master{% else %}v{{ mariadb_mysqltuner_version_required }}{% endif %}"
+                    single_branch: true
                     depth: 1
                     update: true
                   register: mariadb_mysqltuner_git_checkout
 
               rescue:
+
+                - name: Debug failed ansible.builtin.git version
+                  ansible.builtin.debug:
+                    msg: "{% if mariadb_mysqltuner_version_required == 'master' %}master{% else %}v{{ mariadb_mysqltuner_version_required }}{% endif %}"
 
                 - name: Debug mariadb_mysqltuner_git_checkout
                   ansible.builtin.debug:
