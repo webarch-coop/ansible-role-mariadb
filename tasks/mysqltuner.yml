@@ -243,13 +243,32 @@
         - name: Source MySQLTuner install using git
           block:
 
-            - name: MySQLTuner source code present
-              ansible.builtin.git:
-                repo: https://github.com/major/MySQLTuner-perl.git
-                dest: /usr/local/src/MySQLTuner-perl
-                version: "{% if mariadb_mysqltuner_version_required == 'master' %}master{% else %}v{{ mariadb_mysqltuner_version_required }}{% endif %}"
-                depth: 1
-                update: true
+            - name: Get MySQLTuner source code in a block to catch errors
+              block:
+
+                - name: MySQLTuner source code present
+                  ansible.builtin.git:
+                    repo: https://github.com/major/MySQLTuner-perl.git
+                    dest: /usr/local/src/MySQLTuner-perl
+                    version: "{% if mariadb_mysqltuner_version_required == 'master' %}master{% else %}v{{ mariadb_mysqltuner_version_required }}{% endif %}"
+                    depth: 1
+                    update: true
+                  register: mariadb_mysqltuner_git_checkout
+
+              rescue:
+
+                - name: Debug mariadb_mysqltuner_git_checkout
+                  ansible.builtin.debug:
+                    var: mariadb_mysqltuner_git_checkout
+
+                - name: Retry MySQLTuner source code present
+                  ansible.builtin.git:
+                    repo: https://github.com/major/MySQLTuner-perl.git
+                    dest: /usr/local/src/MySQLTuner-perl
+                    version: "{% if mariadb_mysqltuner_version_required == 'master' %}master{% else %}v{{ mariadb_mysqltuner_version_required }}{% endif %}"
+                    depth: 1
+                    update: true
+                  register: mariadb_mysqltuner_git_checkout
 
             - name: Check that MySQLTuner code is present
               ansible.builtin.stat:
