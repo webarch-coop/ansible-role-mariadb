@@ -249,6 +249,10 @@ argument_specs:
         elements: str
         required: false
         description: Internal array of fragmented tables results from running MySQLTuner.
+      mariadb_mysqltuner_git_checkout:
+        type: dict
+        required: false
+        description: Internal results from checking out mysqltuner git repo.
       mariadb_mysqltuner_headers:
         type: dict
         required: false
