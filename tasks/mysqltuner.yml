@@ -243,37 +243,24 @@
         - name: Source MySQLTuner install using git
           block:
 
-            - name: Get MySQLTuner source code in a block to catch errors
-              block:
-
-                - name: MySQLTuner source code present
-                  ansible.builtin.git:
-                    repo: https://github.com/major/MySQLTuner-perl.git
-                    dest: /usr/local/src/MySQLTuner-perl
-                    version: "{% if mariadb_mysqltuner_version_required == 'master' %}master{% else %}v{{ mariadb_mysqltuner_version_required }}{% endif %}"
-                    single_branch: true
-                    depth: 1
-                    update: true
-                  register: mariadb_mysqltuner_git_checkout
-
-              rescue:
-
-                - name: Debug failed ansible.builtin.git version
-                  ansible.builtin.debug:
-                    msg: "{% if mariadb_mysqltuner_version_required == 'master' %}master{% else %}v{{ mariadb_mysqltuner_version_required }}{% endif %}"
-
-                - name: Debug mariadb_mysqltuner_git_checkout
-                  ansible.builtin.debug:
-                    var: mariadb_mysqltuner_git_checkout
-
-                - name: Retry MySQLTuner source code present
-                  ansible.builtin.git:
-                    repo: https://github.com/major/MySQLTuner-perl.git
-                    dest: /usr/local/src/MySQLTuner-perl
-                    version: "{% if mariadb_mysqltuner_version_required == 'master' %}master{% else %}v{{ mariadb_mysqltuner_version_required }}{% endif %}"
-                    depth: 1
-                    update: true
-                  register: mariadb_mysqltuner_git_checkout
+            - name: "MySQLTuner source code present version {{ mariadb_mysqltuner_git_version }}"
+              ansible.builtin.git:
+                repo: https://github.com/major/MySQLTuner-perl.git
+                dest: /usr/local/src/MySQLTuner-perl
+                version: "{{ mariadb_mysqltuner_git_version }}"
+                # depth: 1 failes due to this following bug
+                # https://github.com/ansible/ansible/issues/87881
+                # depth: 1
+                single_branch: true
+                update: true
+              vars:
+                mariadb_mysqltuner_git_version: >-
+                  {%- if mariadb_mysqltuner_version_required == 'master' -%}
+                  master
+                  {%- else -%}
+                  v{{ mariadb_mysqltuner_version_required -}}
+                  {%- endif -%}
+              register: mariadb_mysqltuner_git_checkout
 
             - name: Check that MySQLTuner code is present
               ansible.builtin.stat:
