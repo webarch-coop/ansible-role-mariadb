@@ -43,11 +43,11 @@ before_script:
   - ansible-galaxy collection list
 stages:
   - lint
-  - bookworm
   - forky
   - noble
   - trixie
   - resolute
+  - bookworm
 lint:
   image: registry.git.coop/webarch/containers/images/trixie:20261107
   stage: lint
