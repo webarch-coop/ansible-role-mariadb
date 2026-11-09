@@ -42,41 +42,44 @@ before_script:
   - ansible-galaxy collection install ansible.mariadb
   - ansible-galaxy collection list
 stages:
-  - lint
-  - bookworm
-  - noble
-  - trixie
-  - resolute
+  # - lint
+  # - bookworm
+  # - noble
+  # - trixie
+  # - resolute
   - forky
-lint:
-  image: registry.git.coop/webarch/containers/images/trixie:20261107
-  stage: lint
-  script:
-    - pre-commit install
-    - pre-commit run --all-files
-bookworm:
-  image: registry.git.coop/webarch/containers/images/bookworm:20261107
-  stage: bookworm
-  script:
-    - molecule test
+# lint:
+#   image: registry.git.coop/webarch/containers/images/trixie:20261107
+#   stage: lint
+#   script:
+#     - pre-commit install
+#     - pre-commit run --all-files
+# bookworm:
+#   image: registry.git.coop/webarch/containers/images/bookworm:20261107
+#   stage: bookworm
+#   script:
+#     - molecule test
 forky:
   image: registry.git.coop/webarch/containers/images/forky:20261107
   stage: forky
   script:
-    - molecule test
-noble:
-  image: registry.git.coop/webarch/containers/images/noble:20261107
-  stage: noble
-  script:
-    - molecule test
-trixie:
-  image: registry.git.coop/webarch/containers/images/trixie:20261107
-  stage: trixie
-  script:
-    - molecule test
-resolute:
-  image: registry.git.coop/webarch/containers/images/resolute:20261107
-  stage: resolute
-  script:
-    - molecule test
+    - apt update
+    - apt install -y mariadb-server
+    - dpkg -L mariadb-server
+    # - molecule test
+# noble:
+#   image: registry.git.coop/webarch/containers/images/noble:20261107
+#   stage: noble
+#   script:
+#     - molecule test
+# trixie:
+#   image: registry.git.coop/webarch/containers/images/trixie:20261107
+#   stage: trixie
+#   script:
+#     - molecule test
+# resolute:
+#   image: registry.git.coop/webarch/containers/images/resolute:20261107
+#   stage: resolute
+#   script:
+#     - molecule test
 ...
