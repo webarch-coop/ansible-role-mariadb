@@ -30,7 +30,7 @@
       ansible.builtin.debug:
         var: ansible_facts.user_dir
 
-    - name: Include MariaDB role
+    - name: Include MariaDB role for distros other than Forky
       ansible.builtin.include_role:
         name: mariadb
       vars:  # noqa var-naming[no-role-prefix]
@@ -38,6 +38,18 @@
         mariadb_database: ansible
         mariadb_username: ansible
         mariadb_underscore_autoupdate: true
+      when: ansible_facts.distribution_release != "forky"
+
+    - name: Include MariaDB role for Forky
+      ansible.builtin.include_role:
+        name: mariadb
+      vars:  # noqa var-naming[no-role-prefix]
+        mariadb: true
+        mariadb_database: ansible
+        mariadb_socket: /run/mariadbd/mysqld.sock
+        mariadb_underscore_autoupdate: true
+        mariadb_username: ansible
+      when: ansible_facts.distribution_release == "forky"
 
     - name: Include MariaDB role verify argument spec tasks
       ansible.builtin.include_role:
