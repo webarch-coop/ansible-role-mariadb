@@ -66,6 +66,7 @@ forky:
     - apt update
     - apt install -y mariadb-server
     - dpkg -L mariadb-server
+    - cat /etc/mysql/mariadb.conf.d/50-server.cnf
     # - molecule test
 # noble:
 #   image: registry.git.coop/webarch/containers/images/noble:20261107
