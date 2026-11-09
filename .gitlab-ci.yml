@@ -67,6 +67,7 @@ forky:
     - apt install -y mariadb-server
     - dpkg -L mariadb-server
     - cat /etc/mysql/mariadb.conf.d/50-server.cnf
+    - cat /usr/lib/systemd/system/mariadb.socket
     # - molecule test
 # noble:
 #   image: registry.git.coop/webarch/containers/images/noble:20261107
