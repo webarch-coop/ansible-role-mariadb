@@ -52,6 +52,7 @@
             client:
               user: "{{ mariadb_username }}"
               password: "{{ mariadb_password }}"
+              socket: "{{ mariadb_socket }}"
 
   tags:
     - mariadb
