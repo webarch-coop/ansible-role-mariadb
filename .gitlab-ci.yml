@@ -43,11 +43,10 @@ before_script:
   - ansible-galaxy collection list
 stages:
   - lint
-  # See https://git.coop/webarch/mariadb/-/jobs/141244 for forky debugging -- the socket path
-  - forky
   - bookworm
-  - noble
   - trixie
+  - forky
+  - noble
   - resolute
 lint:
   image: registry.git.coop/webarch/containers/images/trixie:20261107
