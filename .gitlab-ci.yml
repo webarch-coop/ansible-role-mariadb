@@ -42,8 +42,8 @@ before_script:
   - ansible-galaxy collection install ansible.mariadb
   - ansible-galaxy collection list
 stages:
-  - noble
   - resolute
+  - noble
   - trixie
   - bookworm
   - forky

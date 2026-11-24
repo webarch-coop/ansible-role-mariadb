@@ -30,7 +30,7 @@
       ansible.builtin.debug:
         var: ansible_facts.user_dir
 
-    - name: Include MariaDB role for distros other than Bookworm, Trixie, Forky an Noble
+    - name: Include MariaDB role for distros other than Bookworm, Trixie, Forky, Noble and Resolute
       ansible.builtin.include_role:
         name: mariadb
       vars:  # noqa var-naming[no-role-prefix]
@@ -38,7 +38,7 @@
         mariadb_database: ansible
         mariadb_username: ansible
         mariadb_underscore_autoupdate: true
-      when: ansible_facts.distribution_release is not ansible.builtin.regex('bookworm|forky|noble|trixie')
+      when: ansible_facts.distribution_release is not ansible.builtin.regex('bookworm|forky|noble|resolute|trixie')
 
     - name: Include MariaDB role for Bookworm and Noble
       ansible.builtin.include_role:
@@ -101,7 +101,7 @@
                 max_allowed_packet: "64M"
       when: ansible_facts.distribution_release is ansible.builtin.regex('bookworm|noble')
 
-    - name: Include MariaDB role for Forky
+    - name: Include MariaDB role for Forky and Resolute
       ansible.builtin.include_role:
         name: mariadb
       vars:  # noqa var-naming[no-role-prefix]
@@ -159,7 +159,7 @@
               mysqldump:
                 default_character_set: utf8mb4
                 max_allowed_packet: "64M"
-      when: ansible_facts.distribution_release == "forky"
+      when: ansible_facts.distribution_release is ansible.builtin.regex('forky|resolute')
 
     - name: Include MariaDB role for Trixie
       ansible.builtin.include_role:
