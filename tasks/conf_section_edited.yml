@@ -28,9 +28,12 @@
     - name: Debug mariadb_cnf_file_section_existing_jpq
       ansible.builtin.debug:
         var: mariadb_cnf_file_section_existing_jpq
+        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
       vars:
         mariadb_cnf_file_section_existing_jpq: >-
           "{{ mariadb_cnf_section['key'] }}"
+      tags:
+        - debug
 
     - name: "Set a facts for the existing sections and value of section {{ mariadb_cnf_section['key'] }}"
       ansible.builtin.set_fact:
