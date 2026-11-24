@@ -38,7 +38,7 @@
         mariadb_database: ansible
         mariadb_username: ansible
         mariadb_underscore_autoupdate: true
-      when: ansible_facts.distribution_release is not ansible.builtin.regex('^bookworm|forky|noble|trixie$')
+      when: ansible_facts.distribution_release is not ansible.builtin.regex('bookworm|forky|noble|trixie')
 
     - name: Include MariaDB role for Bookworm and Noble
       ansible.builtin.include_role:
@@ -99,7 +99,7 @@
               mysqldump:
                 default_character_set: utf8mb4
                 max_allowed_packet: "64M"
-      when: ansible_facts.distribution_release in ansible.builtin.regex('^bookworm|noble$')
+      when: ansible_facts.distribution_release is ansible.builtin.regex('bookworm|noble')
 
     - name: Include MariaDB role for Forky
       ansible.builtin.include_role:
