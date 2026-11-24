@@ -11,6 +11,12 @@
 - name: Use my_print_defaults and ansible.mariadb.mariadb_info to gather information about the MariaDB server databases, users and version
   block:
 
+    # TODO
+    # Check these files have the same socket path:
+    # - /etc/mysql/mariadb.cnf
+    # - /etc/mysql/my.cnf -> /etc/alternatives/my.cnf
+    # - /etc/mysql/debian.cnf
+
     - name: Debug MySQLTuner distro versions
       ansible.builtin.debug:
         msg: "{{ mariadb_mysqltuner_versions | community.general.json_query('[].distro') }}"

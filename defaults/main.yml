@@ -73,6 +73,7 @@ mariadb_pkgs_present:
   - python3-pymysql
 # For Debian Forky the socket path is
 # /run/mariadbd/mysqld.sock
+# https://mariadb.com/docs/server/reference/plugins/authentication-plugins/authentication-plugin-unix-socket
 mariadb_socket: /run/mysqld/mysqld.sock
 mariadb_systemd_units:
   - name: mariadb
