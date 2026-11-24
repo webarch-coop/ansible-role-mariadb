@@ -61,6 +61,7 @@
             path: /etc/mysql/mariadb.conf.d/50-server.cnf
             state: edited
             conf:
+              server: {}
               mariadbd:
                 binlog_format: "ROW"
                 character_set_server: utf8mb4
@@ -88,6 +89,8 @@
                 thread_concurrency: "10"
                 tmp_table_size: "32M"
                 transaction_isolation: "READ-COMMITTED"
+              embedded: {}
+              "mariadb-11.8": {}
           - name: MariaDB mysqldump configuration
             path: /etc/mysql/conf.d/mysqldump.cnf
             state: present

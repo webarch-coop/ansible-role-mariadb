@@ -397,8 +397,14 @@
 
     - name: Set a variables for the MariaDB databases, users and version
       ansible.builtin.set_fact:
-        mariadb_databases: "{{ mariadb_info.databases.keys() | reject('regex', '.*lost[+]found$') | list }}"
-        mariadb_usernames: "{{ mariadb_info.users.localhost.keys() }}"
+        mariadb_databases: >-
+          {{ mariadb_info.databases.keys()
+          | ansible.builtin.reject('ansible.builtin.regex', '.*lost[+]found$')
+          | ansible.builtin.list
+          | ansible.builtin.sort }}
+        mariadb_usernames: >-
+          {{ mariadb_info.users.localhost.keys()
+          | ansible.builtin.sort }}
         mariadb_version: "{{ mariadb_info.version.major }}.{{ mariadb_info.version.minor }}.{{ mariadb_info.version.release }}"
         mariadb_version_major_minor: "{{ mariadb_info.version.major }}.{{ mariadb_info.version.minor }}"
 

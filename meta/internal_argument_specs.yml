@@ -94,6 +94,10 @@ argument_specs:
         type: dict
         required: false
         description: Internal dictionary of the results of my_print_defaults --mariadbd converted into JSON usng the JC ini filter.
+      mariadb_defaults_datadir:
+        type: dict
+        required: false
+        description: Internal dictionary of the results of ansible.builtin.stat on the MariaDB datadir path.
       mariadb_defaults_socket:
         type: dict
         required: false
@@ -409,9 +413,13 @@ argument_specs:
         required: false
         description: Internal result from running the ansible.builtin.slurp module on /etc/mysql/mariadb.conf.d/50-server.cnf.
       mariadb_server_cnf_contents:
-        type: dict
+        type: str
         required: false
         description: Internal variable for the contents of /etc/mysql/mariadb.conf.d/50-server.cnf.
+      mariadb_server_cnf:
+        type: str
+        required: false
+        description: Internal variable for the JSON version of the contents of /etc/mysql/mariadb.conf.d/50-server.cnf.
       mariadb_service:
         type: dict
         required: false
