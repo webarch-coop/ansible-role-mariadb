@@ -167,7 +167,7 @@
       vars:  # noqa var-naming[no-role-prefix]
         mariadb: true
         mariadb_database: ansible
-        mariadb_socket: /run/mariadbd/mysqld.sock
+        mariadb_socket: /run/mysqld/mysqld.sock
         mariadb_underscore_autoupdate: true
         mariadb_username: ansible
         mariadb_config:
