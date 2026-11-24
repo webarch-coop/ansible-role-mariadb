@@ -331,25 +331,32 @@
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
         fail_msg: "The {{ mariadb_defaults.socket }} path should exist and be a socket."
 
-    - name: Debug mariadb_defaults.datadir[0]
-      ansible.builtin.debug:
-        var: mariadb_defaults.datadir[0]
-        verbosity: "{% if ansible_check_mode | bool %}3{% else %}4{% endif %}"
-      tags:
-        - debug
+    - name: Check the datadir when it is defined
+      block:
 
-    - name: Check the MariaDB defaults datadir path
-      ansible.builtin.stat:
-        path: "{{ mariadb_defaults.datadir[0] }}"
-      register: mariadb_defaults_datadir
+        - name: Debug mariadb_defaults.datadir[0]
+          ansible.builtin.debug:
+            var: mariadb_defaults.datadir[0]
+            verbosity: "{% if ansible_check_mode | bool %}3{% else %}4{% endif %}"
+          tags:
+            - debug
 
-    - name: The MariaDB defaults datadir path should exist and be a directory
-      ansible.builtin.assert:
-        that:
-          - mariadb_defaults_datadir.stat.exists | ansible.builtin.bool
-          - mariadb_defaults_datadir.stat.isdir | ansible.builtin.bool
-        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
-        fail_msg: "The {{ mariadb_defaults.datadir[0] }} path should exist and be a directory."
+        - name: Check the MariaDB defaults datadir path
+          ansible.builtin.stat:
+            path: "{{ mariadb_defaults.datadir[0] }}"
+          register: mariadb_defaults_datadir
+
+        - name: The MariaDB defaults datadir path should exist and be a directory
+          ansible.builtin.assert:
+            that:
+              - mariadb_defaults_datadir.stat.exists | ansible.builtin.bool
+              - mariadb_defaults_datadir.stat.isdir | ansible.builtin.bool
+            quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+            fail_msg: "The {{ mariadb_defaults.datadir[0] }} path should exist and be a directory."
+
+      when:
+        - mariadb_defaults.datadir is ansible.builtin.defined
+        - mariadb_defaults.datadir[0] is ansible.builtin.defined
 
     - name: Check that all the MariaDB config file paths start with /etc/mysql
       ansible.builtin.assert:
