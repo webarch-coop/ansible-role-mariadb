@@ -25,6 +25,8 @@ mariadb_jpq:
   pref: "Modules.Performance"
   recs: '"Recommendations"'
   sec: "Modules.Security"
+  server_conf: "[?path=='/etc/mysql/mariadb.conf.d/50-server.cnf'].conf|[0]"
+  server_cnf_path: "[?path=='/etc/mysql/mariadb.conf.d/50-server.cnf'].path|[0]"
   service: 'ansible_facts.services.["mariadb.service"]|[0]'
   systemd_path: "[].files[].path"
   users: "[].username"

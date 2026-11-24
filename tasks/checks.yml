@@ -63,6 +63,188 @@
       tags:
         - debug
 
+    - name: Check section names in /etc/mysql/mariadb.conf.d/50-server.cnf
+      block:
+
+        - name: Slurp /etc/mysql/mariadb.conf.d/50-server.cnf
+          ansible.builtin.slurp:
+            src: /etc/mysql/mariadb.conf.d/50-server.cnf
+          register: mariadb_server_cnf_b64encoded
+
+        - name: Decode the base64 encoded version of /etc/mysql/mariadb.conf.d/50-server.cnf
+          ansible.builtin.set_fact:
+            mariadb_server_cnf_contents: >-
+              {{ mariadb_server_cnf_b64encoded['content'] | ansible.builtin.b64decode | ansible.builtin.trim }}
+
+        - name: Debug mariadb_server_cnf_contents
+          ansible.builtin.debug:
+            var: mariadb_server_cnf_contents
+            verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+          tags:
+            - debug
+
+        - name: Set a variable for the contents of /etc/mysql/mariadb.conf.d/50-server.cnf
+          ansible.builtin.set_fact:
+            mariadb_server_cnf: "{{ mariadb_server_cnf_contents | community.general.jc('ini') }}"
+
+        - name: Debug mariadb_server_cnf
+          ansible.builtin.debug:
+            var: mariadb_server_cnf
+            verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+          tags:
+            - debug
+
+        - name: Debug section names in /etc/mysql/mariadb.conf.d/50-server.cnf
+          ansible.builtin.debug:
+            msg: "{{ mariadb_server_cnf.keys() }}"
+          tags:
+            - debug
+
+        - name: Debug the number of section names in /etc/mysql/mariadb.conf.d/50-server.cnf
+          ansible.builtin.debug:
+            msg: "{{ mariadb_server_cnf.keys() | ansible.builtin.length }}"
+          tags:
+            - debug
+
+        - name: Debug section names in mariadb_config for the file /etc/mysql/mariadb.conf.d/50-server.cnf
+          ansible.builtin.debug:
+            msg: "{{ (mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys() }}"
+          tags:
+            - debug
+
+        - name: "Check that the first section name in /etc/mysql/mariadb.conf.d/50-server.cnf matches that in mariadb_config"
+          ansible.builtin.assert:
+            that:
+              - (((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys())[0]) is ansible.builtin.defined
+              - >-
+                ((mariadb_server_cnf.keys())[0]) ==
+                (((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys())[0])
+            quiet: "{% if ansible_verbosity < 3 %}true{% else %}false{% endif %}"
+            fail_msg: >-
+              The first section in the /etc/mysql/mariadb.conf.d/50-server.cnf file is {{ (mariadb_server_cnf.keys())[0] }}
+              this should match the first section in mariadb_config,
+              {% if ((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys()) | ansible.builtin.length >= 1 -%}
+              but that contains {{ (((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys())[0]) }}.
+              {% else -%}
+              but that is not defined.
+              {%- endif -%}
+          when: mariadb_server_cnf.keys() | ansible.builtin.length >= 1
+
+        - name: "Check that the second section name in /etc/mysql/mariadb.conf.d/50-server.cnf match that in mariadb_config"
+          ansible.builtin.assert:
+            that:
+              - (((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys())[1]) is ansible.builtin.defined
+              - >-
+                ((mariadb_server_cnf.keys())[1]) ==
+                (((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys())[1])
+            quiet: "{% if ansible_verbosity < 3 %}true{% else %}false{% endif %}"
+            fail_msg: >-
+              The second section in the /etc/mysql/mariadb.conf.d/50-server.cnf file is {{ (mariadb_server_cnf.keys())[1] }} and this
+              should match the second section in mariadb_config,
+              {% if ((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys()) | ansible.builtin.length >= 2 -%}
+              but that contains {{ (((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys())[1]) }}.
+              {% else -%}
+              but that is not defined.
+              {%- endif -%}
+          when: mariadb_server_cnf.keys() | ansible.builtin.length >= 2
+
+        - name: "Check that the third section name in /etc/mysql/mariadb.conf.d/50-server.cnf match that in mariadb_config"
+          ansible.builtin.assert:
+            that:
+              - (((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys())[2]) is ansible.builtin.defined
+              - >-
+                ((mariadb_server_cnf.keys())[2]) ==
+                (((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys())[2])
+            quiet: "{% if ansible_verbosity < 3 %}true{% else %}false{% endif %}"
+            fail_msg: >-
+              The third section in the /etc/mysql/mariadb.conf.d/50-server.cnf file is {{ (mariadb_server_cnf.keys())[2] }} and this
+              should match the third section in mariadb_config,
+              {% if ((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys()) | ansible.builtin.length >= 3 -%}
+              but that contains {{ (((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys())[2]) }}.
+              {% else -%}
+              but that is not defined.
+              {%- endif -%}
+          when: mariadb_server_cnf.keys() | ansible.builtin.length >= 3
+
+        - name: "Check that the fourth section name in /etc/mysql/mariadb.conf.d/50-server.cnf match that in mariadb_config"
+          ansible.builtin.assert:
+            that:
+              - (((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys())[3]) is ansible.builtin.defined
+              - >-
+                ((mariadb_server_cnf.keys())[3]) ==
+                (((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys())[3])
+            quiet: "{% if ansible_verbosity < 3 %}true{% else %}false{% endif %}"
+            fail_msg: >-
+              The forth section in the /etc/mysql/mariadb.conf.d/50-server.cnf file is {{ (mariadb_server_cnf.keys())[3] }} and this
+              should match the forth section in mariadb_config,
+              {% if ((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys()) | ansible.builtin.length >= 4 -%}
+              but that contains {{ (((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys())[3]) }}.
+              {% else -%}
+              but that is not defined.
+              {%- endif -%}
+          when: mariadb_server_cnf.keys() | ansible.builtin.length >= 4
+
+        - name: "Check that the fifth section name in /etc/mysql/mariadb.conf.d/50-server.cnf match that in mariadb_config"
+          ansible.builtin.assert:
+            that:
+              - (((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys())[4]) is ansible.builtin.defined
+              - >-
+                ((mariadb_server_cnf.keys())[4]) ==
+                (((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys())[4])
+            quiet: "{% if ansible_verbosity < 3 %}true{% else %}false{% endif %}"
+            fail_msg: >-
+              The fifth section in the /etc/mysql/mariadb.conf.d/50-server.cnf file is {{ (mariadb_server_cnf.keys())[4] }} and this
+              should match the fifth section in mariadb_config,
+              {% if ((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys()) | ansible.builtin.length >= 5 -%}
+              but that contains {{ (((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys())[4]) }}.
+              {% else -%}
+              but that is not defined.
+              {%- endif -%}
+          when: mariadb_server_cnf.keys() | ansible.builtin.length >= 5
+
+        - name: "Check that the sixth section name in /etc/mysql/mariadb.conf.d/50-server.cnf match that in mariadb_config"
+          ansible.builtin.assert:
+            that:
+              - (((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys())[5]) is ansible.builtin.defined
+              - >-
+                ((mariadb_server_cnf.keys())[5]) ==
+                (((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys())[5])
+            quiet: "{% if ansible_verbosity < 3 %}true{% else %}false{% endif %}"
+            fail_msg: >-
+              The sixth section in the /etc/mysql/mariadb.conf.d/50-server.cnf file is {{ (mariadb_server_cnf.keys())[5] }} and this
+              should match the sixth section in mariadb_config,
+              {% if ((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys()) | ansible.builtin.length >= 6 -%}
+              but that contains {{ (((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys())[5]) }}.
+              {% else -%}
+              but that is not defined.
+              {%- endif -%}
+          when: mariadb_server_cnf.keys() | ansible.builtin.length >= 6
+
+        - name: "Check that the seventh section name in /etc/mysql/mariadb.conf.d/50-server.cnf match that in mariadb_config"
+          ansible.builtin.assert:
+            that:
+              - (((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys())[6]) is ansible.builtin.defined
+              - >-
+                ((mariadb_server_cnf.keys())[6]) ==
+                (((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys())[6])
+            quiet: "{% if ansible_verbosity < 3 %}true{% else %}false{% endif %}"
+            fail_msg: >-
+              The seventh section in the /etc/mysql/mariadb.conf.d/50-server.cnf file is {{ (mariadb_server_cnf.keys())[6] }} and this
+              should match the seventh section in mariadb_config,
+              {% if ((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys()) | ansible.builtin.length >= 7 -%}
+              but that contains {{ (((mariadb_config | community.general.json_query(mariadb_jpq.server_conf)).keys())[6]) }}.
+              {% else -%}
+              but that is not defined.
+              {%- endif -%}
+          when: mariadb_server_cnf.keys() | ansible.builtin.length >= 7
+
+      when:
+        - mariadb_config is ansible.builtin.defined
+        - mariadb_config != []
+        - mariadb_config | community.general.json_query(mariadb_jpq.server_cnf_path) is ansible.builtin.defined
+        - mariadb_config | community.general.json_query(mariadb_jpq.server_cnf_path) | ansible.builtin.type_debug == "str"
+        - mariadb_config | community.general.json_query(mariadb_jpq.server_cnf_path) == "/etc/mysql/mariadb.conf.d/50-server.cnf"
+
     - name: Run my_print_defaults --help
       ansible.builtin.command:
         cmd: my_print_defaults --help
@@ -73,11 +255,11 @@
     - name: Set a fact for the arguments available for my_print_defaults
       ansible.builtin.set_fact:
         mariadb_my_print_defaults_options: >-
-          {{ mariadb_my_print_defaults_help.stdout_lines |
-          select('regex', '^  -.*$') |
-          map('regex_replace', ',.*$') |
-          map('trim') |
-          map('regex_replace', '[ ].*$') }}
+          {{ mariadb_my_print_defaults_help.stdout_lines
+          | ansible.builtin.select('ansible.builtin.regex', '^  -.*$')
+          | ansible.builtin.map('ansible.builtin.regex_replace', ',.*$')
+          | ansible.builtin.map('ansible.builtin.trim')
+          | ansible.builtin.map('ansible.builtin.regex_replace', '[ ].*$') }}
 
     - name: Debug my_print_defaults options
       ansible.builtin.debug:
@@ -86,87 +268,93 @@
       tags:
         - debug
 
-    - name: Run my_print_defaults
+    - name: Run my_print_defaults --mariadbd
       ansible.builtin.command:
-        cmd: >-
-          my_print_defaults
-          {% if "--mariadbd" in mariadb_my_print_defaults_options %}
-          --mariadbd
-          {% else %}
-          --mysqld
-          {% endif -%}
+        cmd: "my_print_defaults {{ mariadb_my_print_defaults_database_flag }}"
+      vars:
+        mariadb_my_print_defaults_database_flag: >-
+          {{ '--mariadbd' if ('--mariadbd' in mariadb_my_print_defaults_options) else '--mysqld' }}
       check_mode: false
       changed_when: false
       register: mariadb_my_print_mysqld_defaults
 
-    - name: Debug mariadb_my_print_mysqld_defaults.stdout
+    - name: Debug mariadb_my_print_mysqld_defaults.stdout_lines
       ansible.builtin.debug:
-        var: mariadb_my_print_mysqld_defaults.stdout
+        var: mariadb_my_print_mysqld_defaults.stdout_lines
         verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
       tags:
         - debug
 
     - name: Set facts for the my_print_defaults results
       ansible.builtin.set_fact:
-        mariadb_mysqld_defaults_lines: "{{ mariadb_my_print_mysqld_defaults.stdout_lines | map('regex_replace', '^[-]{2}') | sort }}"
-        mariadb_mysqld_defaults_variables: "{{ mariadb_my_print_mysqld_defaults.stdout_lines | map('regex_replace', '^[-]{2}') | map('regex_replace', '=.*$') | sort }}"
-
-    - name: Debug mariadb_mysqld_defaults_lines
-      ansible.builtin.debug:
-        var: mariadb_mysqld_defaults_lines
-        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
-      tags:
-        - debug
-
-    - name: Debug mariadb_mysqld_defaults_variables
-      ansible.builtin.debug:
-        var: mariadb_mysqld_defaults_variables
-        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
-      tags:
-        - debug
-
-    - name: Check that no variables are duplicated
-      ansible.builtin.assert:
-        that:
-          - mariadb_mysqld != ansible_loop.nextitem
-        quiet: "{% if ansible_verbosity < 3 %}true{% else %}false{% endif %}"
-        fail_msg: "The MariaDB variable {{ mariadb_mysqld }} is duplicated in the settings returned with `my_print_defaults --mariadbd`"
-      when:
-        - not ansible_loop.last
-        - mariadb_mysqld != "plugin_load_add"
-      loop: "{{ mariadb_mysqld_defaults_variables }}"
-      loop_control:
-        extended: true
-        label: "{{ mariadb_mysqld }}"
-        loop_var: mariadb_mysqld
-
-    - name: Set a fact for the my_print_defaults results
-      ansible.builtin.set_fact:
-        mariadb_defaults: "{{ mariadb_my_print_mysqld_defaults.stdout_lines | map('regex_replace', '^[-]{2}') | sort | join('\n') | community.general.jc('ini') }}"
+        mariadb_defaults: >-
+          {{ mariadb_my_print_mysqld_defaults.stdout
+          | ansible.builtin.regex_replace('[-]{2}')
+          | community.general.jc('ini_dup') }}
 
     - name: Debug mariadb_defaults
       ansible.builtin.debug:
         var: mariadb_defaults
-        verbosity: "{% if ansible_check_mode | bool %}1{% else %}2{% endif %}"
+        verbosity: "{% if ansible_check_mode | bool %}3{% else %}4{% endif %}"
+      tags:
+        - debug
+
+    - name: Debug mariadb_defaults.socket[0]
+      ansible.builtin.debug:
+        var: mariadb_defaults.socket[0]
+        verbosity: "{% if ansible_check_mode | bool %}3{% else %}4{% endif %}"
       tags:
         - debug
 
     - name: Check that the MariaDB defaults socket path matches the specified socket path
       ansible.builtin.assert:
         that:
-          - mariadb_defaults.socket is defined
-          - mariadb_defaults.socket == mariadb_socket
+          - mariadb_defaults.socket[0] is defined
+          - mariadb_defaults.socket[0] == mariadb_socket
         quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
         fail_msg: >-
           This role depends on the Debian default of socket authentication for the root user using the default
-          socket path of /run/mysqld/mysqld.sock, please ensure that the socket path in the default variables
+          socket path of {{ mariadb_socket }}, please ensure that the socket path in the default variables
           for this role match the socket path specified in /etc/mysql/my.cnf. The mariadb_defaults.socket variable
-          is set to {{ mariadb_defaults.socket }} and mariadb_socket is set to {{ mariadb_socket }}.
+          is set to {{ mariadb_defaults.socket[0] }} and mariadb_socket is set to {{ mariadb_socket }}.
+
+    - name: Check the MariaDB defaults socket path
+      ansible.builtin.stat:
+        path: "{{ mariadb_defaults.socket[0] }}"
+      register: mariadb_defaults_socket
+
+    - name: The MariaDB defaults socket path should exist and be a socket
+      ansible.builtin.assert:
+        that:
+          - mariadb_defaults_socket.stat.exists | ansible.builtin.bool
+          - mariadb_defaults_socket.stat.issock | ansible.builtin.bool
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+        fail_msg: "The {{ mariadb_defaults.socket }} path should exist and be a socket."
+
+    - name: Debug mariadb_defaults.datadir[0]
+      ansible.builtin.debug:
+        var: mariadb_defaults.datadir[0]
+        verbosity: "{% if ansible_check_mode | bool %}3{% else %}4{% endif %}"
+      tags:
+        - debug
+
+    - name: Check the MariaDB defaults datadir path
+      ansible.builtin.stat:
+        path: "{{ mariadb_defaults.datadir[0] }}"
+      register: mariadb_defaults_datadir
+
+    - name: The MariaDB defaults datadir path should exist and be a directory
+      ansible.builtin.assert:
+        that:
+          - mariadb_defaults_datadir.stat.exists | ansible.builtin.bool
+          - mariadb_defaults_datadir.stat.isdir | ansible.builtin.bool
+        quiet: "{% if ansible_verbosity == 0 %}true{% else %}false{% endif %}"
+        fail_msg: "The {{ mariadb_defaults.datadir[0] }} path should exist and be a directory."
 
     - name: Check that all the MariaDB config file paths start with /etc/mysql
       ansible.builtin.assert:
         that:
-          - mariadb_config_file_path is regex(mariadb_regex.config_path)
+          - mariadb_config_file_path is ansible.builtin.regex(mariadb_regex.config_path)
         quiet: "{% if ansible_verbosity < 3 %}true{% else %}false{% endif %}"
       loop: "{{ mariadb_config | community.general.json_query(mariadb_jpq.config_path) }}"
       loop_control:

@@ -94,6 +94,10 @@ argument_specs:
         type: dict
         required: false
         description: Internal dictionary of the results of my_print_defaults --mariadbd converted into JSON usng the JC ini filter.
+      mariadb_defaults_socket:
+        type: dict
+        required: false
+        description: Internal dictionary of the results of ansible.builtin.stat on the MariaDB socket path.
       mariadb_etc_group_b64encoded:
         type: dict
         required: false
@@ -147,7 +151,7 @@ argument_specs:
       mariadb_jpq:
         type: dict
         required: true
-        description: Internal dictionary of JMESPath queries.
+        description: Dictionary of JMESPath queries.
         options:
           adjvars:
             type: str
@@ -182,6 +186,14 @@ argument_specs:
             required: true
             description: JMESPath query.
           sec:
+            type: str
+            required: true
+            description: JMESPath query.
+          server_conf:
+            type: str
+            required: true
+            description: JMESPath query.
+          server_cnf_path:
             type: str
             required: true
             description: JMESPath query.
@@ -392,6 +404,14 @@ argument_specs:
         type: dict
         required: false
         description: Internal result from the removal of the legacy mariadb_root.fact file.
+      mariadb_server_cnf_b64encoded:
+        type: dict
+        required: false
+        description: Internal result from running the ansible.builtin.slurp module on /etc/mysql/mariadb.conf.d/50-server.cnf.
+      mariadb_server_cnf_contents:
+        type: dict
+        required: false
+        description: Internal variable for the contents of /etc/mysql/mariadb.conf.d/50-server.cnf.
       mariadb_service:
         type: dict
         required: false
