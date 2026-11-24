@@ -90,6 +90,7 @@
                 tmp_table_size: "32M"
                 transaction_isolation: "READ-COMMITTED"
               embedded: {}
+              mariadb: {}
               "mariadb-10.11": {}
           - name: MariaDB mysqldump configuration
             path: /etc/mysql/conf.d/mysqldump.cnf
