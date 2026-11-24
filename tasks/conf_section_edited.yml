@@ -25,12 +25,20 @@
       tags:
         - debug
 
+    - name: Debug mariadb_cnf_file_section_existing_jpq
+      ansible.builtin.debug:
+        var: mariadb_cnf_file_section_existing_jpq
+      vars:
+        mariadb_cnf_file_section_existing_jpq: >-
+          "{{ mariadb_cnf_section['key'] }}"
+
     - name: "Set a facts for the existing sections and value of section {{ mariadb_cnf_section['key'] }}"
       ansible.builtin.set_fact:
         mariadb_cnf_file_existing_sections: "{{ mariadb_cnf_file_existing_vars.keys() }}"
         mariadb_cnf_file_existing_section: "{{ mariadb_cnf_file_existing_vars | community.general.json_query(mariadb_cnf_file_section_existing_jpq) }}"
       vars:
-        mariadb_cnf_file_section_existing_jpq: "{{ mariadb_cnf_section['key'] }}"
+        mariadb_cnf_file_section_existing_jpq: >-
+          "{{ mariadb_cnf_section['key'] }}"
 
     - name: Debug mariadb_cnf_file_existing_sections
       ansible.builtin.debug:
