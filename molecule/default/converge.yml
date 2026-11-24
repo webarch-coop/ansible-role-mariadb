@@ -49,6 +49,52 @@
         mariadb_socket: /run/mariadbd/mysqld.sock
         mariadb_underscore_autoupdate: true
         mariadb_username: ansible
+        mariadb_config:
+          - name: MariaDB client configuration
+            path: /etc/mysql/mariadb.conf.d/50-client.cnf
+            state: edited
+            conf:
+              client:
+                default_character_set: utf8mb4
+                socket: "{{ mariadb_socket }}"
+          - name: MariaDB server configuration
+            path: /etc/mysql/mariadb.conf.d/50-server.cnf
+            state: edited
+            conf:
+              mariadbd:
+                binlog_format: "ROW"
+                character_set_server: utf8mb4
+                collation_server: utf8mb4_unicode_ci
+                ignore_db_dirs: "lost+found"
+                init_connect: "SET NAMES utf8mb4"
+                innodb_buffer_pool_instances: "1"
+                innodb_buffer_pool_size: "256M"
+                innodb_log_file_size: "64M"
+                join_buffer_size: "8M"
+                key_buffer_size: "16M"
+                max_allowed_packet: "64M"
+                max_connections: "80"
+                max_heap_table_size: "32M"
+                max_user_connections: "0"
+                open_files_limit: "122880"
+                performance_schema: "1"
+                query_cache_limit: "0"
+                query_cache_size: "0"
+                query_cache_type: "0"
+                skip_name_resolve:
+                slow_query_log_file: "/var/log/mysql/mariadb-slow.log"
+                table_cache: "64"
+                table_open_cache: "4000"
+                thread_concurrency: "10"
+                tmp_table_size: "32M"
+                transaction_isolation: "READ-COMMITTED"
+          - name: MariaDB mysqldump configuration
+            path: /etc/mysql/conf.d/mysqldump.cnf
+            state: present
+            conf:
+              mysqldump:
+                default_character_set: utf8mb4
+                max_allowed_packet: "64M"
       when: ansible_facts.distribution_release == "forky"
 
     - name: Include MariaDB role verify argument spec tasks

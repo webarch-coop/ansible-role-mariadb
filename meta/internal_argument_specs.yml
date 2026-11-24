@@ -253,6 +253,10 @@ argument_specs:
         type: dict
         required: false
         description: Internal results from checking out mysqltuner git repo.
+      mariadb_mysqltuner_git_version:
+        type: str
+        required: false
+        description: The git version of the MySQLTuner code required.
       mariadb_mysqltuner_headers:
         type: dict
         required: false

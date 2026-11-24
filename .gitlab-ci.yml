@@ -43,13 +43,12 @@ before_script:
   - ansible-galaxy collection list
 stages:
   - lint
+  # See https://git.coop/webarch/mariadb/-/jobs/141244 for forky debugging -- the socket path
+  - forky
   - bookworm
   - noble
   - trixie
   - resolute
-  # See https://git.coop/webarch/mariadb/-/jobs/141244 for forky debugging -- the socket path
-  # is now /run/mariadbd/mysqld.sock
-  # - forky
 lint:
   image: registry.git.coop/webarch/containers/images/trixie:20261107
   stage: lint
@@ -61,16 +60,16 @@ bookworm:
   stage: bookworm
   script:
     - molecule test
-# forky:
-#   image: registry.git.coop/webarch/containers/images/forky:20261107
-#   stage: forky
-#   script:
-#     - apt update
-#     - apt install -y mariadb-server
-#     - dpkg -L mariadb-server
-#     - cat /etc/mysql/mariadb.conf.d/50-server.cnf
-#     - cat /usr/lib/systemd/system/mariadb.socket
-#     # - molecule test
+forky:
+  image: registry.git.coop/webarch/containers/images/forky:20261107
+  stage: forky
+  script:
+    # - apt update
+    # - apt install -y mariadb-server
+    # - dpkg -L mariadb-server
+    # - cat /etc/mysql/mariadb.conf.d/50-server.cnf
+    # - cat /usr/lib/systemd/system/mariadb.socket
+    - molecule test
 noble:
   image: registry.git.coop/webarch/containers/images/noble:20261107
   stage: noble
