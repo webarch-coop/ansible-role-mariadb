@@ -94,8 +94,9 @@
         molecule_mysqltuner_fragmented_tables: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(molecule_jpq.fragtabs) }}"
         molecule_mysqltuner_performance: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(molecule_jpq.pref) }}"
         molecule_mysqltuner_recommendations: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(molecule_jpq.recs) }}"
-        molecule_mysqltuner_security: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(molecule_jpq.sec) }}"
         molecule_mysqltuner_results: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json }}"
+        molecule_mysqltuner_security: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(molecule_jpq.sec) }}"
+        molecule_mysqltuner_socket: "{{ molecule_mysqltuner_command.stdout | ansible.builtin.from_json | community.general.json_query(molecule_jpq.sock) }}"
       vars:
         molecule_jpq:
           adjvars: 'AdjustVariables'
@@ -106,6 +107,7 @@
           tunerver: "[?distro=='{{ ansible_facts.distribution_release }}'].version|[0]"
           recs: '"Recommendations"'
           sec: "Modules.Security"
+          sock: "Variables.socket"
           users: "[].username"
 
     - name: Print mysqltuner full results when running with -v
@@ -142,7 +144,7 @@
       when:
         - molecule_mysqltuner_cve.List is defined
 
-    - name: "Query the MariaDB databases, users and version using socket {{ mariadb_socket }}"
+    - name: "Query the MariaDB databases, users and version using socket {{ molecule_mysqltuner_socket }}"
       ansible.mariadb.mariadb_info:
         filter:
           - databases
@@ -150,7 +152,7 @@
           - version
         return_empty_dbs: true
         login_user: root
-        login_unix_socket: "{{ mariadb_socket }}"
+        login_unix_socket: "{{ molecule_mysqltuner_socket }}"
       register: molecule_mariadb_info
 
     - name: Debug MariaDB info
