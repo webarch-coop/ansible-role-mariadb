@@ -105,9 +105,27 @@
       tags:
         - debug
 
+    - name: Debug mariadb_cnf_section['key']
+      ansible.builtin.debug:
+        var: mariadb_cnf_section['key']
+
+    - name: Debug mariadb_cnf_file_section_proposed_value_less_keys
+      ansible.builtin.debug:
+        var: mariadb_cnf_file_section_proposed_value_less_keys
+
+    - name: Debug loop
+      ansible.builtin.debug:
+        var: mariadb_cnf_variable_pair['key']
+      when: mariadb_cnf_variable_pair.value | type_debug == 'NoneType'
+      loop: "{{ mariadb_cnf_section.value | ansible.builtin.dict2items }}"
+      loop_control:
+        loop_var: mariadb_cnf_variable_pair
+        label: "{{ mariadb_cnf_variable_pair['key'] }}"
+
     - name: "Set a fact for the proposed variables without values for section {{ mariadb_cnf_section['key'] }}"
       ansible.builtin.set_fact:
-        mariadb_cnf_file_section_proposed_value_less_keys: "{{ mariadb_cnf_file_section_proposed_value_less_keys + [mariadb_cnf_variable_pair['key']] }}"
+        mariadb_cnf_file_section_proposed_value_less_keys: >-
+          {{ mariadb_cnf_file_section_proposed_value_less_keys + [mariadb_cnf_variable_pair['key']] }}
       when: mariadb_cnf_variable_pair.value | type_debug == 'NoneType'
       loop: "{{ mariadb_cnf_section.value | ansible.builtin.dict2items }}"
       loop_control:
