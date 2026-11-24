@@ -21,6 +21,7 @@ mariadb_config:
     path: /etc/mysql/mariadb.conf.d/50-server.cnf
     state: edited
     conf:
+      # For Trixie and Forky this should be a mariadbd section
       mysqld:
         binlog_format: "ROW"
         character_set_server: utf8mb4

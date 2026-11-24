@@ -142,7 +142,7 @@
       when:
         - molecule_mysqltuner_cve.List is defined
 
-    - name: Query the MariaDB databases, users and version using a socket
+    - name: "Query the MariaDB databases, users and version using socket {{ mariadb_socket }}"
       ansible.mariadb.mariadb_info:
         filter:
           - databases
@@ -150,7 +150,7 @@
           - version
         return_empty_dbs: true
         login_user: root
-        login_unix_socket: /run/mysqld/mysqld.sock
+        login_unix_socket: "{{ mariadb_socket }}"
       register: molecule_mariadb_info
 
     - name: Debug MariaDB info
